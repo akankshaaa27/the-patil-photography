@@ -21,6 +21,7 @@ const buildMongoUri = () => {
 export const connectDB = async () => {
   try {
     const mongoUri = buildMongoUri();
+    console.log("🔗 Connecting to MongoDB with URI:", mongoUri.replace(/:([^@]+)@/, ":****@"));
     if (!mongoUri) {
       throw new Error(
         "MongoDB connection settings are missing. Provide MONGODB_URI or MONGODB_USERNAME/MONGODB_PASSWORD in your environment."
@@ -50,8 +51,8 @@ export const connectDB = async () => {
     });
 
     await mongoose.connect(mongoUri, {
-      // Hardcoded to "photograper" to match the actual MongoDB database name
-      dbName: "photograper",
+      // Use DATABASE_NAME from environment or fallback to "the-patil-photography"
+      dbName: process.env.DATABASE_NAME || "the-patil-photography",
       retryWrites: true,
       w: "majority",
     });
