@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Image as ImageIcon, ChevronUp, ChevronDown } from "lucide-react";
+import { Plus, Pencil, Trash2, Image as ImageIcon, ChevronUp, ChevronDown, GripVertical, ArrowUp, ArrowDown } from "lucide-react";
 import Skeleton from "../components/Skeleton";
 import PageHeader from "../components/PageHeader";
 
@@ -86,27 +86,7 @@ export default function AdminSlider() {
     }
   };
 
-  // Move slide up/down by swapping order with neighbor
-  const updateOrders = async (updates) => {
-    try {
-      // updates: [{ id, order }, ...]
-      await Promise.all(
-        updates.map((u) =>
-          fetch(`/api/slider/${u.id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ order: u.order }),
-          })
-        )
-      );
-      queryClient.invalidateQueries({ queryKey: ["slider"] });
-      toast.success("Order updated");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to update order");
-    }
-  };
-
+  // Move slide up/down by reordering - optimistic update
   const move = (id, dir) => {
     // dir: -1 up, +1 down
     const list = [...sliders];
@@ -115,16 +95,43 @@ export default function AdminSlider() {
     const targetIdx = idx + dir;
     if (targetIdx < 0 || targetIdx >= list.length) return;
 
-    const a = list[idx];
-    const b = list[targetIdx];
+    // Swap items in array
+    [list[idx], list[targetIdx]] = [list[targetIdx], list[idx]];
 
-    // Swap their order values
-    const updates = [
-      { id: a._id, order: b.order || targetIdx + 1 },
-      { id: b._id, order: a.order || idx + 1 },
-    ];
+    // Update all affected items with new order value
+    const updates = list.map((slider, i) => ({
+      id: slider._id,
+      order: i,
+    }));
 
-    updateOrders(updates);
+    // Optimistic update - invalidate to refresh UI immediately
+    try {
+      queryClient.setQueryData(["slider"], (old) => {
+        return old.map((s) => {
+          const update = updates.find(u => u.id === s._id);
+          return update ? { ...s, order: update.order } : s;
+        });
+      });
+
+      // Send updates to API (fire and forget with error handling)
+      Promise.all(
+        updates.map((u) =>
+          fetch(`/api/slider/${u.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ order: u.order }),
+          })
+        )
+      ).catch(() => {
+        queryClient.invalidateQueries({ queryKey: ["slider"] });
+        toast.error("Failed to update order");
+      });
+
+      toast.success("Order updated");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update order");
+    }
   };
 
   return (
@@ -183,35 +190,52 @@ export default function AdminSlider() {
                     <p className="text-sm text-gray-500 mt-0.5">Order: {slider.order}</p>
                   </div>
 
-                  <div className="flex justify-end gap-2 pt-1">
-                    <button
-                      onClick={() => move(slider._id, -1)}
-                      disabled={sliders[0]._id === slider._id}
-                      title="Move up"
-                      className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200"
-                    >
-                      <ChevronUp size={18} />
-                    </button>
-                    <button
-                      onClick={() => move(slider._id, 1)}
-                      disabled={sliders[sliders.length - 1]._id === slider._id}
-                      title="Move down"
-                      className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200"
-                    >
-                      <ChevronDown size={18} />
-                    </button>
-                    <button
-                      onClick={() => { setForm({ id: slider._id, title: slider.title, subtitle: slider.subtitle || "", image: slider.image, status: slider.status, order: slider.order }); setModalOpen(true); }}
-                      className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-gray-200"
-                    >
-                      <Pencil size={18} />
-                    </button>
-                    <button
-                      onClick={() => setDeleteId(slider._id)}
-                      className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-gray-200"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                  <div className="flex justify-between items-center pt-3 gap-2">
+                    <div className="flex items-center gap-3">
+                      {/* Position Badge */}
+                      <div className="flex items-center gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-2 rounded-lg border border-blue-200">
+                        <GripVertical size={16} className="text-blue-600" />
+                        <span className="text-sm font-bold text-blue-700">{sliders.indexOf(slider) + 1}/{sliders.length}</span>
+                      </div>
+                      
+                      {/* Order Control Buttons */}
+                      <div className="flex gap-1.5 bg-gray-100 p-1 rounded-lg">
+                        <button
+                          onClick={() => move(slider._id, -1)}
+                          disabled={sliders[0]._id === slider._id}
+                          title="Move up"
+                          className="p-2 text-gray-600 hover:text-white hover:bg-green-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-md transition-all duration-200 flex items-center justify-center"
+                        >
+                          <ArrowUp size={16} />
+                        </button>
+                        <button
+                          onClick={() => move(slider._id, 1)}
+                          disabled={sliders[sliders.length - 1]._id === slider._id}
+                          title="Move down"
+                          className="p-2 text-gray-600 hover:text-white hover:bg-orange-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-md transition-all duration-200 flex items-center justify-center"
+                        >
+                          <ArrowDown size={16} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Edit & Delete Buttons */}
+                    <div className="flex gap-1.5">
+                      <button
+                        onClick={() => { setForm({ id: slider._id, title: slider.title, subtitle: slider.subtitle || "", image: slider.image, status: slider.status, order: slider.order }); setModalOpen(true); }}
+                        className="p-2 text-gray-600 hover:text-white hover:bg-blue-500 rounded-lg transition-all duration-200"
+                        title="Edit"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        onClick={() => setDeleteId(slider._id)}
+                        className="p-2 text-gray-600 hover:text-white hover:bg-red-500 rounded-lg transition-all duration-200"
+                        title="Delete"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -226,7 +250,6 @@ export default function AdminSlider() {
               <tr>
                 <th className="p-4 border-b">Image</th>
                 <th className="p-4 border-b">Title</th>
-                <th className="p-4 border-b">Order</th>
                 <th className="p-4 border-b">Status</th>
                 <th className="p-4 border-b text-right">Actions</th>
               </tr>
@@ -250,7 +273,7 @@ export default function AdminSlider() {
                   </tr>
                 ))
               ) : sliders.length === 0 ? (
-                <tr><td colSpan={5} className="p-8 text-center text-gray-500">No slides found. Create one!</td></tr>
+                <tr><td colSpan={4} className="p-8 text-center text-gray-500">No slides found. Create one!</td></tr>
               ) : (
                 sliders.map((slider) => (
                   <tr key={slider._id} className="hover:bg-gray-50 transition-colors">
@@ -264,41 +287,53 @@ export default function AdminSlider() {
                       </div>
                     </td>
                     <td className="p-4 font-semibold text-gray-900">{slider.title}</td>
-                    <td className="p-4 text-gray-600">{slider.order}</td>
                     <td className="p-4">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${slider.status === "Active" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>
                         {slider.status}
                       </span>
                     </td>
                     <td className="p-4 text-right">
-                      <div className="inline-flex gap-2">
-                        <button
-                          onClick={() => move(slider._id, -1)}
-                          disabled={sliders[0]._id === slider._id}
-                          title="Move up"
-                          className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
-                        >
-                          <ChevronUp size={18} />
-                        </button>
-                        <button
-                          onClick={() => move(slider._id, 1)}
-                          disabled={sliders[sliders.length - 1]._id === slider._id}
-                          title="Move down"
-                          className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
-                        >
-                          <ChevronDown size={18} />
-                        </button>
+                      <div className="inline-flex items-center gap-3">
+                        {/* Position Badge with Drag Icon */}
+                        <div className="flex items-center gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-2 rounded-lg border border-blue-200 whitespace-nowrap">
+                          <GripVertical size={14} className="text-blue-600" />
+                          <span className="text-xs font-bold text-blue-700">{sliders.indexOf(slider) + 1}/{sliders.length}</span>
+                        </div>
+
+                        {/* Order Control Buttons */}
+                        <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+                          <button
+                            onClick={() => move(slider._id, -1)}
+                            disabled={sliders[0]._id === slider._id}
+                            title="Move up"
+                            className="p-2 text-gray-600 hover:text-white hover:bg-green-500 disabled:opacity-40 disabled:cursor-not-allowed rounded transition-all duration-200 flex items-center justify-center"
+                          >
+                            <ArrowUp size={14} />
+                          </button>
+                          <button
+                            onClick={() => move(slider._id, 1)}
+                            disabled={sliders[sliders.length - 1]._id === slider._id}
+                            title="Move down"
+                            className="p-2 text-gray-600 hover:text-white hover:bg-orange-500 disabled:opacity-40 disabled:cursor-not-allowed rounded transition-all duration-200 flex items-center justify-center"
+                          >
+                            <ArrowDown size={14} />
+                          </button>
+                        </div>
+
+                        {/* Edit & Delete Buttons */}
                         <button
                           onClick={() => { setForm({ id: slider._id, title: slider.title, subtitle: slider.subtitle || "", image: slider.image, status: slider.status, order: slider.order }); setModalOpen(true); }}
-                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="p-2 text-gray-600 hover:text-white hover:bg-blue-500 rounded transition-all duration-200"
+                          title="Edit"
                         >
-                          <Pencil size={18} />
+                          <Pencil size={14} />
                         </button>
                         <button
                           onClick={() => setDeleteId(slider._id)}
-                          className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2 text-gray-600 hover:text-white hover:bg-red-500 rounded transition-all duration-200"
+                          title="Delete"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </td>
@@ -397,7 +432,7 @@ export default function AdminSlider() {
               </div>
             </div>
 
-            <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-gray-100">
+            <div className="mt-4 flex justify-end gap-3 pt-4 border-t border-gray-100">
               <button onClick={() => setModalOpen(false)} className="px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
               <button
                 onClick={handleSave}

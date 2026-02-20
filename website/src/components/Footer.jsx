@@ -17,7 +17,9 @@ const Footer = () => {
     }
   };
 
-  const businessName = settings?.businessName || "The Patil Photography & Film's";
+  const businessName = settings?.businessName || "Photography";
+  // pick a logo appropriate for dark backgrounds; secondaryLogo is designed for footer/dark
+  const logoUrl = settings?.secondaryLogo || settings?.primaryLogo;
 
   return (
     <footer id="footer" className="footer dark-background">

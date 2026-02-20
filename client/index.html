@@ -26,6 +26,19 @@
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Photography Admin Dashboard</title>
+    <script>
+      // pre-React title override from settings
+      (function() {
+        try {
+          fetch('/api/settings')
+            .then(res => res.json())
+            .then(s => {
+              if (s && s.businessName) document.title = s.businessName + ' | Admin Console';
+            })
+            .catch(() => {});
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

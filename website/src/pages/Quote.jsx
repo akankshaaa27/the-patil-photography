@@ -6,6 +6,7 @@ import { useSettings } from '../hooks/useSettings';
 
 const Quote = () => {
   const { settings } = useSettings();
+  const businessName = settings?.businessName || "Photography";
   const [formData, setFormData] = useState({
     groomName: '',
     brideName: '',
@@ -113,7 +114,7 @@ const Quote = () => {
             <h2>Let's Create Something <br /> Beautiful Together</h2>
 
             <div className="text-left mx-auto mt-5" >
-              <p className="lead text-muted mb-3">Book your special wedding day with The Patil Photography.!</p>
+              <p className="lead text-muted mb-3">Book your special wedding day with {businessName}.</p>
               <p className="lead text-muted mb-3">We turn your most cherished moments into timeless memories. From heartfelt candid emotions to cinematic storytelling, every frame is captured with passion and creativity. Reserve your date today and let us make your big day truly unforgettable.</p>
               <p className="lead text-muted mb-3">Kindly complete the form below with as much detail as possible to help us provide an accurate quotation. We aim to respond within 48 hours.</p>
               <p className="lead text-muted mb-3">If you do not hear from us within this timeframe, or if your request is urgent, please feel free to contact us directly at the number provided below.</p>
@@ -175,7 +176,7 @@ const Quote = () => {
                           </div>
                           <div className="contact-detail">
                             <i className="bi bi-envelope-fill"></i>
-                            <span>quotes@thepatilphotography.com</span>
+                            <span>{settings?.contactEmail || 'quotes@photography.com'}</span>
                           </div>
                         </div>
                       </div>

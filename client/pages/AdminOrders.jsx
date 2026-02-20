@@ -57,6 +57,10 @@ export default function AdminOrders() {
   }, []);
 
   useEffect(() => {
+    fetchPhotographyTypes();
+  }, []);
+
+  useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowServiceDropdown(false);
@@ -332,16 +336,57 @@ export default function AdminOrders() {
 
   function addNewType() {
     if (!newType.trim()) return;
-    if (photographyTypes.includes(newType.trim())) {
+    const trimmed = newType.trim();
+    if (photographyTypes.includes(trimmed)) {
       alert("Type already exists");
       return;
     }
-    const updated = [...photographyTypes, newType.trim()];
-    setPhotographyTypes(updated);
-    localStorage.setItem("photographyTypes", JSON.stringify(updated));
-    setForm((f) => ({ ...f, photography_type: newType.trim() }));
-    setNewType("");
-    setShowTypeModal(false);
+
+    // Try persisting to server; fall back to localStorage if server unavailable
+    (async () => {
+      try {
+        const res = await fetch('/api/photography-types', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: trimmed }),
+        });
+        if (res.ok) {
+          const created = await res.json();
+          const updated = [...photographyTypes, created.name || trimmed];
+          setPhotographyTypes(updated);
+          setForm((f) => ({ ...f, photography_type: created.name || trimmed }));
+          localStorage.setItem("photographyTypes", JSON.stringify(updated));
+          setNewType("");
+          setShowTypeModal(false);
+          return;
+        }
+      } catch (err) {
+        // ignore and fallback to local
+      }
+
+      const updated = [...photographyTypes, trimmed];
+      setPhotographyTypes(updated);
+      localStorage.setItem("photographyTypes", JSON.stringify(updated));
+      setForm((f) => ({ ...f, photography_type: trimmed }));
+      setNewType("");
+      setShowTypeModal(false);
+    })();
+  }
+
+  async function fetchPhotographyTypes() {
+    try {
+      const res = await fetch('/api/photography-types');
+      if (!res.ok) throw new Error('No server types');
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        const names = data.map(t => t.name || t);
+        setPhotographyTypes(names);
+        localStorage.setItem('photographyTypes', JSON.stringify(names));
+      }
+    } catch (err) {
+      // keep local fallback
+      console.info('Photography types endpoint not available, using local list');
+    }
   }
 
   function addNewService() {

@@ -10,13 +10,30 @@ const Testimonials = () => {
   const [formData, setFormData] = useState({
     coupleName: "",
     location: "",
-    shortDescription: "",
+    fullDescription: "",
     rating: 5,
     thumbnail: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Helpers
+  const truncateText = (text, wordLimit = 50) => {
+    if (!text) return "";
+    const words = text.split(/\s+/).filter(Boolean);
+    if (words.length <= wordLimit) return text;
+    return words.slice(0, wordLimit).join(" ") + "...";
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const toggleExpandReview = (id) => {
+    setExpandedReviews((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   useEffect(() => {
     try {
@@ -39,30 +56,8 @@ const Testimonials = () => {
         setLoading(false);
       });
 
-    return () => (document.body.className = "");
+    return () => (document.body.className = '');
   }, []);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "rating" ? parseInt(value) : value,
-    }));
-  };
-
-  const truncateText = (text, wordLimit = 50) => {
-    if (!text) return text;
-    const words = text.split(' ');
-    if (words.length <= wordLimit) return text;
-    return words.slice(0, wordLimit).join(' ') + '...';
-  };
-
-  const toggleExpandReview = (reviewId) => {
-    setExpandedReviews(prev => ({
-      ...prev,
-      [reviewId]: !prev[reviewId]
-    }));
-  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (submitting) return;
@@ -90,7 +85,7 @@ const Testimonials = () => {
         setFormData({
           coupleName: "",
           location: "",
-          shortDescription: "",
+          fullDescription: "",
           rating: 5,
           thumbnail: "",
         });
@@ -222,12 +217,12 @@ const Testimonials = () => {
                   </div>
 
                   <div className="form-group">
-                    <label htmlFor="shortDescription" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1a1a1a' }}>Your Review *</label>
+                    <label htmlFor="fullDescription" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1a1a1a' }}>Your Review *</label>
                     <textarea
                       className="form-control"
-                      id="shortDescription"
-                      name="shortDescription"
-                      value={formData.shortDescription}
+                      id="fullDescription"
+                      name="fullDescription"
+                      value={formData.fullDescription}
                       onChange={handleInputChange}
                       placeholder="Share your experience with us..."
                       rows="5"
@@ -421,11 +416,11 @@ const Testimonials = () => {
                           flexGrow: 1,
                           fontStyle: 'italic'
                         }}>
-                          "{expandedReviews[review._id] ? review.shortDescription : truncateText(review.shortDescription)} "
+                          "{expandedReviews[review._id] ? (review.fullDescription || '') : truncateText(review.fullDescription || '')} "
                    
 
                         {/* View More Button */}
-                        {review.shortDescription && review.shortDescription.split(' ').length > 50 && (
+                        { review.fullDescription && review.fullDescription.split(' ').length > 50 && (
                           <button
                             onClick={() => toggleExpandReview(review._id)}
                             style={{
@@ -495,7 +490,7 @@ const Testimonials = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="cta-banner" style={{ backgroundColor: '#1a1a1a', color: 'white', padding: '80px 0', textAlign: 'center' }} data-aos="fade-up">
+        <section className="cta-banner" style={{ backgroundColor: '#1a1a1a', color: 'white', padding: '80px 0', textAlign: 'center' }} >
           <div className="container">
             <h2 style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '16px', color: '#fff' }}>Ready to Create Your Love Story?</h2>
             <p style={{ fontSize: '1.1rem', color: '#ccc', marginBottom: '32px' }}>Let us capture your special moments with the elegance they deserve.</p>

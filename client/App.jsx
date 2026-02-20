@@ -269,20 +269,20 @@ const AppShell = () => {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem onClick={() => navigate('/admin-profile')} className="cursor-pointer p-3 focus:bg-gold-50">
-                  <User className="mr-3 h-4 w-4 text-blue-500" />
-                  <span className="font-medium text-gray-700">My Profile</span>
+                  <User className="h-4 w-4 text-gray-500" />
+                  <span className="ml-6 font-medium text-gray-700">My Profile</span>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem onClick={() => setPasswordModalOpen(true)} className="cursor-pointer p-3 focus:bg-gold-50">
-                  <Key className="mr-3 h-4 w-4 text-blue-500" />
-                  <span className="font-medium text-gray-700">Change Password</span>
+                  <Key className="h-4 w-4 text-gray-500" />
+                  <span className="ml-6 font-medium text-gray-700">Change Password</span>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator className="my-2" />
 
                 <DropdownMenuItem onClick={handleLogout} className="cursor-pointer p-3 focus:bg-red-50">
-                  <LogOut className="mr-3 h-4 w-4 text-blue-500" />
-                  <span className="font-medium text-gray-700">Signout</span>
+                  <LogOut className="h-4 w-4 text-gray-500" />
+                  <span className="ml-6 font-medium text-gray-700">Signout</span>
                 </DropdownMenuItem>
 
               </DropdownMenuContent>

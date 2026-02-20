@@ -16,7 +16,6 @@ export default function AdminTestimonials() {
         coupleName: "",
         location: "",
         thumbnail: "",
-        shortDescription: "",
         fullDescription: "",
         rating: 5,
         displayOrder: 0,
@@ -138,7 +137,6 @@ export default function AdminTestimonials() {
             coupleName: "",
             location: "",
             thumbnail: "",
-            shortDescription: "",
             fullDescription: "",
             rating: 5,
             displayOrder: 0,
@@ -278,7 +276,7 @@ export default function AdminTestimonials() {
                                     </div>
 
                                     <p className="text-sm text-slate-600 line-clamp-2 bg-slate-50 p-2 rounded-lg italic">
-                                        "{t.shortDescription}"
+                                        "{t.fullDescription}"
                                     </p>
 
                                     <div className="flex items-center justify-between pt-2">
@@ -337,8 +335,8 @@ export default function AdminTestimonials() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <p className="truncate max-w-xs text-slate-600" title={t.fullDescription}>
-                                                {t.shortDescription}
-                                            </p>
+                                                    {t.fullDescription}
+                                                </p>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-0.5 text-amber-400">
@@ -491,21 +489,12 @@ export default function AdminTestimonials() {
                             </div>
 
                             {/* Full Width Inputs */}
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Short Review <span className="text-slate-400 text-xs">(For preview, max 200 chars)</span></label>
-                                <textarea
-                                    required
-                                    maxLength={200}
-                                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm h-20"
-                                    value={currentTestimonial.shortDescription}
-                                    onChange={e => setCurrentTestimonial({ ...currentTestimonial, shortDescription: e.target.value })}
-                                    placeholder="Brief highlight..."
-                                />
-                            </div>
+                            {/* Short Review removed — using Full Review only now */}
 
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Full Review</label>
                                 <textarea
+                                    required
                                     className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm h-32"
                                     value={currentTestimonial.fullDescription}
                                     onChange={e => setCurrentTestimonial({ ...currentTestimonial, fullDescription: e.target.value })}

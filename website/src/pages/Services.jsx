@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useSettings } from '../hooks/useSettings';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
@@ -42,6 +43,9 @@ const servicesList = [
 ];
 
 const Services = () => {
+  const { settings } = useSettings();
+  const businessName = settings?.businessName || "Photography";
+
   useEffect(() => {
     document.body.className = 'services-page';
     return () => {
@@ -72,7 +76,7 @@ const Services = () => {
             {/* Fresh Services Header */}
             <div className="services-header">
               <h2>Why Choose Our Services</h2>
-              <p>At The Patil Photography & Film's, we craft timeless stories filled with emotion, elegance, and authenticity</p>
+              <p>At {businessName}, we craft timeless stories filled with emotion, elegance, and authenticity</p>
             </div>
 
             {/* Modern Service Cards Grid */}

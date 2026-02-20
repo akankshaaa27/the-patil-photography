@@ -457,7 +457,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <p className="text-xs text-slate-600 line-clamp-2 italic mb-3 border-l-2 border-amber-200 pl-2">
-                      "{t.shortDescription}"
+                      "{t.fullDescription || ''}"
                     </p>
                     <div className="flex gap-2">
                       <button
@@ -542,8 +542,8 @@ export default function Dashboard() {
               </div>
 
               <div className="rounded-xl bg-slate-50 p-4">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Short Description</p>
-                <p className="text-sm text-slate-700 italic">"{selectedTestimonial.shortDescription}"</p>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Preview</p>
+                <p className="text-sm text-slate-700 italic">"{selectedTestimonial.fullDescription || ''}"</p>
               </div>
 
               {selectedTestimonial.fullDescription && (

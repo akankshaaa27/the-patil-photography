@@ -30,7 +30,20 @@
     </script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Patil Photography & Film's</title>
+    <title>Photography</title>
+    <script>
+      // attempt to update title ASAP by fetching settings before React loads
+      (function() {
+        try {
+          fetch('/api/settings')
+            .then(res => res.json())
+            .then(s => {
+              if (s && s.businessName) document.title = s.businessName;
+            })
+            .catch(() => {});
+        } catch (e) {}
+      })();
+    </script>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
