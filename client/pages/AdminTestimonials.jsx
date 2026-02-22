@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Trash2, Edit2, Plus, GripVertical, Star, AlertCircle, Search, ToggleLeft, ToggleRight, X } from "lucide-react";
+import { toast } from "sonner";
+import { Trash2, Edit2, Plus, GripVertical, Star, AlertCircle, Search, ToggleLeft, ToggleRight, X, ArrowUp, ArrowDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import Skeleton from "../components/Skeleton";
 import PageHeader from "../components/PageHeader";
@@ -12,11 +13,15 @@ export default function AdminTestimonials() {
     const [loading, setLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
 
+    // derive sorted list by displayOrder (ascending)
+    const sortedTestimonials = React.useMemo(() => {
+        return [...testimonials].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+    }, [testimonials]);
+
     const [currentTestimonial, setCurrentTestimonial] = useState({
         coupleName: "",
         location: "",
         thumbnail: "",
-        shortDescription: "",
         fullDescription: "",
         rating: 5,
         displayOrder: 0,
@@ -51,7 +56,10 @@ export default function AdminTestimonials() {
             }
 
             const data = await res.json();
-            setTestimonials(Array.isArray(data) ? data : []);
+            const arr = Array.isArray(data) ? data : [];
+            // sort by displayOrder so UI reflects current order immediately
+            arr.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+            setTestimonials(arr);
         } catch (error) {
             console.error("Error fetching reviews:", error);
         } finally {
@@ -133,21 +141,63 @@ export default function AdminTestimonials() {
         }
     };
 
+    // Move testimonial up/down in the list
+    const move = (id, dir) => {
+        const list = [...sortedTestimonials];
+        const idx = list.findIndex((t) => t._id === id);
+        if (idx === -1) return;
+        const targetIdx = idx + dir;
+        if (targetIdx < 0 || targetIdx >= list.length) return;
+
+        // swap
+        [list[idx], list[targetIdx]] = [list[targetIdx], list[idx]];
+
+        const updates = list.map((t, i) => ({ id: t._id, displayOrder: i }));
+
+        // optimistic UI update
+        setTestimonials((prev) =>
+            prev.map((t) => {
+                const u = updates.find((u) => u.id === t._id);
+                return u ? { ...t, displayOrder: u.displayOrder } : t;
+            })
+        );
+
+        // send updates to server
+        Promise.all(
+            updates.map((u) =>
+                fetch(`/api/testimonials/${u.id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ displayOrder: u.displayOrder }),
+                })
+            )
+        )
+            .then(() => {
+                toast.success("Order updated");
+            })
+            .catch((err) => {
+                console.error(err);
+                fetchTestimonials();
+                toast.error("Failed to update order");
+            });
+    };
+
+
     const resetForm = () => {
         setCurrentTestimonial({
             coupleName: "",
             location: "",
             thumbnail: "",
-            shortDescription: "",
             fullDescription: "",
             rating: 5,
-            displayOrder: 0,
+            // default new reviews to end of list
+            displayOrder: sortedTestimonials.length,
             status: "Active"
         });
         setIsEditing(false);
     };
 
-    const filteredTestimonials = testimonials.filter(t =>
+    const filteredTestimonials = sortedTestimonials.filter(t =>
         t.coupleName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         t.location?.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -278,11 +328,38 @@ export default function AdminTestimonials() {
                                     </div>
 
                                     <p className="text-sm text-slate-600 line-clamp-2 bg-slate-50 p-2 rounded-lg italic">
-                                        "{t.shortDescription}"
+                                        "{t.fullDescription}"
                                     </p>
 
-                                    <div className="flex items-center justify-between pt-2">
-                                        <span className="text-xs text-slate-400">Order: {t.displayOrder}</span>
+                                    <div className="flex justify-between items-center pt-2">
+                                        <div className="flex items-center gap-3">
+                                            {/* position badge */}
+                                            <div className="flex items-center gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-2 rounded-lg border border-blue-200">
+                                                <GripVertical size={16} className="text-blue-600" />
+                                                <span className="text-sm font-bold text-blue-700">{filteredTestimonials.indexOf(t) + 1}/{filteredTestimonials.length}</span>
+                                            </div>
+
+                                            {/* order controls */}
+                                            <div className="flex gap-1.5 bg-gray-100 p-1 rounded-lg">
+                                                <button
+                                                    onClick={() => move(t._id, -1)}
+                                                    disabled={sortedTestimonials[0]._id === t._id}
+                                                    title="Move up"
+                                                    className="p-2 text-gray-600 hover:text-white hover:bg-green-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-md transition-all duration-200 flex items-center justify-center"
+                                                >
+                                                    <ArrowUp size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => move(t._id, 1)}
+                                                    disabled={sortedTestimonials[sortedTestimonials.length - 1]._id === t._id}
+                                                    title="Move down"
+                                                    className="p-2 text-gray-600 hover:text-white hover:bg-orange-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-md transition-all duration-200 flex items-center justify-center"
+                                                >
+                                                    <ArrowDown size={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+
                                         <div className="flex items-center gap-2">
                                             <button
                                                 onClick={() => handleEdit(t)}
@@ -337,8 +414,8 @@ export default function AdminTestimonials() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <p className="truncate max-w-xs text-slate-600" title={t.fullDescription}>
-                                                {t.shortDescription}
-                                            </p>
+                                                    {t.fullDescription}
+                                                </p>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-0.5 text-amber-400">
@@ -347,7 +424,30 @@ export default function AdminTestimonials() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-slate-600">
-                                            {t.displayOrder}
+                                            <div className="flex items-center gap-2">
+                                                <div className="flex items-center gap-1 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-2 rounded-lg border border-blue-200 whitespace-nowrap">
+                                                    <GripVertical size={14} className="text-blue-600" />
+                                                    <span className="text-xs font-bold text-blue-700">{filteredTestimonials.indexOf(t) + 1}/{filteredTestimonials.length}</span>
+                                                </div>
+                                                <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+                                                    <button
+                                                        onClick={() => move(t._id, -1)}
+                                                        disabled={sortedTestimonials[0]._id === t._id}
+                                                        title="Move up"
+                                                        className="p-2 text-gray-600 hover:text-white hover:bg-green-500 disabled:opacity-40 disabled:cursor-not-allowed rounded transition-all duration-200 flex items-center justify-center"
+                                                    >
+                                                        <ArrowUp size={14} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => move(t._id, 1)}
+                                                        disabled={sortedTestimonials[sortedTestimonials.length - 1]._id === t._id}
+                                                        title="Move down"
+                                                        className="p-2 text-gray-600 hover:text-white hover:bg-orange-500 disabled:opacity-40 disabled:cursor-not-allowed rounded transition-all duration-200 flex items-center justify-center"
+                                                    >
+                                                        <ArrowDown size={14} />
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             {t.status === 'Pending' ? (
@@ -491,21 +591,12 @@ export default function AdminTestimonials() {
                             </div>
 
                             {/* Full Width Inputs */}
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Short Review <span className="text-slate-400 text-xs">(For preview, max 200 chars)</span></label>
-                                <textarea
-                                    required
-                                    maxLength={200}
-                                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm h-20"
-                                    value={currentTestimonial.shortDescription}
-                                    onChange={e => setCurrentTestimonial({ ...currentTestimonial, shortDescription: e.target.value })}
-                                    placeholder="Brief highlight..."
-                                />
-                            </div>
+                            {/* Short Review removed — using Full Review only now */}
 
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Full Review</label>
                                 <textarea
+                                    required
                                     className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm h-32"
                                     value={currentTestimonial.fullDescription}
                                     onChange={e => setCurrentTestimonial({ ...currentTestimonial, fullDescription: e.target.value })}

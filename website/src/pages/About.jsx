@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSettings } from '../hooks/useSettings';
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -7,6 +8,9 @@ import "aos/dist/aos.css";
 import "../App.css";
 
 const About = () => {
+  const { settings } = useSettings();
+  const businessName = settings?.businessName || "Photography";
+
   useEffect(() => {
     document.body.className = "index-page";
 
@@ -116,13 +120,13 @@ const About = () => {
                 <div className="founder-image m-auto">
                   <img
                     src="/assets/img/person/founder.jpg"
-                    alt="Founder - The Patil Photography"
+                    alt={`Founder - ${businessName}`}
                     className="rounded founder-photo img-fluid"
                   />
                   <div className="founder-section">
                   <div className="founder-title">Aakask Darme-Patil</div>
                   <div className="founder-subtitle ">Founder & <br /> & Lead Photographer</div>
-                  <div className="Lead-subtitle ">The Patil Photography</div>
+                  <div className="Lead-subtitle ">{businessName}</div>
                   </div>
                 </div>
               </div>
@@ -139,7 +143,7 @@ const About = () => {
                 Why Choose Us
               </h2>
               <p style={{ fontSize: "1.1rem", color: "#666", maxWidth: "700px", margin: "0 auto" }}>
-                At The Patil Photography & Film's, we craft timeless stories filled with emotion, elegance, and authenticity
+                At {businessName}, we craft timeless stories filled with emotion, elegance, and authenticity
               </p>
             </div>
 

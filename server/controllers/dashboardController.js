@@ -77,7 +77,7 @@ export const getDashboardStats = async (req, res) => {
             paymentStatus: { $ne: 'Paid' }
         }).select('_id invoiceNumber clientName dueDate grandTotal amountPaid').limit(5);
 
-        const pendingTestimonialsList = await Testimonial.find({ status: 'Pending' }).select('_id coupleName createdAt shortDescription fullDescription rating location thumbnail').limit(4);
+        const pendingTestimonialsList = await Testimonial.find({ status: 'Pending' }).select('_id coupleName createdAt fullDescription rating location thumbnail').limit(4);
 
         // 3. Pipeline
         const pipelineStats = await Order.aggregate([

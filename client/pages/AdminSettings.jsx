@@ -302,8 +302,9 @@ export default function AdminSettings() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Primary Logo */}
                             <div className="space-y-3">
-                                <label className="block text-sm font-medium text-gray-700">Primary Logo (Light Mode)</label>
-                                <div className="relative group border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center bg-gray-50 min-h-[160px] hover:bg-gray-100 transition-colors">
+                                <label className="block text-sm font-medium text-gray-700">Primary Logo (Dark/Footer)</label>
+
+                                <div className="relative group border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center bg-gray-900 min-h-[160px] hover:bg-gray-800 transition-colors">
                                     {formData.primaryLogo ? (
                                         <div className="relative w-full h-32 flex items-center justify-center">
                                             <img src={formData.primaryLogo} alt="Primary Logo" className="max-h-full max-w-full object-contain" />
@@ -327,13 +328,14 @@ export default function AdminSettings() {
                                         className="absolute inset-0 opacity-0 cursor-pointer"
                                     />
                                 </div>
-                                <p className="text-xs text-gray-500 text-center">Used in Header, Invoices & White backgrounds</p>
+
+                                <p className="text-xs text-gray-500 text-center">Used in Footer & Dark backgrounds</p>
                             </div>
 
                             {/* Secondary Logo */}
                             <div className="space-y-3">
-                                <label className="block text-sm font-medium text-gray-700">Secondary Logo (Dark/Footer)</label>
-                                <div className="relative group border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center bg-gray-900 min-h-[160px] hover:bg-gray-800 transition-colors">
+                                <label className="block text-sm font-medium text-gray-700">Secondary Logo (Light Mode) </label>
+                                <div className="relative group border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center bg-gray-50 min-h-[160px] hover:bg-gray-100 transition-colors">
                                     {formData.secondaryLogo ? (
                                         <div className="relative w-full h-32 flex items-center justify-center">
                                             <img src={formData.secondaryLogo} alt="Secondary Logo" className="max-h-full max-w-full object-contain" />
@@ -357,7 +359,7 @@ export default function AdminSettings() {
                                         className="absolute inset-0 opacity-0 cursor-pointer"
                                     />
                                 </div>
-                                <p className="text-xs text-gray-500 text-center">Used in Footer & Dark backgrounds</p>
+                                <p className="text-xs text-gray-500 text-center">Used in Header, Invoices & White backgrounds</p>
                             </div>
                         </div>
                     </div>
@@ -440,8 +442,8 @@ export default function AdminSettings() {
                                         value={link.url}
                                         onChange={(e) => handleSocialChange(index, "url", e.target.value)}
                                         placeholder={
-                                            link.platform === 'WhatsApp' 
-                                                ? 'https://wa.me/1234567890' 
+                                            link.platform === 'WhatsApp'
+                                                ? 'https://wa.me/1234567890'
                                                 : `https://${link.platform.toLowerCase()}.com/...`
                                         }
                                         className={`w-full text-xs px-3 py-2 bg-white border rounded-md outline-none focus:border-gold-500 transition-all ${errors[`social_${index}`] ? 'border-red-500' : 'border-gray-200'}`}
@@ -454,6 +456,6 @@ export default function AdminSettings() {
                 </div>
 
             </div>
-        </div>
+        </div >
     );
 }

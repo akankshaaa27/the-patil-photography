@@ -61,6 +61,7 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
   const [isSaving, setIsSaving] = useState(false);
 
   const [predefinedServices, setPredefinedServices] = useState([]);
+  const [eventTypes, setEventTypes] = useState([]);
   const [open, setOpen] = useState(false);
 
   // Modals state
@@ -77,7 +78,19 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
 
   useEffect(() => {
     fetchServices();
+    fetchEventTypes();
   }, []);
+
+  const fetchEventTypes = async () => {
+    try {
+      const res = await fetch('/api/event-types');
+      if (!res.ok) throw new Error('Failed to fetch event types');
+      const data = await res.json();
+      setEventTypes(data || []);
+    } catch (err) {
+      console.error('Error fetching event types:', err);
+    }
+  };
 
   useEffect(() => {
     if (quotation) {
@@ -187,6 +200,30 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
     }));
   };
 
+  // Auto-add service when event type corresponds to exactly one predefined service
+  useEffect(() => {
+    const evt = formData.eventType?.trim();
+    if (!evt || predefinedServices.length === 0) return;
+
+    const matches = predefinedServices.filter((s) => {
+      const nameMatch = s.name && evt && s.name.toLowerCase().includes(evt.toLowerCase());
+      const categoryMatch = s.category && s.category.toLowerCase() === evt.toLowerCase();
+      return nameMatch || categoryMatch;
+    });
+
+    if (matches.length === 1) {
+      const svc = matches[0];
+      const already = formData.services.some(it => it.serviceName && it.serviceName.toLowerCase() === svc.name.toLowerCase());
+      if (!already) {
+        const qty = 1;
+        const days = 1;
+        const rate = parseFloat(svc.ratePerDay || svc.ratePerUnit || 0) || 0;
+        const newRow = { serviceName: svc.name, quantity: qty, days, ratePerDay: rate, total: qty * days * rate };
+        setFormData(prev => ({ ...prev, services: [...prev.services, newRow] }));
+      }
+    }
+  }, [formData.eventType, predefinedServices]);
+
   const handleRemoveService = (index) => {
     setFormData((prev) => ({
       ...prev,
@@ -258,21 +295,28 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
   };
 
   const handleSaveService = () => {
-    if (newService.name.trim()) {
-      // Add to predefined services locally
-      const newSvc = {
-        _id: `temp-${Date.now()}`,
-        name: newService.name,
-        ratePerDay: parseFloat(newService.rate) || 0
-      };
-      setPredefinedServices(prev => [...prev, newSvc]);
-
-      // If triggered from a specific row (optional feature), populate it
-      // But typically "Add New" adds to options. 
-      // Let's just reset
-      setIsServiceModalOpen(false);
-      setNewService({ name: "", rate: 0 });
-    }
+    if (!newService.name.trim()) return;
+    (async () => {
+      try {
+        const payload = { name: newService.name, ratePerDay: parseFloat(newService.rate) || 0 };
+        const res = await fetch('/api/services', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || 'Failed to create service');
+        }
+        const created = await res.json();
+        setPredefinedServices(prev => [...prev, created]);
+        setIsServiceModalOpen(false);
+        setNewService({ name: '', rate: 0 });
+      } catch (error) {
+        console.error('Error creating service:', error);
+        alert(error.message || 'Could not create service');
+      }
+    })();
   };
 
 
@@ -368,12 +412,18 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
                   </Button>
                 </div>
                 <datalist id="eventTypes">
-                  <option value="Wedding" />
-                  <option value="Pre-Wedding" />
-                  <option value="Engagement" />
-                  <option value="Birthday" />
-                  <option value="Anniversary" />
-                  <option value="Baby Shower" />
+                  {eventTypes && eventTypes.length > 0 ? (
+                    eventTypes.map((et) => <option key={et._id || et.name} value={et.name} />)
+                  ) : (
+                    <>
+                      <option value="Wedding" />
+                      <option value="Pre-Wedding" />
+                      <option value="Engagement" />
+                      <option value="Birthday" />
+                      <option value="Anniversary" />
+                      <option value="Baby Shower" />
+                    </>
+                  )}
                 </datalist>
               </div>
               <div>

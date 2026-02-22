@@ -5,7 +5,7 @@ const testimonialSchema = new mongoose.Schema(
         coupleName: { type: String, required: true },
         location: { type: String, trim: true },
         thumbnail: { type: String }, // URL or Base64
-        shortDescription: { type: String, required: true, maxlength: 1000 },
+        shortDescription: { type: String, maxlength: 1000 },
         fullDescription: { type: String },
         rating: { type: Number, default: 5, min: 1, max: 5 },
         displayOrder: { type: Number, default: 0 },

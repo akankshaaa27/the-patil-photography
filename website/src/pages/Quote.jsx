@@ -6,6 +6,7 @@ import { useSettings } from '../hooks/useSettings';
 
 const Quote = () => {
   const { settings } = useSettings();
+  const businessName = settings?.businessName || "Photography";
   const [formData, setFormData] = useState({
     groomName: '',
     brideName: '',
@@ -37,6 +38,42 @@ const Quote = () => {
 
   const handleCheckboxChange = (e, field) => {
     const { value, checked } = e.target;
+
+    // custom logic for services checkboxes: "Both" should select/deselect all
+    if (field === 'services') {
+      setFormData(prev => {
+        let updated = [...prev.services];
+
+        if (value === 'Both') {
+          if (checked) {
+            // when "Both" is checked ensure Photography and Films are also selected
+            updated = Array.from(new Set([...updated, 'Photography', 'Films', 'Both']));
+          } else {
+            // unchecking "Both" clears all service selections
+            updated = [];
+          }
+        } else {
+          // toggling Photography or Films
+          if (checked) {
+            updated.push(value);
+            // if both individual services are selected, add "Both"
+            if (updated.includes('Photography') && updated.includes('Films') && !updated.includes('Both')) {
+              updated.push('Both');
+            }
+          } else {
+            updated = updated.filter(item => item !== value);
+            // if we removed one of the pair, drop "Both" as well
+            if (updated.includes('Both')) {
+              updated = updated.filter(item => item !== 'Both');
+            }
+          }
+        }
+
+        return { ...prev, services: updated };
+      });
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       [field]: checked
@@ -46,6 +83,19 @@ const Quote = () => {
   };
 
   const [submitting, setSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // automatically clear messages after 5 seconds
+  useEffect(() => {
+    if (successMessage || errorMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage('');
+        setErrorMessage('');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, errorMessage]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -60,7 +110,8 @@ const Quote = () => {
       });
 
       if (res.ok) {
-        alert("Thank you for your enquiry! We will get back to you soon.");
+        setSuccessMessage("Thank you for your enquiry! We will get back to you soon.");
+        setErrorMessage('');
         setFormData({
           groomName: '',
           brideName: '',
@@ -74,11 +125,13 @@ const Quote = () => {
           message: ''
         });
       } else {
-        alert("Something went wrong. Please try again.");
+        setErrorMessage("Something went wrong. Please try again.");
+        setSuccessMessage('');
       }
     } catch (error) {
       console.error("Submission error:", error);
-      alert("Error submitting. Please try again later.");
+      setErrorMessage("Error submitting. Please try again later.");
+      setSuccessMessage('');
     } finally {
       setSubmitting(false);
     }
@@ -113,7 +166,7 @@ const Quote = () => {
             <h2>Let's Create Something <br /> Beautiful Together</h2>
 
             <div className="text-left mx-auto mt-5" >
-              <p className="lead text-muted mb-3">Book your special wedding day with The Patil Photography.!</p>
+              <p className="lead text-muted mb-3">Book your special wedding day with {businessName}.</p>
               <p className="lead text-muted mb-3">We turn your most cherished moments into timeless memories. From heartfelt candid emotions to cinematic storytelling, every frame is captured with passion and creativity. Reserve your date today and let us make your big day truly unforgettable.</p>
               <p className="lead text-muted mb-3">Kindly complete the form below with as much detail as possible to help us provide an accurate quotation. We aim to respond within 48 hours.</p>
               <p className="lead text-muted mb-3">If you do not hear from us within this timeframe, or if your request is urgent, please feel free to contact us directly at the number provided below.</p>
@@ -175,7 +228,7 @@ const Quote = () => {
                           </div>
                           <div className="contact-detail">
                             <i className="bi bi-envelope-fill"></i>
-                            <span>quotes@thepatilphotography.com</span>
+                            <span>{settings?.contactEmail || 'quotes@photography.com'}</span>
                           </div>
                         </div>
                       </div>
@@ -191,6 +244,16 @@ const Quote = () => {
                         <div className="card">
                           <div className="card-body">
                             <form onSubmit={handleSubmit}>
+                              {successMessage && (
+                                <div className="alert alert-success alert-dismissible fade show" role="alert">
+                                  {successMessage}
+                                </div>
+                              )}
+                              {errorMessage && (
+                                <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                                  {errorMessage}
+                                </div>
+                              )}
                               <div className="row">
                                 <div className="col-md-6 mb-3">
                                   <label htmlFor="groomName" className="form-label font-weight-bold">Groom Name</label>

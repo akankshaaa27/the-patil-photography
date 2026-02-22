@@ -9,6 +9,7 @@ import { Autoplay, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import Skeleton from "../components/Skeleton";
+import { useSettings } from '../hooks/useSettings';
 import TributeModal from "../components/TributeModal";
 import LuxGallery from "../components/LuxGallery";
 // import HomeFeature from "../components/HomeFeature";
@@ -54,6 +55,8 @@ const Counter = ({ end, duration = 2000, suffix = "" }) => {
 
 const Home = () => {
   console.log("Home component rendering");
+  const { settings } = useSettings();
+  const businessName = settings?.businessName || "Photography";
   const [slides, setSlides] = useState([]);
   const [loadingSlider, setLoadingSlider] = useState(true);
   const [loadingStories, setLoadingStories] = useState(true);
@@ -238,16 +241,16 @@ const Home = () => {
         <section id="hero" className="hero dark-background">
           {loadingSlider || slides.length === 0 ? (
             <div className="hero-video-container hero-fullheight">
-              <img src="/assets/img/slider/hero6.jpg" className="img-fluid hero-bg-image" alt="Beauty of Photography" />
+              <img src="/website/assets/img/HomePage/website_4.webp" className="img-fluid hero-bg-image" alt="Beauty of Photography" />
               <div className="container hfull d-flex align-items-center justify-content-center hero-content-wrapper" data-aos="fade-up" data-aos-delay="100">
                 <div className="row justify-content-center text-center">
                   <div className="col-lg-8">
                     <div className="hero-content">
                       <h1 data-aos="fade-up" data-aos-delay="200" className="gold-text-gradient">
-                        Capture the Moment
+                        Pure Traditions, Pure Emotions
                       </h1>
                       <p data-aos="fade-up" data-aos-delay="300">
-                        Preserving memories that last a lifetime
+                        Documenting your wedding rituals with perfection.
                       </p>
                     </div>
                   </div>
@@ -304,7 +307,7 @@ const Home = () => {
             <div className="row align-items-center g-5 about-main">
               {/* Image - LEFT */}
               <div className="col-lg-5" data-aos="fade-right" data-aos-delay="150">
-                <img src="/assets/img/HomePage/7.webp" alt="Our Photography Studio" className="img-fluid about-image" />
+                <img src="website/assets/img/HomePage/website_1.webp" alt="Our Photography Studio" className="img-fluid about-image" />
               </div>
 
               {/* Content - RIGHT */}
@@ -313,7 +316,7 @@ const Home = () => {
                   <h3 className="about-h3">We Create Timeless Memories</h3>
 
                   <p className="about-p">
-                    At <strong>The Patil Photography &amp; Films</strong>, we don't just capture moments — we tell your unique love story through stunning visuals and cinematic excellence.
+                    At <strong>{businessName}</strong>, we don't just capture moments — we tell your unique love story through stunning visuals and cinematic excellence.
                   </p>
 
                   <p className="about-p">
@@ -354,15 +357,15 @@ const Home = () => {
             </div>
 
             {/* Stats Section */}
-            <div className="stats-grid">
+            <div className="stats-grid mb-4">
               <div className="stats-card" data-aos="fade-up" data-aos-delay="100">
-                <h3 className="stats-number"><Counter end={500} suffix="+" /></h3>
+                <h3 className="stats-number"><Counter end={300} suffix="+" /></h3>
                 <p className="stats-title">Happy Couples</p>
                 <p className="stats-sub">Worldwide</p>
               </div>
 
               <div className="stats-card" data-aos="fade-up" data-aos-delay="150">
-                <h3 className="stats-number"><Counter end={10} suffix="+" /></h3>
+                <h3 className="stats-number"><Counter end={7} suffix="+" /></h3>
                 <p className="stats-title">Years Experience</p>
                 <p className="stats-sub">Industry Expert</p>
               </div>
@@ -383,7 +386,7 @@ const Home = () => {
         </section>
 
         {/* Portfolio Preview Section */}
-        <section id="portfolio-preview" className="portfolio-preview section">
+        <section id="portfolio-preview" className="portfolio-preview section pt-0">
           <div className="container pb-5  section-title text-center" data-aos="fade-up" data-aos-delay="100">
             <h2>Our Portfolio</h2>
             <p>
@@ -810,7 +813,7 @@ const Home = () => {
                           <i className="bi bi-quote"></i>
                         </div>
                         <p className="shortDescriptionLenth">
-                          "{t.shortDescription}"
+                          "{t.fullDescription}"
                         </p>
 
                         {/* Star Rating */}
