@@ -148,7 +148,7 @@ export default function Quotations() {
 
   return (
     <>
-      <div className="max-w-7xl mx-auto p-0 sm:px-6 lg:px-0 pb-6">
+      <div className="mx-auto p-0 sm:px-6 lg:px-0 pb-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>

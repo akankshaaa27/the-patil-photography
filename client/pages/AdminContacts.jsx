@@ -241,65 +241,6 @@ export default function AdminContacts() {
 
             {/* Dynamic Dashboard Section - Data from All Components */}
             <div className="max-w-7xl mx-auto px-6 py-8">
-                <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-charcoal-900 mb-6">Business Overview</h2>
-                    
-                    {/* All Component Stats Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {/* Orders */}
-                        <div className="bg-white border border-slate-200 rounded-lg p-5">
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="font-semibold text-charcoal-900 text-sm">Orders</h3>
-                                <ShoppingCart size={18} className="text-gold-500" />
-                            </div>
-                            <p className="text-3xl font-bold text-charcoal-900">{aggStats.totalOrders}</p>
-                            <div className="mt-3 text-xs text-slate-600 space-y-1">
-                                <p>Completed: <span className="font-semibold text-emerald-600">{aggStats.ordersCompleted}</span></p>
-                                <p>In Progress: <span className="font-semibold text-amber-600">{aggStats.ordersInProgress}</span></p>
-                            </div>
-                        </div>
-
-                        {/* Enquiries */}
-                        <div className="bg-white border border-slate-200 rounded-lg p-5">
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="font-semibold text-charcoal-900 text-sm">Enquiries</h3>
-                                <Zap size={18} className="text-blue-500" />
-                            </div>
-                            <p className="text-3xl font-bold text-charcoal-900">{aggStats.totalEnquiries}</p>
-                            <div className="mt-3 text-xs text-slate-600 space-y-1">
-                                <p>New: <span className="font-semibold text-blue-600">{aggStats.enquiriesNew}</span></p>
-                                <p>Booked: <span className="font-semibold text-emerald-600">{aggStats.enquiriesBooked}</span></p>
-                            </div>
-                        </div>
-
-                        {/* Invoices */}
-                        <div className="bg-white border border-slate-200 rounded-lg p-5">
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="font-semibold text-charcoal-900 text-sm">Invoices</h3>
-                                <FileText size={18} className="text-slate-500" />
-                            </div>
-                            <p className="text-3xl font-bold text-charcoal-900">{aggStats.totalInvoices}</p>
-                            <div className="mt-3 text-xs text-slate-600 space-y-1">
-                                <p>Paid: <span className="font-semibold text-emerald-600">{aggStats.invoicesPaid}</span></p>
-                                <p>Overdue: <span className="font-semibold text-rose-600">{aggStats.invoicesOverdue}</span></p>
-                            </div>
-                        </div>
-
-                        {/* Clients & Users */}
-                        <div className="bg-white border border-slate-200 rounded-lg p-5">
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="font-semibold text-charcoal-900 text-sm">Network</h3>
-                                <Users size={18} className="text-purple-500" />
-                            </div>
-                            <p className="text-3xl font-bold text-charcoal-900">{aggStats.totalClients + aggStats.totalUsers}</p>
-                            <div className="mt-3 text-xs text-slate-600 space-y-1">
-                                <p>Clients: <span className="font-semibold">{aggStats.totalClients}</span></p>
-                                <p>Users: <span className="font-semibold">{aggStats.totalUsers}</span></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 {/* Messages Stats */}
                 <h2 className="text-2xl font-bold text-charcoal-900 mb-4">Contact Messages</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
