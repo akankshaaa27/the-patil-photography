@@ -36,9 +36,14 @@ const validateMobileNumber = (mobile) => {
     return clean.length >= 10 && clean.length <= 15;
 };
 
+import SettingsCard from "../components/SettingsCard";
+
 export default function AdminSettings() {
     const queryClient = useQueryClient();
     const { data: settings, isLoading } = useSettings();
+
+    // toggle between edit form and read-only preview
+    const [viewOnly, setViewOnly] = useState(false);
 
     const [formData, setFormData] = useState({
         businessName: "",
@@ -184,19 +189,41 @@ export default function AdminSettings() {
 
     if (isLoading) return <div className="p-8 text-center text-slate-500">Loading settings...</div>;
 
+    // show preview if viewOnly mode enabled
+    if (viewOnly)
+        return (
+            <div className="relative">
+                <button
+                    onClick={() => setViewOnly(false)}
+                    className="absolute top-4 left-4 bg-white border border-gray-300 px-3 py-1 rounded shadow-sm hover:bg-gray-50"
+                >
+                    ← Edit
+                </button>
+                <SettingsCard settings={settings} />
+            </div>
+        );
+
     return (
         <div className="container mt-0 mx-auto  px-0 pt-0 pb-6 animate-in fade-in duration-500">
             <PageHeader
                 title="Global Settings"
                 description="Manage branding, logos, and connections"
                 action={
-                    <button
-                        onClick={handleSubmit}
-                        disabled={mutation.isPending}
-                        className="bg-gray-900 text-white px-6 py-2.5 rounded-lg flex items-center gap-2 hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl disabled:opacity-70"
-                    >
-                        {mutation.isPending ? "Saving..." : <><Save size={18} /> Save Changes</>}
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setViewOnly(true)}
+                            className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+                        >
+                            Preview
+                        </button>
+                        <button
+                            onClick={handleSubmit}
+                            disabled={mutation.isPending}
+                            className="bg-gray-900 text-white px-6 py-2.5 rounded-lg flex items-center gap-2 hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl disabled:opacity-70"
+                        >
+                            {mutation.isPending ? "Saving..." : <><Save size={18} /> Save Changes</>}
+                        </button>
+                    </div>
                 }
             />
 

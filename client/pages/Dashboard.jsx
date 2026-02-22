@@ -123,10 +123,10 @@ export default function Dashboard() {
             <p className="text-slate-500">Welcome back. Here's what's happening today.</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <QuickAction to="/orders" label="New Order" icon={Plus} />
-            <QuickAction to="/quotations" label="Create Quote" icon={Plus} />
-            <QuickAction to="/invoices" label="New Invoice" icon={Plus} />
-            <QuickAction to="/enquiries" label="Add Enquiry" icon={Plus} />
+            <QuickAction to="/admin-orders" label="New Order" icon={Plus} />
+            <QuickAction to="/admin-quotations" label="Create Quote" icon={Plus} />
+            <QuickAction to="/admin-invoices" label="New Invoice" icon={Plus} />
+            <QuickAction to="/admin-enquiries" label="Add Enquiry" icon={Plus} />
           </div>
         </div>
 
@@ -139,13 +139,13 @@ export default function Dashboard() {
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {actionRequired.enquiriesNoReply.map(e => (
-                <Link key={e._id} to="/enquiries" className="flex items-center justify-between rounded-xl bg-white p-3 text-sm shadow-sm ring-1 ring-rose-100 transition hover:ring-rose-200">
+                <Link key={e._id} to="/admin-enquiries" className="flex items-center justify-between rounded-xl bg-white p-3 text-sm shadow-sm ring-1 ring-rose-100 transition hover:ring-rose-200">
                   <span className="truncate font-medium text-charcoal-900">Reply to {e.names?.split('&')[0] || e.groomName}</span>
                   <span className="text-xs text-rose-500">Overdue</span>
                 </Link>
               ))}
               {actionRequired.overdueInvoices.map(i => (
-                <Link key={i._id} to="/invoices" className="flex items-center justify-between rounded-xl bg-white p-3 text-sm shadow-sm ring-1 ring-rose-100 transition hover:ring-rose-200">
+                <Link key={i._id} to="/admin-invoices" className="flex items-center justify-between rounded-xl bg-white p-3 text-sm shadow-sm ring-1 ring-rose-100 transition hover:ring-rose-200">
                   <span className="truncate font-medium text-charcoal-900">INV {i.invoiceNumber} Due</span>
                   <span className="text-xs text-rose-500">₹{i.grandTotal}</span>
                 </Link>
@@ -163,7 +163,7 @@ export default function Dashboard() {
         <KpiCard label="Unpaid Invoices" value={kpi.unpaidInvoicesCount} sub={`Total ₹${(kpi.unpaidInvoicesAmount / 1000).toFixed(0)}k`} icon={CreditCard} accent />
         <KpiCard label="Shoots This Week" value={kpi.upcomingShootsCount} sub="Next 7 days" icon={Film} />
         <KpiCard label="Unread Messages" value={kpi.unreadMessages} sub="Contact forms" icon={MessageSquare} />
-        <Link to="/testimonials" className="block">
+        <Link to="/admin-testimonials" className="block">
           <KpiCard label="Testimonials" value={kpi.pendingTestimonials} sub="Pending review" icon={CheckCircle} />
         </Link>
       </div>
@@ -225,84 +225,81 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Order Trend & Invoice Status */}
-          <div className="space-y-8">
-            {/* Orders Trend */}
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="mb-6 flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold text-charcoal-900">Order Growth</h2>
-                  <p className="text-sm text-slate-500">New bookings per month</p>
-                </div>
-                <div className="rounded-lg bg-indigo-50 p-2 text-indigo-600">
-                  <Activity className="h-5 w-5" />
-                </div>
+          {/* Orders Trend */}
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-charcoal-900">Order Growth</h2>
+                <p className="text-sm text-slate-500">New bookings per month</p>
               </div>
-              <div className="h-[200px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={formatMonthlyData(data.charts.monthlyOrders)}>
-                    <defs>
-                      <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} />
-                    <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                    <Area
-                      type="monotone"
-                      dataKey="count"
-                      stroke="#6366f1"
-                      strokeWidth={3}
-                      fillOpacity={1}
-                      fill="url(#colorOrders)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+              <div className="rounded-lg bg-indigo-50 p-2 text-indigo-600">
+                <Activity className="h-5 w-5" />
               </div>
             </div>
+            <div className="h-[200px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={formatMonthlyData(data.charts.monthlyOrders)}>
+                  <defs>
+                    <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} />
+                  <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                  <Area
+                    type="monotone"
+                    dataKey="count"
+                    stroke="#6366f1"
+                    strokeWidth={3}
+                    fillOpacity={1}
+                    fill="url(#colorOrders)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
 
-            {/* Invoice Status */}
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold text-charcoal-900">Invoice Status</h2>
-                  <p className="text-sm text-slate-500">By value</p>
-                </div>
-                <div className="rounded-lg bg-rose-50 p-2 text-rose-600">
-                  <PieIcon className="h-5 w-5" />
-                </div>
+          {/* Invoice Status */}
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-charcoal-900">Invoice Status</h2>
+                <p className="text-sm text-slate-500">By value</p>
               </div>
-              <div className="h-[200px] w-full flex items-center justify-center">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={data.charts.invoiceStatus}
-                      dataKey="value"
-                      nameKey="_id"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
-                    >
-                      {data.charts.invoiceStatus.map((entry, index) => {
-                        const colors = {
-                          'Paid': '#10b981', // Emerald
-                          'Pending': '#f59e0b', // Amber
-                          'Overdue': '#ef4444', // Rose
-                          'Draft': '#94a3b8'  // Slate
-                        };
-                        return <Cell key={`cell-${index}`} fill={colors[entry._id] || '#cbd5e1'} />;
-                      })}
-                    </Pie>
-                    <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
-                    <Legend verticalAlign="bottom" height={36} iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '12px' }} />
-                  </PieChart>
-                </ResponsiveContainer>
+              <div className="rounded-lg bg-rose-50 p-2 text-rose-600">
+                <PieIcon className="h-5 w-5" />
               </div>
+            </div>
+            <div className="h-[200px] w-full flex items-center justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={data.charts.invoiceStatus}
+                    dataKey="value"
+                    nameKey="_id"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                  >
+                    {data.charts.invoiceStatus.map((entry, index) => {
+                      const colors = {
+                        'Paid': '#10b981', // Emerald
+                        'Pending': '#f59e0b', // Amber
+                        'Overdue': '#ef4444', // Rose
+                        'Draft': '#94a3b8'  // Slate
+                      };
+                      return <Cell key={`cell-${index}`} fill={colors[entry._id] || '#cbd5e1'} />;
+                    })}
+                  </Pie>
+                  <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
+                  <Legend verticalAlign="bottom" height={36} iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '12px' }} />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>

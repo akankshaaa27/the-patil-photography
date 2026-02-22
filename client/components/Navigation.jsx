@@ -29,7 +29,7 @@ const items = [
   // System Administration (Least Important)
   { to: "/admin-users", label: "Users" },
   { to: "/admin-settings", label: "Global Settings" },
-  { to: "/admin-accessories", label: "Accessories" },
+  { to: "/admin-accessories", label: "Inventory" },
   { to: "/admin-common-types", label: "Common Types" },
 ];
 

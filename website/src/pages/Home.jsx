@@ -861,7 +861,7 @@ const Home = () => {
           </div>
 
           <div className="d-flex justify-content-center mt-5">
-            <Link to="/testimonials" className="submit-btn mt-3" style={{ textDecoration: "none" }}>
+            <Link to="/reviews-feedback" className="submit-btn mt-3" style={{ textDecoration: "none" }}>
               <span>View All Reviews</span>
               <i className="bi bi-arrow-right ms-2"></i>
             </Link>

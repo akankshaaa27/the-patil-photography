@@ -1,10 +1,10 @@
 <main id="main" class="main">
     <div class="pagetitle">
-        <h1>Accessories Management</h1>
+        <h1>Inventory Management</h1>
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                <li class="breadcrumb-item active">Accessories</li>
+                <li class="breadcrumb-item active">Inventory</li>
             </ol>
         </nav>
     </div>
@@ -13,15 +13,15 @@
         <div class="container">
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <input type="text" class="form-control" id="searchAccessory" placeholder="Search Accessories..." onkeyup="filterAccessories()">
+                    <input type="text" class="form-control" id="searchAccessory" placeholder="Search inventory..." onkeyup="filterAccessories()">
                 </div>
                 <div class="col-md-3">
                     <select class="form-select" id="filterCategory" onchange="filterAccessories()">
-                        <option value="">All Categories</option>
-                        <option>Tripod</option>
-                        <option>Gimbal</option>
-                        <option>Memory Card</option>
-                        <option>Lighting Equipment</option>
+                        <option value="">All Types</option>
+                        <option>Camera</option>
+                        <option>Lens</option>
+                        <option>Battery</option>
+                        <option>Other</option>
                     </select>
                 </div>
             </div>
@@ -30,22 +30,23 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="accessory-main d-flex justify-content-between align-items-center">
-                                <h5 class="card-title">Manage Accessories</h5>
+                                <h5 class="card-title">Manage Inventory</h5>
                                 <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#accessoryModal" onclick="clearModal()">
-                                    <i class="bi bi-plus-circle me-1"></i> Add New Accessory
+                                    <i class="bi bi-plus-circle me-1"></i> Add New Item
                                 </button>
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-bordered mt-3" id="accessoryTable">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th>Image</th>
-                                            <th>Accessory Name</th>
-                                            <th>Brand</th>
-                                            <th>Category</th>
-                                            <th>Price</th>
+                                            <th>Type</th>
+                                            <th>Name</th>
                                             <th>Quantity</th>
-                                            <th>Stock Status</th>
+                                            <th>Condition</th>
+                                            <th>Purchase Date</th>
+                                            <th>Next Service</th>
+                                            <th>MM</th>
+                                            <th>Section</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -63,34 +64,45 @@
                                         <div class="modal-body">
                                             <form class="row g-3" id="accessoryForm">
                                                 <div class="col-md-6">
-                                                    <label class="form-label">Accessory Name</label>
-                                                    <input type="text" class="form-control" id="inputAccessoryName" required>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label">Brand</label>
-                                                    <input type="text" class="form-control" id="inputBrand" required>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label">Category</label>
-                                                    <select class="form-select" id="inputCategory" required>
-                                                        <option selected disabled>Choose category</option>
-                                                        <option>Tripod</option>
-                                                        <option>Gimbal</option>
-                                                        <option>Memory Card</option>
-                                                        <option>Lighting Equipment</option>
+                                                    <label class="form-label">Type</label>
+                                                    <select class="form-select" id="inputType" required onchange="onTypeChange()">
+                                                        <option selected>Camera</option>
+                                                        <option>Lens</option>
+                                                        <option>Battery</option>
+                                                        <option>Other</option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Price</label>
-                                                    <input type="number" class="form-control" id="inputPrice" required>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Name / Description</label>
+                                                    <input type="text" class="form-control" id="inputName" required>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-6">
                                                     <label class="form-label">Quantity</label>
                                                     <input type="number" class="form-control" id="inputQuantity" required>
                                                 </div>
-                                                <div class="col-md-12">
-                                                    <label class="form-label">Upload Image</label>
-                                                    <input type="file" class="form-control" id="inputImage" accept="image/*">
+                                                <div class="col-md-6" id="fieldCondition">
+                                                    <label class="form-label">Condition</label>
+                                                    <select class="form-select" id="inputCondition">
+                                                        <option>Excellent</option>
+                                                        <option>Good</option>
+                                                        <option>Under Servicing</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6" id="fieldPurchase">
+                                                    <label class="form-label">Purchase Date</label>
+                                                    <input type="date" class="form-control" id="inputPurchase">
+                                                </div>
+                                                <div class="col-md-6" id="fieldNextService">
+                                                    <label class="form-label">Next Service</label>
+                                                    <input type="date" class="form-control" id="inputNextService">
+                                                </div>
+                                                <div class="col-md-6" id="fieldMM">
+                                                    <label class="form-label">Focal Length (mm)</label>
+                                                    <input type="text" class="form-control" id="inputMM">
+                                                </div>
+                                                <div class="col-md-6" id="fieldSection">
+                                                    <label class="form-label">Section</label>
+                                                    <input type="text" class="form-control" id="inputSection">
                                                 </div>
                                             </form>
                                         </div>
@@ -110,55 +122,79 @@
 
     <script>
     function clearModal() {
-        document.getElementById("accessoryForm").reset();
+        const form = document.getElementById("accessoryForm");
+        form.reset();
+        onTypeChange();
+    }
+
+    function onTypeChange() {
+        const type = document.getElementById("inputType").value;
+        // hide all optional sections
+        ["fieldCondition", "fieldPurchase", "fieldNextService", "fieldMM", "fieldSection"].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = "none";
+        });
+        // show relevant
+        if (type === "Camera") {
+            document.getElementById("fieldCondition").style.display = "";
+            document.getElementById("fieldPurchase").style.display = "";
+            document.getElementById("fieldNextService").style.display = "";
+        } else if (type === "Lens") {
+            document.getElementById("fieldMM").style.display = "";
+            document.getElementById("fieldSection").style.display = "";
+        }
     }
 
     function saveAccessory() {
-        const name = document.getElementById("inputAccessoryName").value;
-        const brand = document.getElementById("inputBrand").value;
-        const category = document.getElementById("inputCategory").value;
-        const price = document.getElementById("inputPrice").value;
+        const type = document.getElementById("inputType").value;
+        const name = document.getElementById("inputName").value;
         const quantity = document.getElementById("inputQuantity").value;
-        const image = document.getElementById("inputImage").files[0];
+        const condition = document.getElementById("inputCondition")?.value || "";
+        const purchase = document.getElementById("inputPurchase")?.value || "";
+        const nextSvc = document.getElementById("inputNextService")?.value || "";
+        const mm = document.getElementById("inputMM")?.value || "";
+        const section = document.getElementById("inputSection")?.value || "";
 
-        if (!name || !brand || !category || !price || !quantity || !image) {
-            alert("Please fill in all required fields.");
+        if (!type || !name || !quantity) {
+            alert("Please fill in the required fields.");
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const table = document.getElementById("accessoryTable").getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
-            const stockStatus = quantity > 0 ? '<span class="badge bg-success">In Stock</span>' : '<span class="badge bg-danger">Out of Stock</span>';
-
-            newRow.innerHTML = `
-                <td><img src="${e.target.result}" width="50"></td>
-                <td>${name}</td>
-                <td>${brand}</td>
-                <td>${category}</td>
-                <td>${price}</td>
-                <td>${quantity}</td>
-                <td>${stockStatus}</td>
-            `;
-        };
-        reader.readAsDataURL(image);
+        const table = document.getElementById("accessoryTable").getElementsByTagName('tbody')[0];
+        const newRow = table.insertRow();
+        newRow.innerHTML = `
+            <td>${type}</td>
+            <td>${name}</td>
+            <td>${quantity}</td>
+            <td>${condition}</td>
+            <td>${purchase}</td>
+            <td>${nextSvc}</td>
+            <td>${mm}</td>
+            <td>${section}</td>
+        `;
 
         document.getElementById("accessoryForm").reset();
+        onTypeChange();
         new bootstrap.Modal(document.getElementById("accessoryModal")).hide();
     }
 
     function filterAccessories() {
         const searchValue = document.getElementById("searchAccessory").value.toLowerCase();
-        const categoryFilter = document.getElementById("filterCategory").value;
+        const typeFilter = document.getElementById("filterCategory").value;
         const table = document.getElementById("accessoryTable").getElementsByTagName('tbody')[0];
         const rows = table.getElementsByTagName("tr");
 
         for (let row of rows) {
             const name = row.cells[1].textContent.toLowerCase();
-            const category = row.cells[3].textContent;
-            row.style.display = (name.includes(searchValue) && (!categoryFilter || category === categoryFilter)) ? "" : "none";
+            const type = row.cells[0].textContent;
+            row.style.display =
+                (name.includes(searchValue) && (!typeFilter || type === typeFilter))
+                ? ""
+                : "none";
         }
     }
+    // initialize hide/show
+    document.addEventListener('DOMContentLoaded', onTypeChange);
+
     </script>
 </main>

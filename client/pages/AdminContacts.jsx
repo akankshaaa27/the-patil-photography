@@ -32,7 +32,7 @@ export default function AdminContacts() {
             const [contactRes, userRes, settingsRes, ordersRes, enquiriesRes, invoicesRes, clientsRes, usersRes] = await Promise.all([
                 fetch("/api/contact"),
                 fetch("/api/users/me"),
-                fetch("/api/global-settings"),
+                fetch("/api/settings"),
                 fetch("/api/orders").catch(() => ({ ok: false, json: () => [] })),
                 fetch("/api/enquiries").catch(() => ({ ok: false, json: () => [] })),
                 fetch("/api/invoices").catch(() => ({ ok: false, json: () => [] })),
@@ -240,7 +240,7 @@ export default function AdminContacts() {
             )}
 
             {/* Dynamic Dashboard Section - Data from All Components */}
-            <div className="max-w-7xl mx-auto px-6 py-8">
+            <div className="max-w-7xl mx-auto">
                 {/* Messages Stats */}
                 <h2 className="text-2xl font-bold text-charcoal-900 mb-4">Contact Messages</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

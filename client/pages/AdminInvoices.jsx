@@ -76,37 +76,60 @@ export default function AdminInvoices() {
 
   const handleGeneratePDF = (e, invoice) => {
     e.stopPropagation();
-    // Construct client object if missing or incomplete
-    const clientObj = invoice.clientData || {
-      name: invoice.client,
-      email: "clients@example.com", // Fallback
+    // Construct comprehensive client object with all required fields
+    const clientObj = invoice.clientData ? {
+      name: invoice.clientData.name || invoice.client || "Client",
+      email: invoice.clientData.email || "client@example.com",
+      phone: invoice.clientData.phone || "",
+      address: invoice.clientData.address || ""
+    } : {
+      name: invoice.client || "Client",
+      email: "",
       phone: "",
       address: ""
     };
 
-    // Construct invoice object for PDF generator
-    // We need to ensure logic for empty services to avoid empty table
+    // Construct professional services array with proper calculations
     const safeServices = (invoice.services && invoice.services.length > 0)
-      ? invoice.services
+      ? invoice.services.map(service => ({
+        serviceName: service.serviceName || service.name || "Photography Service",
+        quantity: Number(service.quantity) || 1,
+        days: Number(service.days) || 1,
+        ratePerDay: Number(service.ratePerDay) || 0,
+        total: Number(service.total) || Number(service.quantity || 1) * Number(service.ratePerDay || 0)
+      }))
       : [{
-        serviceName: "Consolidated Services",
+        serviceName: invoice.event || "Photography Service",
         quantity: 1,
         days: 1,
-        ratePerDay: invoice.amount,
-        total: invoice.amount
+        ratePerDay: Number(invoice.amount) || 0,
+        total: Number(invoice.amount) || 0
       }];
 
+    // Calculate proper invoice totals with professional rounding
+    const subtotal = safeServices.reduce((sum, s) => sum + (s.total || 0), 0);
+    const taxPercentage = Number(invoice.taxPercentage) || 0;
+    const tax = Math.round((subtotal * taxPercentage) / 100);
+    const discount = Number(invoice.discount) || 0;
+    const grandTotal = subtotal + tax - discount;
+
+    // Construct complete professional invoice object for PDF
     const pdfInvoice = {
-      ...invoice,
-      invoiceNumber: invoice.invoiceNo,
-      invoiceDate: invoice.issueDate,
+      invoiceNumber: invoice.invoiceNo || "INV-001",
+      invoiceDate: invoice.issueDate || new Date().toISOString().split('T')[0],
+      eventDate: invoice.issueDate || new Date().toISOString().split('T')[0],
+      dueDate: invoice.dueDate || new Date().toISOString().split('T')[0],
       services: safeServices,
-      subtotal: invoice.amount,
-      tax: 0, // Fallback as basic form doesn't track tax separately
-      taxPercentage: 0,
-      grandTotal: invoice.amount,
-      discount: 0,
-      bankDetails: settings?.bankDetails || {} // Use global settings bank details
+      subtotal: Math.round(subtotal),
+      tax: Math.round(tax),
+      taxPercentage: taxPercentage,
+      discount: Math.round(discount),
+      discountType: "fixed",
+      grandTotal: Math.round(grandTotal),
+      amountPaid: Number(invoice.paid) || 0,
+      paymentStatus: invoice.status || "Draft",
+      notes: invoice.notes || "",
+      bankDetails: settings?.bankDetails || {}
     };
 
     generateInvoicePDF(pdfInvoice, clientObj, settings || {});
@@ -520,24 +543,6 @@ export default function AdminInvoices() {
                 </div>
               ))}
             </div>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h3 className="text-base font-semibold text-charcoal-900">Workflow Notes</h3>
-            <ol className="mt-4 space-y-3 text-sm text-slate-600">
-              <li className="rounded-xl bg-slate-50 p-3">
-                <p className="font-semibold text-charcoal-900">Send teaser-linked invoices</p>
-                <p className="text-xs text-slate-500">Attach preview gallery for faster approvals.</p>
-              </li>
-              <li className="rounded-xl bg-slate-50 p-3">
-                <p className="font-semibold text-charcoal-900">Automate WhatsApp nudges</p>
-                <p className="text-xs text-slate-500">Schedule reminders 48h before due date.</p>
-              </li>
-              <li className="rounded-xl bg-slate-50 p-3">
-                <p className="font-semibold text-charcoal-900">Reward early settlements</p>
-                <p className="text-xs text-slate-500">Offer 5% off on advance payments.</p>
-              </li>
-            </ol>
           </div>
         </div>
       </div>

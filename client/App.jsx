@@ -268,21 +268,21 @@ const AppShell = () => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem onClick={() => navigate('/admin-profile')} className="cursor-pointer p-3 focus:bg-gold-50">
+                <DropdownMenuItem onClick={() => navigate('/admin-profile')} className="cursor-pointer p-3 focus:bg-gold-50 flex gap-2 items-cente">
                   <User className="h-4 w-4 text-gray-500" />
-                  <span className="ml-6 font-medium text-gray-700">My Profile</span>
+                  <span className="font-medium text-gray-700">My Profile</span>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem onClick={() => setPasswordModalOpen(true)} className="cursor-pointer p-3 focus:bg-gold-50">
+                <DropdownMenuItem onClick={() => setPasswordModalOpen(true)} className="cursor-pointer p-3 focus:bg-gold-50 flex gap-2 items-center">
                   <Key className="h-4 w-4 text-gray-500" />
-                  <span className="ml-6 font-medium text-gray-700">Change Password</span>
+                  <span className="font-medium text-gray-700">Change Password</span>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator className="my-2" />
 
-                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer p-3 focus:bg-red-50">
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer p-3 focus:bg-red-50 flex gap-2 items-cente">
                   <LogOut className="h-4 w-4 text-gray-500" />
-                  <span className="ml-6 font-medium text-gray-700">Signout</span>
+                  <span className="font-medium text-gray-700">Signout</span>
                 </DropdownMenuItem>
 
               </DropdownMenuContent>

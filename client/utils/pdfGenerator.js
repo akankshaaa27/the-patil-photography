@@ -58,28 +58,12 @@ export const generateQuotationPDF = (quotation, client, settings = {}) => {
   const primaryPhone = settings.primaryMobileNumber || "";
   const secondaryPhone = settings.secondaryMobileNumber || "";
   const contactEmail = settings.contactEmail || "";
-  const socialLinks = settings.socialLinks || [];
 
   const logoHtml = primaryLogo
     ? `<img src="${primaryLogo}" style="height: 50px; object-fit: contain;" />`
     : `<div style="width: 50px; height: 50px; background: linear-gradient(135deg, #d4a574, #c49561); border-radius: 8px; display: flex; align-items: center; justify-content: center;"><span style="color: white; font-weight: bold; font-size: 20px;">P</span></div>`;
 
-  // Social media icons HTML
-  const socialIconsHtml = socialLinks
-    .filter(l => l.active)
-    .map(link => {
-      const platformIcons = {
-        'WhatsApp': '📱',
-        'Instagram': '📷',
-        'Facebook': 'f',
-        'YouTube': '▶',
-        'Twitter': '𝕏',
-        'LinkedIn': 'in',
-        'Other': '🔗'
-      };
-      return `<a href="${link.url}" target="_blank" style="margin: 0 5px; text-decoration: none; color: #d4a574; font-weight: bold;">${platformIcons[link.platform] || link.platform}</a>`;
-    })
-    .join('');
+
 
   // Contact info HTML
   const contactInfoHtml = `
@@ -87,7 +71,6 @@ export const generateQuotationPDF = (quotation, client, settings = {}) => {
       ${primaryPhone ? `<p style="margin: 0;">📞 ${primaryPhone}${secondaryPhone ? ` | ${secondaryPhone}` : ''}</p>` : ''}
       ${contactEmail ? `<p style="margin: 0;">✉️ ${contactEmail}</p>` : ''}
       ${address ? `<p style="margin: 0;">📍 ${address}</p>` : ''}
-      ${socialIconsHtml ? `<p style="margin: 0 0 5px 0;">Social: ${socialIconsHtml}</p>` : ''}
     </div>
   `;
 
@@ -209,7 +192,14 @@ export const generateQuotationPDF = (quotation, client, settings = {}) => {
 
   setTimeout(async () => {
     try {
-      await generatePDF("pdf-content", `Quotation-${quotation.quotationNumber}.pdf`);
+      // include client name in filename if available
+      const clientName =
+        client?.name || quotation.client?.name || quotation.clientName || "client";
+      const clientLabel = clientName.replace(/\s+/g, "_");
+      await generatePDF(
+        "pdf-content",
+        `Quotation-${clientLabel}-${quotation.quotationNumber}.pdf`
+      );
     } finally {
       document.body.removeChild(tempDiv);
     }
@@ -224,28 +214,12 @@ export const generateInvoicePDF = (invoice, client, settings = {}) => {
   const primaryPhone = settings.primaryMobileNumber || "";
   const secondaryPhone = settings.secondaryMobileNumber || "";
   const contactEmail = settings.contactEmail || "";
-  const socialLinks = settings.socialLinks || [];
 
   const logoHtml = primaryLogo
     ? `<img src="${primaryLogo}" style="height: 50px; object-fit: contain;" />`
     : `<div style="width: 50px; height: 50px; background: linear-gradient(135deg, #d4a574, #c49561); border-radius: 8px; display: flex; align-items: center; justify-content: center;"><span style="color: white; font-weight: bold; font-size: 20px;">P</span></div>`;
 
-  // Social media icons HTML
-  const socialIconsHtml = socialLinks
-    .filter(l => l.active)
-    .map(link => {
-      const platformIcons = {
-        'WhatsApp': '📱',
-        'Instagram': '📷',
-        'Facebook': 'f',
-        'YouTube': '▶',
-        'Twitter': '𝕏',
-        'LinkedIn': 'in',
-        'Other': '🔗'
-      };
-      return `<a href="${link.url}" target="_blank" style="margin: 0 5px; text-decoration: none; color: #d4a574; font-weight: bold;">${platformIcons[link.platform] || link.platform}</a>`;
-    })
-    .join('');
+
 
   // Contact info HTML
   const contactInfoHtml = `
@@ -253,7 +227,6 @@ export const generateInvoicePDF = (invoice, client, settings = {}) => {
       ${primaryPhone ? `<p style="margin: 0;">📞 ${primaryPhone}${secondaryPhone ? ` | ${secondaryPhone}` : ''}</p>` : ''}
       ${contactEmail ? `<p style="margin: 0;">✉️ ${contactEmail}</p>` : ''}
       ${address ? `<p style="margin: 0;">📍 ${address}</p>` : ''}
-      ${socialIconsHtml ? `<p style="margin: 0 0 5px 0;">Social: ${socialIconsHtml}</p>` : ''}
     </div>
   `;
 
@@ -383,7 +356,14 @@ export const generateInvoicePDF = (invoice, client, settings = {}) => {
 
   setTimeout(async () => {
     try {
-      await generatePDF("pdf-content", `Invoice-${invoice.invoiceNumber}.pdf`);
+      // include client name in filename if available
+      const clientName =
+        client?.name || invoice.client?.name || invoice.clientName || "client";
+      const clientLabel = clientName.replace(/\s+/g, "_");
+      await generatePDF(
+        "pdf-content",
+        `Invoice-${clientLabel}-${invoice.invoiceNumber}.pdf`
+      );
     } finally {
       document.body.removeChild(tempDiv);
     }
@@ -398,28 +378,12 @@ export const generateOrderPDF = (order, settings = {}) => {
   const primaryPhone = settings.primaryMobileNumber || "";
   const secondaryPhone = settings.secondaryMobileNumber || "";
   const contactEmail = settings.contactEmail || "";
-  const socialLinks = settings.socialLinks || [];
 
   const logoHtml = primaryLogo
     ? `<img src="${primaryLogo}" style="height: 50px; object-fit: contain;" />`
     : `<div style="width: 50px; height: 50px; background: linear-gradient(135deg, #d4a574, #c49561); border-radius: 8px; display: flex; align-items: center; justify-content: center;"><span style="color: white; font-weight: bold; font-size: 20px;">P</span></div>`;
 
-  // Social media icons HTML
-  const socialIconsHtml = socialLinks
-    .filter(l => l.active)
-    .map(link => {
-      const platformIcons = {
-        'WhatsApp': '📱',
-        'Instagram': '📷',
-        'Facebook': 'f',
-        'YouTube': '▶',
-        'Twitter': '𝕏',
-        'LinkedIn': 'in',
-        'Other': '🔗'
-      };
-      return `<a href="${link.url}" target="_blank" style="margin: 0 5px; text-decoration: none; color: #d4a574; font-weight: bold;">${platformIcons[link.platform] || link.platform}</a>`;
-    })
-    .join('');
+
 
   // Contact info HTML
   const contactInfoHtml = `
@@ -427,7 +391,6 @@ export const generateOrderPDF = (order, settings = {}) => {
       ${primaryPhone ? `<p style="margin: 0;">📞 ${primaryPhone}${secondaryPhone ? ` | ${secondaryPhone}` : ''}</p>` : ''}
       ${contactEmail ? `<p style="margin: 0;">✉️ ${contactEmail}</p>` : ''}
       ${address ? `<p style="margin: 0;">📍 ${address}</p>` : ''}
-      ${socialIconsHtml ? `<p style="margin: 0 0 5px 0;">Social: ${socialIconsHtml}</p>` : ''}
     </div>
   `;
 

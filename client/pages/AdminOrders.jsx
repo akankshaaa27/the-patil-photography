@@ -174,6 +174,15 @@ export default function AdminOrders() {
     const { name, value } = e.target;
     setForm((f) => {
       const updated = { ...f, [name]: value };
+
+      // keep end date >= start date
+      if (name === "event_date") {
+        if (updated.event_end_date && updated.event_end_date < value) {
+          // push end date forward to match start
+          updated.event_end_date = value;
+        }
+      }
+
       if (name === "amount" || name === "amount_paid") {
         const total = parseFloat(updated.amount) || 0;
         const paid = parseFloat(updated.amount_paid) || 0;
@@ -719,6 +728,7 @@ export default function AdminOrders() {
                       type="date"
                       name="event_end_date"
                       value={form.event_end_date}
+                      min={form.event_date || ""}
                       onChange={handleChange}
                       className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none"
                     />
