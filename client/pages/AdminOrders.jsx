@@ -473,7 +473,7 @@ export default function AdminOrders() {
                         <h3 className="font-semibold text-charcoal-900">{order.name || order.customerName}</h3>
                         <p className="text-sm text-slate-500">{order.event_name || "-"}</p>
                       </div>
-                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusClass(order.order_status || order.status)}`}>
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap ${statusClass(order.order_status || order.status)}`}>
                         {order.order_status || order.status || "Pending"}
                       </span>
                     </div>
@@ -562,7 +562,7 @@ export default function AdminOrders() {
                         {remaining > 0 ? `₹${remaining.toLocaleString()}` : "-"}
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${statusClass(order.order_status || order.status)}`}>
+                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap ${statusClass(order.order_status || order.status)}`}>
                           {order.order_status || order.status || "Pending"}
                         </span>
                       </td>

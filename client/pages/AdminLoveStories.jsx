@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Edit, Trash2, Plus } from "lucide-react";
+import { Edit, Trash2, Plus, ArrowUp, ArrowDown, GripVertical } from "lucide-react";
 import Skeleton from "../components/Skeleton";
 import PageHeader from "../components/PageHeader";
 
@@ -14,6 +14,7 @@ export default function AdminLoveStories() {
         thumbnail: "",
         gallery: [],
         status: "Active",
+        order: 1, // default display priority
     });
     const [editingId, setEditingId] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
@@ -27,7 +28,10 @@ export default function AdminLoveStories() {
         try {
             const res = await fetch("/api/love-stories");
             const data = await res.json();
-            setStories(Array.isArray(data) ? data : []);
+            const list = Array.isArray(data) ? data : [];
+            // sort by order asc so UI reflects positioning
+            list.sort((a, b) => (a.order || 0) - (b.order || 0));
+            setStories(list);
         } catch (error) {
             console.error("Error fetching stories:", error);
         } finally {
@@ -108,7 +112,10 @@ export default function AdminLoveStories() {
     };
 
     const handleEdit = (story) => {
-        setForm(story);
+        setForm({
+            ...story,
+            order: story.order || 1
+        });
         setEditingId(story._id);
         setShowForm(true);
     };
@@ -116,6 +123,41 @@ export default function AdminLoveStories() {
     const handleDelete = async (id) => {
         if (confirm("Are you sure you want to delete this story?")) {
             await fetch(`/api/love-stories/${id}`, { method: "DELETE" });
+            fetchStories();
+        }
+    };
+
+    // reorder stories using up/down buttons (similar to slider management)
+    const moveStory = async (id, dir) => {
+        const list = [...stories];
+        const idx = list.findIndex((s) => s._id === id);
+        if (idx === -1) return;
+        const targetIdx = idx + dir;
+        if (targetIdx < 0 || targetIdx >= list.length) return;
+
+        // swap
+        [list[idx], list[targetIdx]] = [list[targetIdx], list[idx]];
+
+        // update order values based on new index (1-based)
+        const updates = list.map((st, i) => ({ id: st._id, order: i + 1 }));
+
+        // optimistic local update
+        setStories(list);
+
+        try {
+            // send all updates to server
+            await Promise.all(
+                updates.map((u) =>
+                    fetch(`/api/love-stories/${u.id}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ order: u.order }),
+                    })
+                )
+            );
+        } catch (err) {
+            console.error("Error updating order:", err);
+            // fallback to fresh data
             fetchStories();
         }
     };
@@ -213,17 +255,17 @@ export default function AdminLoveStories() {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Order (display priority)</label>
-                                        <select
-                                            name="order"
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                          Order (display priority): <span className="font-semibold">{form.order || 1}</span>
+                                        </label>
+                                        <input
+                                            type="range"
+                                            min="1"
+                                            max="20"
                                             value={form.order || 1}
                                             onChange={(e) => setForm({ ...form, order: Number(e.target.value) })}
-                                            className="w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-gold-500 outline-none bg-white"
-                                        >
-                                            {[...Array(20)].map((_, i) => (
-                                                <option key={i} value={i + 1}>{i + 1}</option>
-                                            ))}
-                                        </select>
+                                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                        />
                                     </div>
                                 </div>
 
@@ -285,7 +327,7 @@ export default function AdminLoveStories() {
                                     <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
                                         <li>Use high quality images (recommended 1200x800)</li>
                                         <li>Write a descriptive title and location</li>
-                                        <li>Order defines display priority (1 is highest)</li>
+                                        <li>Slide the order control to set display priority (1 is highest)</li>
                                     </ul>
                                 </div>
 
@@ -348,6 +390,30 @@ export default function AdminLoveStories() {
                                     <div>
                                         <h3 className="font-semibold text-gray-900 text-lg leading-tight">{story.title}</h3>
                                         <p className="text-sm text-gray-500 mt-0.5">{story.location}</p>
+                                        <div className="mt-2 flex items-center gap-2">
+                      <div className="flex items-center gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-2 rounded-lg border border-blue-200">
+                        <GripVertical size={16} className="text-blue-600" />
+                        <span className="text-sm font-bold text-blue-700">{stories.indexOf(story) + 1}/{stories.length}</span>
+                      </div>
+                      <div className="flex gap-1.5 bg-gray-100 p-1 rounded-lg">
+                        <button
+                          onClick={() => moveStory(story._id, -1)}
+                          disabled={stories[0]._id === story._id}
+                          title="Move up"
+                          className="p-2 text-gray-600 hover:text-white hover:bg-green-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-md transition-all duration-200 flex items-center justify-center"
+                        >
+                          <ArrowUp size={16} />
+                        </button>
+                        <button
+                          onClick={() => moveStory(story._id, 1)}
+                          disabled={stories[stories.length - 1]._id === story._id}
+                          title="Move down"
+                          className="p-2 text-gray-600 hover:text-white hover:bg-orange-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-md transition-all duration-200 flex items-center justify-center"
+                        >
+                          <ArrowDown size={16} />
+                        </button>
+                      </div>
+                    </div>
                                     </div>
 
                                     <div className="flex justify-end gap-2 pt-1">
@@ -379,6 +445,7 @@ export default function AdminLoveStories() {
                                 <th className="px-6 py-4">Title</th>
                                 <th className="px-6 py-4">Location</th>
                                 <th className="px-6 py-4">Status</th>
+                                <th className="px-6 py-4">Order</th>
                                 <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -392,6 +459,7 @@ export default function AdminLoveStories() {
                                         <td className="px-6 py-4"><Skeleton width="180px" height="20px" /></td>
                                         <td className="px-6 py-4"><Skeleton width="120px" height="20px" /></td>
                                         <td className="px-6 py-4"><Skeleton width="60px" height="24px" borderRadius="16px" /></td>
+                                        <td className="px-6 py-4"><Skeleton width="120px" height="24px" /></td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex justify-end gap-2">
                                                 <Skeleton width="34px" height="34px" borderRadius="8px" />
@@ -422,6 +490,30 @@ export default function AdminLoveStories() {
                                         >
                                             {story.status}
                                         </span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2">
+                                          <GripVertical size={14} className="text-blue-600" />
+                                          <span className="text-xs font-bold text-blue-700">{stories.indexOf(story) + 1}/{stories.length}</span>
+                                          <div className="flex gap-1.5 bg-gray-100 p-1 rounded-lg ml-3">
+                                            <button
+                                              onClick={() => moveStory(story._id, -1)}
+                                              disabled={stories[0]._id === story._id}
+                                              title="Move up"
+                                              className="p-2 text-gray-600 hover:text-white hover:bg-green-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-md transition-all duration-200 flex items-center justify-center"
+                                            >
+                                              <ArrowUp size={16} />
+                                            </button>
+                                            <button
+                                              onClick={() => moveStory(story._id, 1)}
+                                              disabled={stories[stories.length - 1]._id === story._id}
+                                              title="Move down"
+                                              className="p-2 text-gray-600 hover:text-white hover:bg-orange-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-md transition-all duration-200 flex items-center justify-center"
+                                            >
+                                              <ArrowDown size={16} />
+                                            </button>
+                                          </div>
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-2">

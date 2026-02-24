@@ -64,6 +64,11 @@ export default function AdminPopup() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        // don't submit if there's nothing to save (all fields empty)
+        if (!formData.title && !formData.description && !formData.image) {
+            toast.error("Please provide at least a title, description or image before saving");
+            return;
+        }
         mutation.mutate(formData);
     };
 
@@ -125,7 +130,10 @@ export default function AdminPopup() {
 
                         <button
                             type="submit"
-                            disabled={mutation.isPending}
+                            disabled={
+                                mutation.isPending ||
+                                (!formData.title && !formData.description && !formData.image)
+                            }
                             className="w-full bg-gold-500 text-white rounded-lg py-3 font-semibold hover:bg-gold-600 transition-colors disabled:opacity-50"
                         >
                             {mutation.isPending ? "Saving..." : "Save Changes"}

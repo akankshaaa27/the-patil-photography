@@ -212,7 +212,7 @@ export default function AdminSettings() {
                     <div className="flex gap-2">
                         <button
                             onClick={() => setViewOnly(true)}
-                            className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+                            className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition hidden"
                         >
                             Preview
                         </button>
