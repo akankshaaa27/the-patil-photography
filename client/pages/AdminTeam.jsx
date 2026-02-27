@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { apiRequest } from "../lib/apiFetch";
 import { useToast } from "@/components/ui/use-toast"; // Assuming this exists or similar
 import { Trash2, Edit, Plus, GripVertical, Image as ImageIcon } from "lucide-react";
+import { useConfirm } from "@/components/ConfirmModal";
 
 export default function AdminTeam() {
     const [showForm, setShowForm] = useState(false);
@@ -19,6 +20,8 @@ export default function AdminTeam() {
         contact: { phone: "", email: "" },
         order: 0
     });
+
+    const { confirm, ConfirmDialog } = useConfirm();
 
     const queryClient = useQueryClient();
     const { toast } = useToast();
@@ -119,6 +122,7 @@ export default function AdminTeam() {
 
     return (
         <div className="p-0">
+            {ConfirmDialog}
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold font-playfair text-charcoal-900">Team Management</h1>
@@ -255,8 +259,12 @@ export default function AdminTeam() {
                                     <Button size="icon" variant="ghost" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={() => handleEdit(member)}>
                                         <Edit className="h-4 w-4" />
                                     </Button>
-                                    <Button size="icon" variant="ghost" className="h-8 w-8 text-red-600 hover:bg-red-50" onClick={() => {
-                                        if (confirm('Delete this team member?')) deleteMutation.mutate(member._id);
+                                    <Button size="icon" variant="ghost" className="h-8 w-8 text-red-600 hover:bg-red-50" onClick={async () => {
+                                        const ok = await confirm({
+                                            title: "Delete Team Member?",
+                                            message: "Delete this team member?",
+                                        });
+                                        if (ok) deleteMutation.mutate(member._id);
                                     }}>
                                         <Trash2 className="h-4 w-4" />
                                     </Button>

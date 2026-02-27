@@ -9,6 +9,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import PageHeader from "../components/PageHeader";
+import { useConfirm } from "@/components/ConfirmModal";
 
 export default function AdminCommonTypes() {
     const [activeTab, setActiveTab] = useState("event-types");
@@ -22,6 +23,8 @@ export default function AdminCommonTypes() {
 
     // Form State
     const [formData, setFormData] = useState({});
+
+    const { confirm, ConfirmDialog } = useConfirm();
 
     useEffect(() => {
         fetchData();
@@ -44,7 +47,11 @@ export default function AdminCommonTypes() {
     };
 
     const handleDelete = async (id) => {
-        if (!confirm("Are you sure you want to delete this item?")) return;
+        const ok = await confirm({
+            title: "Delete Item?",
+            message: "Are you sure you want to delete this item?",
+        });
+        if (!ok) return;
 
         try {
             const endpoint = activeTab === "event-types" ? `/api/event-types/${id}` : `/api/services/${id}`;
@@ -106,6 +113,7 @@ export default function AdminCommonTypes() {
 
     return (
         <div className="mt-0 container mx-auto px-0 pt-0 pb-6 animate-in fade-in duration-500 space-y-6">
+            {ConfirmDialog}
             <PageHeader
                 title="Common Types Management"
                 description="Manage Event Types and Service Categories"

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { generatePDF, generateOrderPDF } from "../utils/pdfGenerator";
 import { useSettings } from "../hooks/useSettings";
-import { Eye, FileText, Edit, Trash2, Download, Plus } from "lucide-react";
+import { Eye, FileText, Edit, Trash2, Download, Plus, MessageCircle } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 
 const emptyOrder = {
@@ -221,9 +221,11 @@ export default function AdminOrders() {
 
   async function saveOrder() {
     if (isSaving) return;
+    setIsSaving(true);
 
     if (!form.name || !form.whatsapp_no) {
       alert("Please provide name and WhatsApp number");
+      setIsSaving(false);
       return;
     }
 
@@ -287,6 +289,56 @@ export default function AdminOrders() {
         throw new Error(errData.message || "Failed to save order");
       }
 
+      // if this was a newly created order, ensure we have a corresponding client record
+      if (!editingOrder) {
+        // attempt to find existing client by phone or name (local cache)
+        const existing = clients.find(c =>
+          (c.phone && c.phone === payload.whatsapp_no) ||
+          (c.name && c.name.toLowerCase() === payload.name.toLowerCase())
+        );
+
+        // helper to create the client on server
+        const createClientRecord = async () => {
+          try {
+            await fetch('/api/clients', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: payload.name,
+                phone: payload.whatsapp_no,
+                email: payload.email || ''
+              }),
+            });
+            // refresh local list so autocomplete sees new client
+            fetchClients();
+          } catch (e) {
+            console.error('Failed to auto-create client for order:', e);
+          }
+        };
+
+        if (!existing && payload.name && payload.whatsapp_no) {
+          // perform server search to avoid race conditions or stale cache
+          try {
+            const q = encodeURIComponent(payload.whatsapp_no || payload.name);
+            const searchRes = await fetch(`/api/clients/search?query=${q}`);
+            if (searchRes.ok) {
+              const arr = await searchRes.json();
+              if (!Array.isArray(arr) || arr.length === 0) {
+                await createClientRecord();
+              } else {
+                // there is at least one match, so skip create
+              }
+            } else {
+              // fallback to creating if search fails
+              await createClientRecord();
+            }
+          } catch (e) {
+            console.error('Error searching clients before create:', e);
+            await createClientRecord();
+          }
+        }
+      }
+
       await fetchOrders();
       setShowForm(false);
       setEditingOrder(null);
@@ -296,6 +348,7 @@ export default function AdminOrders() {
       console.error(err);
       alert(err.message);
     } finally {
+      // reset saving flag regardless of outcome
       setIsSaving(false);
     }
   }
@@ -326,6 +379,35 @@ export default function AdminOrders() {
 
   async function downloadReceipt(order) {
     generateOrderPDF(order, settings || {});
+  }
+
+  function sendPaymentReminder(order) {
+    if (!order.whatsapp_no) {
+      alert("Client WhatsApp number not found!");
+      return;
+    }
+
+    const total = parseFloat(order.amount) || 0;
+    const paid = parseFloat(order.amount_paid) || parseFloat(order.paidAmount) || 0;
+    const remaining = total - paid;
+
+    if (remaining <= 0) {
+      alert("No pending payment for this order!");
+      return;
+    }
+
+    // Format phone number (remove spaces, dashes, +)
+    const phoneNumber = order.whatsapp_no.replace(/[^\d]/g, "");
+    
+    // Create professional payment reminder message
+    const eventName = order.event_name || "Your Event";
+    const message = encodeURIComponent(
+      `Hello ${order.name}!\n\nThis is a friendly reminder regarding the payment for your ${eventName}.\n\n Payment Details:\n• Total Amount: ₹${Number(total).toLocaleString()}\n• Amount Paid: ₹${Number(paid).toLocaleString()}\n• Outstanding Balance: ₹${Number(remaining).toLocaleString()}\n\nKindly arrange for the remaining payment at your earliest convenience.\n\nThank you for choosing The Patil Photography!\n\nBest regards,\nThe Patil Photography Team`
+    );
+
+    // Open WhatsApp
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+    window.open(whatsappUrl, "_blank");
   }
 
   const [photographyTypes, setPhotographyTypes] = useState(() => {
@@ -503,6 +585,9 @@ export default function AdminOrders() {
                     <div className="flex justify-end gap-2 pt-2">
                       <button className="p-2 text-slate-500 hover:bg-slate-50 rounded" onClick={() => openView(order)}><Eye size={18} /></button>
                       <button className="p-2 text-slate-500 hover:bg-slate-50 rounded" onClick={() => downloadReceipt(order)}><Download size={18} /></button>
+                      {remaining > 0 && (
+                        <button className="p-2 text-green-600 hover:bg-green-50 rounded" onClick={() => sendPaymentReminder(order)} title="Send Payment Reminder"><MessageCircle size={18} /></button>
+                      )}
                       <button className="p-2 text-slate-500 hover:bg-slate-50 rounded" onClick={() => openEdit(order)}><Edit size={18} /></button>
                       <button className="p-2 text-rose-500 hover:bg-rose-50 rounded" onClick={() => confirmDelete(order)}><Trash2 size={18} /></button>
                     </div>
@@ -582,6 +667,15 @@ export default function AdminOrders() {
                           >
                             <Download size={18} />
                           </button>
+                          {remaining > 0 && (
+                            <button
+                              className="p-1.5 rounded-md text-slate-500 hover:bg-white hover:text-green-600 transition-colors"
+                              onClick={() => sendPaymentReminder(order)}
+                              title="Send Payment Reminder"
+                            >
+                              <MessageCircle size={18} />
+                            </button>
+                          )}
                           <button
                             className="p-1.5 rounded-md text-slate-500 hover:bg-white hover:text-green-600 transition-colors"
                             onClick={() => openEdit(order)}
@@ -1090,6 +1184,15 @@ export default function AdminOrders() {
                 >
                   <Download size={16} /> Download Receipt
                 </button>
+                {(parseFloat(viewOrder.amount || 0) - (parseFloat(viewOrder.amount_paid) || parseFloat(viewOrder.paidAmount) || 0)) > 0 && (
+                  <button
+                    className="flex items-center gap-2 rounded-md border border-emerald-200 px-4 py-2 text-sm hover:bg-emerald-50 text-emerald-700 transition-colors"
+                    onClick={() => sendPaymentReminder(viewOrder)}
+                    title="Send WhatsApp payment reminder"
+                  >
+                    <MessageCircle size={16} /> Request Payment
+                  </button>
+                )}
                 <button
                   className="rounded-md bg-gold-500 px-4 py-2 text-sm font-semibold text-white hover:bg-gold-600 transition-colors"
                   onClick={() => openEdit(viewOrder)}

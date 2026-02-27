@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import ClientForm from "@/components/ClientForm";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, Users } from "lucide-react";
+import { useConfirm } from "@/components/ConfirmModal";
 
 export default function Clients() {
   const [clients, setClients] = useState([]);
@@ -9,6 +10,7 @@ export default function Clients() {
   const [showForm, setShowForm] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const { confirm, ConfirmDialog } = useConfirm();
 
   useEffect(() => {
     fetchClients();
@@ -38,7 +40,11 @@ export default function Clients() {
   };
 
   const handleDelete = async (clientId) => {
-    if (!window.confirm("Are you sure you want to delete this client?")) return;
+    const ok = await confirm({
+      title: "Delete Client?",
+      message: "Are you sure you want to delete this client?",
+    });
+    if (!ok) return;
 
     try {
       const response = await fetch(`/api/clients/${clientId}`, {
@@ -82,6 +88,7 @@ export default function Clients() {
 
   return (
     <div>
+      {ConfirmDialog}
       <div className="flex justify-between items-center mb-4">
         <div>
           <h1 className="luxury-text-title mb-1">Clients</h1>

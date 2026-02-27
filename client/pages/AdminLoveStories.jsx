@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Edit, Trash2, Plus, ArrowUp, ArrowDown, GripVertical } from "lucide-react";
 import Skeleton from "../components/Skeleton";
 import PageHeader from "../components/PageHeader";
+import { useConfirm } from "@/components/ConfirmModal";
 
 export default function AdminLoveStories() {
     const [loading, setLoading] = useState(true);
@@ -19,6 +20,8 @@ export default function AdminLoveStories() {
     const [editingId, setEditingId] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+
+    const { confirm, ConfirmDialog } = useConfirm();
 
     useEffect(() => {
         fetchStories();
@@ -121,10 +124,14 @@ export default function AdminLoveStories() {
     };
 
     const handleDelete = async (id) => {
-        if (confirm("Are you sure you want to delete this story?")) {
-            await fetch(`/api/love-stories/${id}`, { method: "DELETE" });
-            fetchStories();
-        }
+        const ok = await confirm({
+            title: "Delete Story?",
+            message: "Are you sure you want to delete this story?",
+        });
+        if (!ok) return;
+
+        await fetch(`/api/love-stories/${id}`, { method: "DELETE" });
+        fetchStories();
     };
 
     // reorder stories using up/down buttons (similar to slider management)
@@ -164,6 +171,7 @@ export default function AdminLoveStories() {
 
     return (
         <div className="mt-0 container mx-auto px-0 pt-0 pb-6 animate-in fade-in duration-500">
+            {ConfirmDialog}
             <PageHeader
                 title="Love Stories"
                 description="Manage and showcase beautiful love stories"

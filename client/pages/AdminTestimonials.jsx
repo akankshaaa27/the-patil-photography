@@ -4,6 +4,7 @@ import { Trash2, Edit2, Plus, GripVertical, Star, AlertCircle, Search, ToggleLef
 import { Link } from "react-router-dom";
 import Skeleton from "../components/Skeleton";
 import PageHeader from "../components/PageHeader";
+import { useConfirm } from "@/components/ConfirmModal";
 
 export default function AdminTestimonials() {
     const [testimonials, setTestimonials] = useState([]);
@@ -12,6 +13,8 @@ export default function AdminTestimonials() {
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+
+    const { confirm, ConfirmDialog } = useConfirm();
 
     // derive sorted list by displayOrder (ascending)
     const sortedTestimonials = React.useMemo(() => {
@@ -115,10 +118,14 @@ export default function AdminTestimonials() {
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm("Are you sure you want to delete this review?")) {
-            await fetch(`/api/testimonials/${id}`, { method: "DELETE" });
-            fetchTestimonials();
-        }
+        const ok = await confirm({
+            title: "Delete Review?",
+            message: "Are you sure you want to delete this review?",
+        });
+        if (!ok) return;
+
+        await fetch(`/api/testimonials/${id}`, { method: "DELETE" });
+        fetchTestimonials();
     };
 
     const handleEdit = (t) => {
@@ -204,6 +211,7 @@ export default function AdminTestimonials() {
 
     return (
         <div className="mt-0 container mx-auto px-0 pt-0 pb-6 animate-in fade-in duration-500">
+            {ConfirmDialog}
             <PageHeader
                 title="Reviews & Feedback"
                 description="Manage accolades and love stories from couples."

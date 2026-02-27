@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Video, PlayCircle } from "lucide-react";
+import { Plus, Pencil, Trash2, Video, PlayCircle, Instagram, AlertCircle } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 
 export default function AdminFilms() {
     const queryClient = useQueryClient();
     const [modalOpen, setModalOpen] = useState(false);
-    const [form, setForm] = useState({ id: null, title: "", youtubeUrl: "", category: "Wedding", status: "Active" });
+    const [form, setForm] = useState({ id: null, title: "", videoUrl: "", category: "Wedding", status: "Active" });
     const [deleteId, setDeleteId] = useState(null);
     const [showSuccess, setShowSuccess] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -47,7 +47,7 @@ export default function AdminFilms() {
             queryClient.invalidateQueries({ queryKey: ["films"] });
             toast.success(form.id ? "Film updated" : "Film created");
             setModalOpen(false);
-            setForm({ id: null, title: "", youtubeUrl: "", category: "Wedding", status: "Active" });
+            setForm({ id: null, title: "", videoUrl: "", category: "Wedding", status: "Active" });
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 3000);
         },
@@ -58,7 +58,8 @@ export default function AdminFilms() {
     const handleSave = () => {
         if (isSaving) return;
         setIsSaving(true);
-        mutation.mutate(form);
+        // send field under youtubeUrl for backward compatibility
+        mutation.mutate({ ...form, youtubeUrl: form.videoUrl });
     };
 
     const deleteMutation = useMutation({
@@ -81,6 +82,13 @@ export default function AdminFilms() {
         return match ? match[1] : null;
     };
 
+    const getVideoPlatform = (url) => {
+        if (!url) return null;
+        if (/youtu/.test(url)) return 'youtube';
+        if (/instagram\.com\/reel/.test(url) || /instagram\.com\/tv/.test(url)) return 'instagram';
+        return null;
+    };
+
     return (
         <div className="container mx-auto mt-0 px-0 pt-0 pb-6 animate-in fade-in duration-500">
             {/* Header */}
@@ -89,7 +97,7 @@ export default function AdminFilms() {
                 description="Manage and showcase video content and films"
                 action={
                     <button
-                        onClick={() => { setForm({ id: null, title: "", youtubeUrl: "", category: "Wedding", status: "Active" }); setModalOpen(true); }}
+                        onClick={() => { setForm({ id: null, title: "", videoUrl: "", category: "Wedding", status: "Active" }); setModalOpen(true); }}
                         className="flex items-center gap-2 bg-gray-900 text-white px-6 py-2.5 rounded-lg hover:bg-gray-800 transition-all shadow-lg"
                     >
                         <Plus size={18} /> Add Film
@@ -105,8 +113,12 @@ export default function AdminFilms() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {films.map((item) => {
-                        const videoId = getYouTubeId(item.youtubeUrl);
-                        const thumbnail = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
+                        const platform = getVideoPlatform(item.youtubeUrl);
+                        let thumbnail = null;
+                        if (platform === 'youtube') {
+                            const videoId = getYouTubeId(item.youtubeUrl);
+                            thumbnail = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
+                        }
 
                         return (
                             <div key={item._id} className="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
@@ -118,7 +130,7 @@ export default function AdminFilms() {
                                     )}
                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                                         <button
-                                            onClick={() => { setForm({ id: item._id, title: item.title, youtubeUrl: item.youtubeUrl, category: item.category, status: item.status }); setModalOpen(true); }}
+                                            onClick={() => { setForm({ id: item._id, title: item.title, videoUrl: item.youtubeUrl, category: item.category, status: item.status }); setModalOpen(true); }}
                                             className="p-2 bg-white text-gray-900 rounded-full hover:scale-110 transition-transform"
                                         >
                                             <Pencil size={16} />
@@ -171,20 +183,20 @@ export default function AdminFilms() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">YouTube URL</label>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Video URL</label>
                                 <div className="flex gap-2">
                                     <input
                                         type="text"
-                                        value={form.youtubeUrl}
-                                        onChange={(e) => setForm({ ...form, youtubeUrl: e.target.value })}
+                                        value={form.videoUrl}
+                                        onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
                                         className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-shadow"
-                                        placeholder="https://www.youtube.com/watch?v=..."
+                                        placeholder="YouTube or Instagram reel link"
                                     />
                                 </div>
-                                {form.youtubeUrl && (
-                                    <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                                        <Video size={12} />
-                                        Preview: {getYouTubeId(form.youtubeUrl) ? "Valid Link" : "Invalid Link"}
+                                {form.videoUrl && (
+                                    <p className="text-xs mt-1 flex items-center gap-1">
+                                        {getVideoPlatform(form.videoUrl) === 'youtube' ? <Video size={12} /> : getVideoPlatform(form.videoUrl) === 'instagram' ? <Instagram size={12} /> : <AlertCircle size={12} />}
+                                        Preview: {getVideoPlatform(form.videoUrl) ? `${getVideoPlatform(form.videoUrl)} link detected` : "Invalid link"}
                                     </p>
                                 )}
                             </div>

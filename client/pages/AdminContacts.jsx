@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Trash2, MessageSquare, Mail, AlertCircle, CheckCircle2, Eye, X, User, Settings, Globe, Phone, MapPin, Users, FileText, ShoppingCart, MessageCircle, Zap } from "lucide-react";
 import PageHeader from "../components/PageHeader";
+import { useConfirm } from "@/components/ConfirmModal";
 
 export default function AdminContacts() {
     const [messages, setMessages] = useState([]);
@@ -19,6 +20,8 @@ export default function AdminContacts() {
         users: [],
         contacts: []
     });
+
+    const { confirm, ConfirmDialog } = useConfirm();
 
     useEffect(() => {
         fetchAllData();
@@ -104,11 +107,15 @@ export default function AdminContacts() {
     };
 
     const handleDelete = async (id) => {
-        if (confirm("Are you sure you want to delete this message?")) {
-            await fetch(`/api/contact/${id}`, { method: "DELETE" });
-            if (viewDetails?._id === id) setViewDetails(null);
-            fetchMessages();
-        }
+        const ok = await confirm({
+            title: "Delete Message?",
+            message: "Are you sure you want to delete this message?",
+        });
+        if (!ok) return;
+
+        await fetch(`/api/contact/${id}`, { method: "DELETE" });
+        if (viewDetails?._id === id) setViewDetails(null);
+        fetchMessages();
     };
 
     // Calculate stats from all components
@@ -142,6 +149,8 @@ export default function AdminContacts() {
     // Filter messages
     const filteredMessages = filter === 'All' ? messages : messages.filter(m => m.status === filter);
 
+    // --- insert ConfirmDialog just before return closure ---
+
     // Get status badge colors
     const getStatusBadgeColor = (status) => {
         switch(status) {
@@ -154,6 +163,7 @@ export default function AdminContacts() {
 
     return (
         <div className="min-h-screen mb-6">
+            {ConfirmDialog}
             <PageHeader
                 title="Contact Messages"
                 description="Manage website contact form messages"
@@ -241,24 +251,22 @@ export default function AdminContacts() {
 
             {/* Dynamic Dashboard Section - Data from All Components */}
             <div className="max-w-7xl mx-auto">
-                {/* Messages Stats */}
-                <h2 className="text-2xl font-bold text-charcoal-900 mb-4">Contact Messages</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <div className="bg-slate-100 rounded-lg p-4">
-                        <p className="text-sm text-slate-600 font-medium mb-1">Total Messages</p>
-                        <p className="text-3xl font-bold text-charcoal-900">{contactStats.total}</p>
-                    </div>
-                    <div className="bg-blue-100 rounded-lg p-4">
-                        <p className="text-sm text-blue-600 font-medium mb-1">New</p>
-                        <p className="text-3xl font-bold text-blue-900">{contactStats.new}</p>
-                    </div>
-                    <div className="bg-amber-100 rounded-lg p-4">
-                        <p className="text-sm text-amber-600 font-medium mb-1">Read</p>
-                        <p className="text-3xl font-bold text-amber-900">{contactStats.read}</p>
-                    </div>
-                    <div className="bg-emerald-100 rounded-lg p-4">
-                        <p className="text-sm text-emerald-600 font-medium mb-1">Replied</p>
-                        <p className="text-3xl font-bold text-emerald-900">{contactStats.replied}</p>
+                {/* Themed statistics header */}
+                <div className="bg-gradient-to-r from-charcoal-900 to-charcoal-800 text-white px-6 py-8 mb-8">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {[
+                                { label: 'Total', value: contactStats.total },
+                                { label: 'New', value: contactStats.new },
+                                { label: 'Read', value: contactStats.read },
+                                { label: 'Replied', value: contactStats.replied },
+                            ].map((stat, idx) => (
+                                <div key={idx} className="bg-white/10 rounded-lg p-4 text-center">
+                                    <p className="text-3xl font-bold">{stat.value}</p>
+                                    <p className="text-sm uppercase tracking-wide mt-1">{stat.label}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
@@ -270,8 +278,8 @@ export default function AdminContacts() {
                             onClick={() => setFilter(status)}
                             className={`px-4 py-2 rounded-lg font-medium transition ${
                                 filter === status
-                                    ? 'bg-charcoal-900 text-white'
-                                    : 'bg-slate-200 text-charcoal-700 hover:bg-slate-300'
+                                    ? 'bg-gold-600 text-white'
+                                    : 'bg-charcoal-100 text-charcoal-900 hover:bg-charcoal-200'
                             }`}
                         >
                             {status}
@@ -282,33 +290,35 @@ export default function AdminContacts() {
                 {/* Messages List */}
                 <div className="space-y-3">
                     {filteredMessages.length === 0 ? (
-                        <div className="text-center py-16 bg-slate-50 rounded-lg border border-slate-200">
-                            <MessageSquare className="mx-auto h-12 w-12 text-slate-300 mb-3" />
-                            <p className="text-slate-500 font-medium">No {filter !== 'All' ? filter.toLowerCase() : ''} messages yet.</p>
+                        <div className="text-center py-16 bg-charcoal-50 rounded-lg border border-gold-200">
+                            <MessageSquare className="mx-auto h-12 w-12 text-gold-400 mb-3" />
+                            <p className="text-charcoal-700 font-medium">No {filter !== 'All' ? filter.toLowerCase() : ''} messages yet.</p>
                         </div>
                     ) : (
                         filteredMessages.map((msg) => (
-                            <div key={msg._id} className="bg-white border border-slate-200 rounded-lg p-4 hover:shadow-md transition">
+                            <div key={msg._id} className="bg-white border border-gold-200 rounded-xl p-5 hover:shadow-lg transition relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-br from-gold-50 to-transparent opacity-20 pointer-events-none" />
                                 <div className="flex items-center justify-between gap-4">
                                     {/* Left Info */}
                                     <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <h3 className="font-semibold text-charcoal-900 text-sm">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <h3 className="text-lg font-semibold text-charcoal-900 truncate">
                                                 {msg.subject}
                                             </h3>
-                                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusBadgeColor(msg.status)}`}>
+                                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(msg.status)}`}>
                                                 {msg.status}
                                             </span>
                                         </div>
-                                        <div className="text-sm text-slate-600 space-y-1">
-                                            <div className="flex items-center gap-2">
-                                                <span className="font-medium">{msg.name}</span>
-                                                <span className="text-xs text-slate-400">•</span>
-                                                <span className="text-xs">{msg.email}</span>
-                                            </div>
-                                            <p className="text-xs text-slate-500">
-                                                {new Date(msg.createdAt).toLocaleDateString()} at {new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                            </p>
+                                        <div className="flex flex-wrap items-center text-sm text-gray-600 gap-3">
+                                            <span className="flex items-center gap-1">
+                                                <User size={14} /> {msg.name}
+                                            </span>
+                                            <span className="flex items-center gap-1">
+                                                <Mail size={14} /> {msg.email}
+                                            </span>
+                                            <span className="text-xs text-gray-500">
+                                                {new Date(msg.createdAt).toLocaleDateString()}
+                                            </span>
                                         </div>
                                     </div>
 

@@ -3,6 +3,7 @@ import QuotationForm from "@/components/QuotationForm";
 import { generateQuotationPDF } from "@/utils/pdfGenerator";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, Copy, FileText, Download } from "lucide-react";
+import { useConfirm } from "@/components/ConfirmModal";
 
 export default function Quotations() {
   const [quotations, setQuotations] = useState([]);
@@ -11,6 +12,7 @@ export default function Quotations() {
   const [selectedQuotation, setSelectedQuotation] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
+  const { confirm, ConfirmDialog } = useConfirm();
 
   useEffect(() => {
     fetchQuotations();
@@ -40,8 +42,11 @@ export default function Quotations() {
   };
 
   const handleDelete = async (quotationId) => {
-    if (!window.confirm("Are you sure you want to delete this quotation?"))
-      return;
+    const ok = await confirm({
+      title: "Delete Quotation?",
+      message: "Are you sure you want to delete this quotation?",
+    });
+    if (!ok) return;
 
     try {
       const response = await fetch(`/api/quotations/${quotationId}`, {
@@ -79,7 +84,12 @@ export default function Quotations() {
       return;
     }
 
-    if (!window.confirm("Convert this quotation to invoice?")) return;
+    const ok = await confirm({
+      title: "Convert to Invoice?",
+      message: "Convert this quotation to invoice?",
+      confirmText: "Convert",
+    });
+    if (!ok) return;
 
     try {
       const invoiceData = {
@@ -148,6 +158,7 @@ export default function Quotations() {
 
   return (
     <>
+      {ConfirmDialog}
       <div className="mx-auto p-0 sm:px-6 lg:px-0 pb-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
