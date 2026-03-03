@@ -1,0 +1,168 @@
+/* =====================================
+   TABS FILTER COMPONENT STYLES
+   ===================================== */
+
+.tabs-filter {
+  display: flex;
+  justify-content: center;
+  /* margin: 2rem 0; */
+  animation: fadeInDown 0.5s ease-out;
+}
+
+.tabs-filter__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.tabs-filter__item {
+  flex-shrink: 0;
+}
+
+.tabs-filter__button {
+  background: none;
+  border: none;
+  padding: 5px 20px;
+  border-radius: 25px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: capitalize;
+  white-space: nowrap;
+  position: relative;
+  outline: none;
+}
+
+/* =====================================
+   PILL VARIANT (default)
+   ===================================== */
+
+.tabs-filter--pill .tabs-filter__button {
+  background-color: transparent;
+  color: #666;
+  border: 2px solid #e0e0e0;
+}
+
+.tabs-filter--pill .tabs-filter__button:hover {
+  border-color: #daa520;
+  color: #daa520;
+  transform: translateY(-2px);
+}
+
+.tabs-filter--pill .tabs-filter__item--active .tabs-filter__button {
+  background: linear-gradient(135deg, #daa520 0%, #c19a1a 100%);
+  color: #fff;
+  border-color: #daa520;
+  box-shadow: 0 4px 12px rgba(218, 165, 32, 0.3);
+}
+
+.tabs-filter--pill .tabs-filter__item--active .tabs-filter__button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(218, 165, 32, 0.4);
+}
+
+/* =====================================
+   UNDERLINE VARIANT
+   ===================================== */
+
+.tabs-filter--underline .tabs-filter__button {
+  background-color: transparent;
+  color: #666;
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  padding: 0.75rem 1.25rem;
+  position: relative;
+}
+
+.tabs-filter--underline .tabs-filter__button:hover {
+  color: #daa520;
+}
+
+.tabs-filter--underline .tabs-filter__item--active .tabs-filter__button {
+  color: #daa520;
+  border-bottom-color: #daa520;
+}
+
+.tabs-filter--underline .tabs-filter__item--active .tabs-filter__button::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #daa520, #c19a1a);
+  border-radius: 2px;
+}
+
+/* =====================================
+   MOBILE & RESPONSIVE
+   ===================================== */
+
+@media (max-width: 768px) {
+  .tabs-filter {
+    margin: 1.5rem 0;
+  }
+
+  .tabs-filter__button {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  .tabs-filter__list {
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .tabs-filter__button {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .tabs-filter__list {
+    gap: 0.4rem;
+  }
+
+  .tabs-filter--pill .tabs-filter__button {
+    border-width: 1.5px;
+  }
+
+  .tabs-filter--underline .tabs-filter__button {
+    padding: 0.6rem 0.9rem;
+  }
+}
+
+/* =====================================
+   ANIMATIONS
+   ===================================== */
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =====================================
+   SKELETON LOADER
+   ===================================== */
+
+.tabs-filter__skeleton {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.tabs-filter__skeleton .d-flex {
+  width: 100%;
+}

@@ -11,6 +11,8 @@ const Contact = () => {
     subject: "",
     message: "",
   });
+  
+  const [status, setStatus] = useState({ type: "", message: "" });
 
   useEffect(() => {
     document.body.className = "contact-page";
@@ -34,6 +36,8 @@ const Contact = () => {
     if (submitting) return;
 
     setSubmitting(true);
+    setStatus({ type: "", message: "" });
+
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -42,14 +46,28 @@ const Contact = () => {
       });
 
       if (res.ok) {
-        alert("Thanks for reaching out! We will get back to you shortly.");
+        setStatus({
+          type: "success",
+          message: "✓ Thanks for reaching out! We've sent you a confirmation email and will respond shortly."
+        });
         setFormData({ name: "", email: "", subject: "", message: "" });
+        
+        // Auto-clear success message after 5 seconds
+        setTimeout(() => {
+          setStatus({ type: "", message: "" });
+        }, 5000);
       } else {
-        alert("Could not send message. Please try again.");
+        setStatus({
+          type: "error",
+          message: "✗ Something went wrong. Please try again or contact us directly."
+        });
       }
     } catch (error) {
       console.error("Contact Form Error:", error);
-      alert("Error sending message. Please try again later.");
+      setStatus({
+        type: "error",
+        message: "✗ Error sending message. Please check your connection and try again."
+      });
     } finally {
       setSubmitting(false);
     }
@@ -127,7 +145,7 @@ const Contact = () => {
                     </div>
                     <div className="contact-text">
                       <h4>Open Hours</h4>
-                      <p>Monday-Friday: 9AM - 6PM</p>
+                      <p>Open 24/7</p>
                     </div>
                   </div>
                 </div>
@@ -144,6 +162,24 @@ const Contact = () => {
                     We'd love to hear from you. Send us a message and we'll
                     respond as soon as possible.
                   </p>
+
+                  {/* Status Message */}
+                  {status.message && (
+                    <div
+                      style={{
+                        padding: "12px 16px",
+                        borderRadius: "8px",
+                        marginBottom: "20px",
+                        fontSize: "0.95rem",
+                        backgroundColor: status.type === "success" ? "#d4edda" : "#f8d7da",
+                        color: status.type === "success" ? "#155724" : "#721c24",
+                        border: `1px solid ${status.type === "success" ? "#c3e6cb" : "#f5c6cb"}`,
+                        animation: "slideDown 0.3s ease"
+                      }}
+                    >
+                      {status.message}
+                    </div>
+                  )}
 
                   <form onSubmit={handleSubmit} className="contact-form">
                     <div className="row">
@@ -196,11 +232,13 @@ const Contact = () => {
                     <div className="form-submit">
                       <button
                         type="submit"
-                        class="submit-btn mt-3"
+                        className="submit-btn mt-3"
                         disabled={submitting}
                         style={{
                           opacity: submitting ? 0.7 : 1,
                           cursor: submitting ? "not-allowed" : "pointer",
+                          minWidth: "150px",
+                          transition: "all 0.3s ease"
                         }}
                       >
                         {submitting ? (
@@ -213,7 +251,10 @@ const Contact = () => {
                             Sending...
                           </>
                         ) : (
-                          "Send Message"
+                          <>
+                            <i className="bi bi-send me-2"></i>
+                            Send Message
+                          </>
                         )}
                       </button>
                     </div>
@@ -235,6 +276,19 @@ const Contact = () => {
       >
         <i className="bi bi-arrow-up-short"></i>
       </a>
+
+      <style>{`
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </>
   );
 };

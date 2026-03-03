@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { formatDate } from "../lib/dateFormatter";
 import { Link } from "react-router-dom";
 import {
   CreditCard,
@@ -445,7 +446,7 @@ export default function Dashboard() {
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <p className="font-medium text-sm text-charcoal-900">{t.coupleName}</p>
-                        <p className="text-xs text-slate-500">{new Date(t.createdAt).toLocaleDateString()}</p>
+                        <p className="text-xs text-slate-500">{formatDate(t.createdAt)}</p>
                       </div>
                       {/* Compact Star Rating */}
                       <div className="flex text-amber-400">
@@ -551,7 +552,7 @@ export default function Dashboard() {
               )}
 
               <div className="flex items-center justify-between text-xs text-slate-400">
-                <span>Submitted: {new Date(selectedTestimonial.createdAt).toLocaleDateString()}</span>
+                <span>Submitted: {formatDate(selectedTestimonial.createdAt)}</span>
                 <span className="rounded-full bg-amber-100 px-2 py-0.5 text-amber-700">Pending Approval</span>
               </div>
             </div>

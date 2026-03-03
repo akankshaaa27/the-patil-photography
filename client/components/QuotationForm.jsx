@@ -322,7 +322,19 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
 
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={onCancel}>
+    <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={(e) => {
+            // don't close the outer quotation form if an inner modal (event type or service)
+            // is currently open; clicks on their backdrop would otherwise bubble through
+            // and trigger `onCancel` prematurely.
+            if (isEventTypeModalOpen || isServiceModalOpen) {
+              e.stopPropagation();
+              return;
+            }
+            onCancel();
+          }}
+>
       <div className="bg-white dark:bg-charcoal-800 rounded-lg shadow-xl max-w-5xl w-full mx-4 max-h-[95vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-gold-200 dark:border-charcoal-700 sticky top-0 bg-white dark:bg-charcoal-800 z-10">

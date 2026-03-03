@@ -104,9 +104,20 @@ const useAutoLogout = (logoutCallback) => {
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
   if (!token) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/admin" replace />;
   }
   return children;
+};
+
+// Admin Redirect Component - Shows login if not authenticated
+const AdminRedirect = () => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    // If already logged in, go to dashboard
+    return <Navigate to="/" replace />;
+  }
+  // If not logged in, show the Login component
+  return <Login />;
 };
 
 const App = () => (
@@ -117,12 +128,9 @@ const App = () => (
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Navigate to="/admin" replace />} />
+          <Route path="/admin" element={<AdminRedirect />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-
-          {/* Redirect /admin to / */}
-          <Route path="/admin" element={<Navigate to="/" replace />} />
 
           {/* Protected Routes */}
           <Route
@@ -158,7 +166,7 @@ const AppShell = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("rememberMe");
-    navigate("/login");
+    navigate("/admin");
   };
 
   useAutoLogout(handleLogout);

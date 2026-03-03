@@ -374,8 +374,8 @@ export default function AdminSlider() {
                   placeholder="Enter slide subtitle"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 gap-4">
+                {/* <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Order</label>
                   <select
                     value={form.order}
@@ -386,7 +386,7 @@ export default function AdminSlider() {
                       <option key={i} value={i + 1}>{i + 1}</option>
                     ))}
                   </select>
-                </div>
+                </div> */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Status</label>
                   <select

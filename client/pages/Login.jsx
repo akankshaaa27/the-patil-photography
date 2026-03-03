@@ -50,14 +50,22 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100">
-      <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-0 bg-white rounded-3xl shadow-2xl overflow-hidden">
+      {/* Admin Header */}
+      <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-gold-600 to-gold-700 text-white py-3 px-4">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <h2 className="text-sm font-semibold">🔐 Admin Studio Console</h2>
+          <a href="/" className="text-sm hover:opacity-90 transition">← Back to Website</a>
+        </div>
+      </div>
+
+      <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-0 bg-white rounded-3xl shadow-2xl overflow-hidden mt-16">
         {/* Left Section - Login Form */}
         <div className="p-8 lg:p-12 flex flex-col justify-center bg-white order-last lg:order-last">
           <div className="space-y-8">
             {/* Heading */}
             <div className="text-center lg:text-left">
-              <h1 className="text-4xl font-bold text-gray-900 mb-3">Login</h1>
-              <p className="text-gray-600">Enter your credentials to get in</p>
+              <h1 className="text-4xl font-bold text-gray-900 mb-3">Studio Admin Login</h1>
+              <p className="text-gray-600">Sign in to access your studio management console</p>
             </div>
 
             {/* Login Form */}

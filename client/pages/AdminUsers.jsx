@@ -374,11 +374,27 @@ export default function AdminUsers() {
                 </div>
               </form>
             ) : (
+              // if backend returned the standard sentinel we don't want
+              // to render that literal string as a password; instead show
+              // a friendly explanation and avoid encouraging copy.
               <div className="text-center py-4">
-                <div className="text-sm text-gray-500 mb-2">User's Password</div>
-                <div className="text-2xl font-mono font-bold text-gray-900 bg-gray-100 p-4 rounded-xl border border-gray-200 select-all mb-6 break-all">
-                  {revealedPassword}
-                </div>
+                {revealedPassword === "Encrypted (Cannot Reveal)" ? (
+                  <>
+                    <div className="text-sm text-gray-500 mb-2">Password cannot be viewed</div>
+                    <div className="text-base text-gray-700 bg-gray-100 p-4 rounded-xl border border-gray-200 mb-6">
+                      For security reasons passwords are stored as hashes and cannot
+                      be retrieved.  Only an administrator with proper access can reset
+                      a user's password if needed.
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-sm text-gray-500 mb-2">User's Password</div>
+                    <div className="text-2xl font-mono font-bold text-gray-900 bg-gray-100 p-4 rounded-xl border border-gray-200 select-all mb-6 break-all">
+                      {revealedPassword}
+                    </div>
+                  </>
+                )}
                 <button
                   onClick={closeRevealModal}
                   className="w-full px-4 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors shadow-md"

@@ -1,0 +1,473 @@
+/* =====================================
+   TESTIMONIALS PAGE STYLES
+   ===================================== */
+
+.reviews-feedback-section {
+  background-color: #fafaf8;
+  padding: 80px 0;
+}
+
+.reviews-feedback-header {
+  text-align: center;
+  margin-bottom: 80px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reviews-feedback-label {
+  font-size: 0.85rem;
+  color: var(--accent-color);
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.reviews-feedback-title {
+  font-size: 3.2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 24px;
+  color: var(--heading-color);
+}
+
+.reviews-feedback-desc {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--default-color);
+  margin-bottom: 40px;
+}
+
+.btn-share-review {
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: inline-block;
+  background-color: var(--accent-color);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-share-review:hover {
+  background-color: color-mix(in srgb, var(--accent-color), transparent 15%);
+  transform: translateY(-2px);
+}
+
+/* =====================================
+   REVIEW FORM STYLES
+   ===================================== */
+
+.review-form-container {
+  background-color: var(--surface-color);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  max-width: 700px;
+  margin: 0 auto 40px;
+  animation: slideDown 0.4s ease-out;
+}
+
+.review-form-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: var(--heading-color);
+}
+
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--heading-color);
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  color: var(--default-color);
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(179, 133, 86, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+}
+
+/* =====================================
+   IMAGE UPLOAD STYLES
+   ===================================== */
+
+.image-upload-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.image-upload-input {
+  display: none;
+}
+
+.image-upload-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--heading-color);
+}
+
+.image-upload-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border: 2px dashed var(--accent-color);
+  border-radius: 8px;
+  background-color: color-mix(in srgb, var(--accent-color), transparent 95%);
+  color: var(--accent-color);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  gap: 8px;
+}
+
+.image-upload-button:hover {
+  background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
+}
+
+.image-preview-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: color-mix(in srgb, var(--accent-color), transparent 95%);
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--accent-color), transparent 70%);
+}
+
+.image-preview {
+  width: 60px;
+  height: 60px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.image-preview-info {
+  flex-grow: 1;
+}
+
+.image-preview-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--default-color);
+  margin-bottom: 4px;
+}
+
+.image-preview-size {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.btn-remove-image {
+  padding: 6px 12px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  color: var(--default-color);
+}
+
+.btn-remove-image:hover {
+  background-color: #e0e0e0;
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.btn-submit {
+  padding: 12px 28px;
+  background-color: var(--accent-color);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--accent-color), transparent 15%);
+}
+
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-cancel {
+  padding: 12px 28px;
+  background-color: #f0f0f0;
+  color: var(--default-color);
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #e0e0e0;
+}
+
+/* =====================================
+   REVIEWS GRID STYLES
+   ===================================== */
+
+.reviews-grid {
+  margin-bottom: 60px;
+}
+
+.reviews-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 32px;
+}
+
+.review-card {
+  background: var(--surface-color);
+  border-radius: 12px;
+  padding: 2.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.review-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-5px);
+}
+
+.review-quote-icon {
+  margin-bottom: 16px;
+  font-size: 2rem;
+  color: var(--accent-color);
+  opacity: 0.5;
+}
+
+.review-text {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--default-color);
+  margin-bottom: 20px;
+  flex-grow: 1;
+}
+
+.btn-view-more {
+  display: block;
+  background: none;
+  border: none;
+  color: var(--accent-color);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0 0 12px 0;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  margin-bottom: 12px;
+}
+
+.btn-view-more:hover {
+  text-decoration: underline;
+}
+
+.review-stars {
+  margin-bottom: 20px;
+  color: #ffc107;
+}
+
+.review-stars i {
+  margin-right: 4px;
+}
+
+.review-divider {
+  border-top: 1px solid #eee;
+  margin-bottom: 16px;
+}
+
+.review-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.review-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.review-author-info {
+  flex-grow: 1;
+}
+
+.review-author-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--heading-color);
+  margin: 0 0 4px 0;
+}
+
+.review-author-location {
+  font-size: 0.85rem;
+  color: #999;
+  margin: 0;
+}
+
+/* =====================================
+   CTA BANNER STYLES
+   ===================================== */
+
+.cta-banner-testimonials {
+  background-color: var(--heading-color);
+  color: white;
+  padding: 80px 0;
+  text-align: center;
+}
+
+.cta-banner-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.cta-banner-desc {
+  font-size: 1.1rem;
+  color: #ccc;
+  margin-bottom: 32px;
+}
+
+.cta-link-btn {
+  display: inline-block;
+  padding: 14px 32px;
+  background-color: var(--accent-color);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.cta-link-btn:hover {
+  background-color: color-mix(in srgb, var(--accent-color), transparent 15%);
+  transform: translateY(-2px);
+}
+
+/* =====================================
+   MOBILE & RESPONSIVE
+   ===================================== */
+
+@media (max-width: 768px) {
+  .reviews-feedback-title {
+    font-size: 2.2rem;
+  }
+
+  .review-form-container {
+    padding: 24px;
+  }
+
+  .form-row-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .reviews-grid-container {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .cta-banner-title {
+    font-size: 1.8rem;
+  }
+
+  .cta-banner-desc {
+    font-size: 0.95rem;
+  }
+}
+
+/* =====================================
+   ANIMATIONS
+   ===================================== */
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

@@ -116,7 +116,7 @@ const ForgotPassword = () => {
                         {/* Back to Login Link */}
                         <div className="text-center">
                             <Link 
-                                to="/login" 
+                                to="/admin" 
                                 className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 font-semibold text-sm"
                             >
                                 <ArrowLeft size={16} />

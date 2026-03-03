@@ -5,6 +5,7 @@ import QuotationForm from "../components/QuotationForm";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import PageHeader from "../components/PageHeader";
+import { formatDate } from "../lib/dateFormatter";
 
 const quoteStatusStyles = {
   Draft: "bg-slate-100 text-slate-600",
@@ -54,6 +55,8 @@ export default function AdminQuotations() {
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [eventTypes, setEventTypes] = useState([]);
+  const [eventFilter, setEventFilter] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [activeQuote, setActiveQuote] = useState(null);
 
@@ -74,10 +77,11 @@ export default function AdminQuotations() {
         .join(" ")
         .toLowerCase()
         .includes(search.toLowerCase());
-      const matchesFilter = filter === "all" ? true : quote.status === filter;
-      return matchesSearch && matchesFilter;
+      const matchesStatus = filter === "all" ? true : quote.status === filter;
+      const matchesEvent = eventFilter === "all" ? true : quote.event === eventFilter;
+      return matchesSearch && matchesStatus && matchesEvent;
     });
-  }, [quotes, search, filter]);
+  }, [quotes, search, filter, eventFilter]);
 
   const followUpQueue = useMemo(() => {
     return [...quotes]
@@ -152,6 +156,18 @@ export default function AdminQuotations() {
       Number(value || 0)
     );
   }
+
+  // fetch event types for filters
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/event-types');
+        if (!res.ok) throw new Error('failed');
+        const list = await res.json();
+        setEventTypes(list.map(t => t.name || t));
+      } catch {}
+    })();
+  }, []);
 
   return (
     <section className="mt-0 container mx-auto px-0 pt-0 pb-6 animate-in fade-in duration-500">
@@ -454,7 +470,3 @@ function Blueprint({ title, items }) {
   );
 }
 
-function formatDate(dateStr) {
-  if (!dateStr) return "--";
-  return new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short" }).format(new Date(dateStr));
-}

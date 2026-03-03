@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, FileText, Download, Eye, FileCheck } from "lucide-react";
+import { Plus, FileText, Download, Eye, FileCheck, Trash2 } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import { generateInvoicePDF } from "../utils/pdfGenerator";
 import { useSettings } from "../hooks/useSettings";
+import { formatDate } from "../lib/dateFormatter";
 
 const seedInvoices = [
   // ... (keep seed data if needed, but we rely on API)
@@ -262,6 +263,24 @@ export default function AdminInvoices() {
     }
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      const res = await fetch(`/api/invoices/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Failed to delete invoice");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["invoices"]);
+      toast.success("Invoice deleted");
+    },
+    onError: (err) => toast.error(err.message || "Delete failed")
+  });
+
   function markAsPaid(id) {
     // Find the invoice to get its full amount
     const inv = invoices.find(i => i.id === id);
@@ -271,6 +290,11 @@ export default function AdminInvoices() {
       paymentStatus: "Paid",
       amountPaid: inv.amount // Set paid amount to total amount
     });
+  }
+
+  function deleteInvoice(id) {
+    if (!window.confirm("Delete this invoice? This action cannot be undone.")) return;
+    deleteMutation.mutate(id);
   }
 
   function formatCurrency(value) {
@@ -417,6 +441,13 @@ export default function AdminInvoices() {
                                 Mark Paid
                               </button>
                             )}
+                            <button
+                              className="p-1.5 rounded-md hover:bg-rose-50 text-rose-600 hover:text-rose-800 transition-colors"
+                              onClick={() => deleteInvoice(invoice.id)}
+                              title="Delete Invoice"
+                            >
+                              <Trash2 size={14} />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -490,6 +521,13 @@ export default function AdminInvoices() {
                             Paid
                           </button>
                         )}
+                          <button
+                            className="flex items-center justify-center h-8 w-8 rounded-full bg-rose-50 text-rose-600 border border-rose-100"
+                            onClick={() => deleteInvoice(invoice.id)}
+                            title="Delete Invoice"
+                          >
+                            <Trash2 size={14} />
+                          </button>
                       </div>
                     </div>
                   </div>
@@ -719,11 +757,6 @@ function isOverdue(invoice) {
   const due = new Date(invoice.dueDate);
   const now = new Date();
   return due < now;
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return "--";
-  return new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short" }).format(new Date(dateStr));
 }
 
 function formatSubLabel(text) {

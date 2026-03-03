@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 import PageHeader from "../components/PageHeader";
+import { formatDate } from "../lib/dateFormatter";
 
 
 const conditionStyles = {
@@ -550,7 +551,3 @@ function Field({ label, required, children }) {
   );
 }
 
-function formatDate(dateStr) {
-  if (!dateStr) return "--";
-  return new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short" }).format(new Date(dateStr));
-}

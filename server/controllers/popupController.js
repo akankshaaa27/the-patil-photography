@@ -22,11 +22,28 @@ export const updatePopup = async (req, res) => {
 
         let popup = await Popup.findOne();
         if (!popup) {
-            popup = new Popup({ title, description, image, isActive });
+            // if image is sent as empty string we want the field to remain blank
+            popup = new Popup({
+                title,
+                description,
+                image: image || "",
+                isActive,
+            });
         } else {
             popup.title = title;
             popup.description = description;
-            popup.image = image;
+
+            // only update image when the property is supplied
+            // this covers both setting a new URL and manually clearing it
+            if (typeof image !== "undefined") {
+                // empty string = user removed image; delete the field entirely
+                if (image === "") {
+                    popup.image = undefined;
+                } else {
+                    popup.image = image;
+                }
+            }
+
             popup.isActive = isActive;
         }
 

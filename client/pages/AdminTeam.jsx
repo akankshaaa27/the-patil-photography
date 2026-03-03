@@ -120,6 +120,8 @@ export default function AdminTeam() {
         }
     };
 
+    const isSingleMember = members && members.length === 1;
+
     return (
         <div className="p-0">
             {ConfirmDialog}
@@ -223,7 +225,7 @@ export default function AdminTeam() {
             )}
 
             {/* Team List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className={isSingleMember ? "flex flex-wrap gap-6" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>
                 {isLoading ? (
                     <p>Loading team...</p>
                 ) : members?.length === 0 ? (
@@ -231,8 +233,10 @@ export default function AdminTeam() {
                         <p className="text-slate-500">No team members yet. Add your first photographer!</p>
                     </div>
                 ) : (
-                    members?.map((member) => (
-                        <div key={member._id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 flex flex-col gap-4">
+                    members?.map((member) => {
+                        const itemClass = `bg-white rounded-lg shadow-sm border border-slate-200 p-4 flex flex-col gap-4${isSingleMember ? ' w-full sm:w-1/2 md:w-1/4 lg:w-1/4 mx-auto' : ''}`;
+                        return (
+                        <div key={member._id} className={itemClass}>
                             <div className="flex items-start justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="w-16 h-16 rounded-full bg-slate-100 overflow-hidden shrink-0">
@@ -271,7 +275,8 @@ export default function AdminTeam() {
                                 </div>
                             </div>
                         </div>
-                    ))
+                    );
+                    })
                 )}
             </div>
         </div>

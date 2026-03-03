@@ -5,6 +5,7 @@ import { clientService } from '../services/clientService';
 import { quotationService } from '../services/quotationService';
 import { invoiceService } from '../services/invoiceService';
 import { useFetch } from '../hooks/useFetch';
+import { formatDate } from '../../lib/dateFormatter';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -114,7 +115,7 @@ export default function Dashboard() {
                 <div key={idx} className="flex justify-between items-center py-3 border-b border-gold-100 dark:border-charcoal-700">
                   <div>
                     <p className="font-montserrat font-medium text-charcoal-900 dark:text-white">{quotation.clientId?.name || 'Unknown Client'}</p>
-                    <p className="font-montserrat text-sm text-charcoal-500 dark:text-charcoal-400">{new Date(quotation.createdAt).toLocaleDateString()}</p>
+                    <p className="font-montserrat text-sm text-charcoal-500 dark:text-charcoal-400">{formatDate(quotation.createdAt)}</p>
                   </div>
                   <span className="font-montserrat font-semibold text-gold-600">₹{quotation.grandTotal?.toLocaleString()}</span>
                 </div>

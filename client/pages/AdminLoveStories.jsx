@@ -99,7 +99,7 @@ export default function AdminLoveStories() {
 
             if (res.ok) {
                 setShowForm(false);
-                setForm({ title: "", location: "", description: "", thumbnail: "", gallery: [], status: "Active" });
+                setForm({ title: "", location: "", description: "", thumbnail: "", gallery: [], status: "Active", order: stories.length + 1 });
                 setEditingId(null);
                 fetchStories();
                 setShowSuccess(true);
@@ -179,7 +179,7 @@ export default function AdminLoveStories() {
                     <button
                         onClick={() => {
                             setShowForm(true);
-                            setForm({ title: "", location: "", description: "", thumbnail: "", gallery: [], status: "Active" });
+                            setForm({ title: "", location: "", description: "", thumbnail: "", gallery: [], status: "Active", order: stories.length + 1 });
                             setEditingId(null);
                         }}
                         className="flex items-center gap-2 bg-gray-900 text-white px-6 py-2.5 rounded-lg hover:bg-gray-800 transition-all shadow-lg"
@@ -262,19 +262,19 @@ export default function AdminLoveStories() {
                                             <option value="Inactive">Inactive</option>
                                         </select>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                          Order (display priority): <span className="font-semibold">{form.order || 1}</span>
-                                        </label>
-                                        <input
-                                            type="range"
-                                            min="1"
-                                            max="20"
-                                            value={form.order || 1}
-                                            onChange={(e) => setForm({ ...form, order: Number(e.target.value) })}
-                                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                                        />
-                                    </div>
+                                                                        {/* <div>
+                                                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                                    <span className="font-semibold">{form.order || 1}</span>
+                                                                                </label>
+                                                                                <input
+                                                                                        type="range"
+                                                                                        min="1"
+                                                                                        max="50"
+                                                                                        value={form.order || 1}
+                                                                                        onChange={(e) => setForm({ ...form, order: Number(e.target.value) })}
+                                                                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                                                />
+                                                                        </div> */}
                                 </div>
 
                                 <div>

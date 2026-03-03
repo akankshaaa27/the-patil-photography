@@ -5,6 +5,18 @@ const TributeModal = ({ isOpen, onClose }) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // when the popup data loads we may decide not to display
+    // if the user has already closed this specific popup before
+    useEffect(() => {
+        if (data && data._id) {
+            const seenId = localStorage.getItem("popupClosedId");
+            if (seenId === data._id) {
+                // immediately close if same popup has been dismissed
+                onClose();
+            }
+        }
+    }, [data, onClose]);
+
     // Fetch the popup data
     useEffect(() => {
         const fetchPopup = async () => {
@@ -130,10 +142,19 @@ const TributeModal = ({ isOpen, onClose }) => {
         },
     };
 
+    // modified close button handler; also persist whichever popup is being closed
+    const handleClose = () => {
+        if (data && data._id) {
+            localStorage.setItem("popupClosedId", data._id);
+            localStorage.setItem("popupClosed", "true");
+        }
+        onClose();
+    };
+
     return (
         <div style={styles.overlay}>
             <div style={styles.container}>
-                <button onClick={onClose} style={styles.closeBtn}>
+                <button onClick={handleClose} style={styles.closeBtn}>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="24"

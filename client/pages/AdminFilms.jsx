@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Video, PlayCircle, Instagram, AlertCircle } from "lucide-react";
+import { Plus, Pencil, Trash2, Video, PlayCircle, AlertCircle } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 
 export default function AdminFilms() {
@@ -85,7 +85,6 @@ export default function AdminFilms() {
     const getVideoPlatform = (url) => {
         if (!url) return null;
         if (/youtu/.test(url)) return 'youtube';
-        if (/instagram\.com\/reel/.test(url) || /instagram\.com\/tv/.test(url)) return 'instagram';
         return null;
     };
 
@@ -185,17 +184,17 @@ export default function AdminFilms() {
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Video URL</label>
                                 <div className="flex gap-2">
-                                    <input
+                                        <input
                                         type="text"
                                         value={form.videoUrl}
                                         onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
                                         className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-shadow"
-                                        placeholder="YouTube or Instagram reel link"
+                                        placeholder="YouTube link"
                                     />
                                 </div>
                                 {form.videoUrl && (
                                     <p className="text-xs mt-1 flex items-center gap-1">
-                                        {getVideoPlatform(form.videoUrl) === 'youtube' ? <Video size={12} /> : getVideoPlatform(form.videoUrl) === 'instagram' ? <Instagram size={12} /> : <AlertCircle size={12} />}
+                                        {getVideoPlatform(form.videoUrl) === 'youtube' ? <Video size={12} /> : <AlertCircle size={12} />}
                                         Preview: {getVideoPlatform(form.videoUrl) ? `${getVideoPlatform(form.videoUrl)} link detected` : "Invalid link"}
                                     </p>
                                 )}

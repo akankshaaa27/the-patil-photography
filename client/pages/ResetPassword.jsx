@@ -63,7 +63,7 @@ const ResetPassword = () => {
 
             if (res.ok) {
                 setSuccess(true);
-                setTimeout(() => navigate("/login"), 2000);
+                setTimeout(() => navigate("/admin"), 2000);
             } else {
                 setError(data.error || "Failed to reset password");
             }
@@ -177,7 +177,7 @@ const ResetPassword = () => {
                         <div className="text-center text-gray-600 text-sm">
                             <p>
                                 Remember your password?{" "}
-                                <Link to="/login" className="font-semibold text-gray-900 hover:text-gold-600">
+                                <Link to="/admin" className="font-semibold text-gray-900 hover:text-gold-600">
                                     Back to Login
                                 </Link>
                             </p>

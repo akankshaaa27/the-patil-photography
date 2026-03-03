@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import "./Testimonials.css";
 
 const Testimonials = () => {
   const [testimonials, setTestimonials] = useState([]);
@@ -12,7 +13,7 @@ const Testimonials = () => {
     location: "",
     fullDescription: "",
     rating: 5,
-    thumbnail: "",
+    thumbnail: null,
   });
   const [submitting, setSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -29,6 +30,49 @@ const Testimonials = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file is an image
+    if (!file.type.startsWith("image/")) {
+      setErrorMessage("Please select a valid image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setErrorMessage("Image size must be less than 5MB");
+      return;
+    }
+
+    // Convert file to base64
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64String = event.target?.result;
+      setFormData((prev) => ({
+        ...prev,
+        thumbnail: {
+          name: file.name,
+          size: file.size,
+          data: base64String,
+        },
+      }));
+      setErrorMessage("");
+    };
+    reader.onerror = () => {
+      setErrorMessage("Failed to read image file");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setFormData((prev) => ({
+      ...prev,
+      thumbnail: null,
+    }));
   };
 
   const toggleExpandReview = (id) => {
@@ -67,15 +111,25 @@ const Testimonials = () => {
     setSuccessMessage("");
 
     try {
+      const submitData = {
+        coupleName: formData.coupleName,
+        location: formData.location,
+        fullDescription: formData.fullDescription,
+        rating: formData.rating,
+        status: "Pending",
+      };
+
+      // If thumbnail is available, include the base64 data
+      if (formData.thumbnail?.data) {
+        submitData.thumbnail = formData.thumbnail.data;
+      }
+
       const response = await fetch("/api/testimonials", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...formData,
-          status: "Pending",
-        }),
+        body: JSON.stringify(submitData),
       });
 
       if (response.ok) {
@@ -87,7 +141,7 @@ const Testimonials = () => {
           location: "",
           fullDescription: "",
           rating: 5,
-          thumbnail: "",
+          thumbnail: null,
         });
         setTimeout(() => {
           setShowForm(false);
@@ -124,33 +178,24 @@ const Testimonials = () => {
         </div>
 
         {/* Reviews & Feedback Section */}
-        <section className="reviews-feedback-section section" style={{ backgroundColor: '#fafaf8', paddingTop: '80px', paddingBottom: '80px' }}>
+        <section className="reviews-feedback-section">
           <div className="container">
             {/* Header */}
-            <div style={{ textAlign: 'center', marginBottom: '80px', maxWidth: '700px', margin: '0 auto 80px' }} data-aos="fade-up">
-              <div style={{ fontSize: '0.85rem', color: '#d4af37', fontWeight: '700', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '16px' }}>
+            <div className="reviews-feedback-header" data-aos="fade-up">
+              <div className="reviews-feedback-label">
                 From Our Couples
               </div>
-              <h2 style={{ fontSize: '3.2rem', fontWeight: '700', lineHeight: '1.2', marginBottom: '24px', color: '#1a1a1a' }}>
+              <h2 className="reviews-feedback-title">
                 From the Hearts of Our Couples
               </h2>
-              <p style={{ fontSize: '1.05rem', lineHeight: '1.8', color: '#666', marginBottom: '40px' }}>
+              <p className="reviews-feedback-desc">
                 Every love story is unique, and we're honored to be a part of it. Read what our couples have to say about their experience with us.
               </p>
               <button
-                className="cta-link"
+                className="btn-share-review"
                 onClick={() => setShowForm(!showForm)}
                 data-aos="fade-up"
                 data-aos-delay="100"
-                style={{ padding: '14px 32px', borderRadius: '8px', fontWeight: '600', fontSize: '0.95rem', display: 'inline-block', backgroundColor: '#d4af37', color: '#FFF', border: 'none', cursor: 'pointer', transition: 'all 0.3s ease' }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#c49a2f';
-                  e.target.style.transform = 'translateY(-2px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#d4af37';
-                  e.target.style.transform = 'translateY(0)';
-                }}
               >
                 <i className="bi bi-pencil-square me-2"></i>
                 Share Your Review
@@ -160,66 +205,44 @@ const Testimonials = () => {
             {/* Review Form */}
             {showForm && (
               <div
-                className="review-form-container mb-5"
+                className="review-form-container"
                 data-aos="fade-up"
-                style={{ 
-                  backgroundColor: '#ffffff', 
-                  padding: '40px', 
-                  borderRadius: '12px', 
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
-                  maxWidth: '700px',
-                  margin: '0 auto 40px'
-                }}
               >
-                <h3 className="form-title" style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '24px', color: '#1a1a1a' }}>Share Your Experience</h3>
-                <form onSubmit={handleSubmit} className="review-form" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <h3 className="review-form-title">Share Your Experience</h3>
+                <form onSubmit={handleSubmit} className="review-form">
+                  <div className="form-row-grid">
                     <div className="form-group">
-                      <label htmlFor="coupleName" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1a1a1a' }}>Couple Name *</label>
+                      <label htmlFor="coupleName" className="form-label">Couple Name *</label>
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-input"
                         id="coupleName"
                         name="coupleName"
                         value={formData.coupleName}
                         onChange={handleInputChange}
                         placeholder="Your couple name"
                         required
-                        style={{ 
-                          width: '100%', 
-                          padding: '10px 12px', 
-                          border: '1px solid #ddd', 
-                          borderRadius: '6px',
-                          fontSize: '0.95rem'
-                        }}
                       />
                     </div>
                     <div className="form-group">
-                      <label htmlFor="location" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1a1a1a' }}>Location *</label>
+                      <label htmlFor="location" className="form-label">Location *</label>
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-input"
                         id="location"
                         name="location"
                         value={formData.location}
                         onChange={handleInputChange}
                         placeholder="Your location"
                         required
-                        style={{ 
-                          width: '100%', 
-                          padding: '10px 12px', 
-                          border: '1px solid #ddd', 
-                          borderRadius: '6px',
-                          fontSize: '0.95rem'
-                        }}
                       />
                     </div>
                   </div>
 
                   <div className="form-group">
-                    <label htmlFor="fullDescription" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1a1a1a' }}>Your Review *</label>
+                    <label htmlFor="fullDescription" className="form-label">Your Review *</label>
                     <textarea
-                      className="form-control"
+                      className="form-textarea"
                       id="fullDescription"
                       name="fullDescription"
                       value={formData.fullDescription}
@@ -227,33 +250,18 @@ const Testimonials = () => {
                       placeholder="Share your experience with us..."
                       rows="5"
                       required
-                      style={{ 
-                        width: '100%', 
-                        padding: '10px 12px', 
-                        border: '1px solid #ddd', 
-                        borderRadius: '6px',
-                        fontSize: '0.95rem',
-                        fontFamily: 'inherit'
-                      }}
                     ></textarea>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                  <div className="form-row-grid">
                     <div className="form-group">
-                      <label htmlFor="rating" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1a1a1a' }}>Rating *</label>
+                      <label htmlFor="rating" className="form-label">Rating *</label>
                       <select
-                        className="form-control"
+                        className="form-select"
                         id="rating"
                         name="rating"
                         value={formData.rating}
                         onChange={handleInputChange}
-                        style={{ 
-                          width: '100%', 
-                          padding: '10px 12px', 
-                          border: '1px solid #ddd', 
-                          borderRadius: '6px',
-                          fontSize: '0.95rem'
-                        }}
                       >
                         <option value="5">5 Stars - Excellent</option>
                         <option value="4">4 Stars - Very Good</option>
@@ -262,38 +270,45 @@ const Testimonials = () => {
                         <option value="1">1 Star - Poor</option>
                       </select>
                     </div>
-                    <div className="form-group">
-                      <label htmlFor="thumbnail" style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1a1a1a' }}>Photo URL (Optional)</label>
+                    <div className="form-group image-upload-wrapper">
+                      <label className="image-upload-label">Upload Photo (Optional)</label>
                       <input
-                        type="url"
-                        className="form-control"
+                        type="file"
                         id="thumbnail"
-                        name="thumbnail"
-                        value={formData.thumbnail}
-                        onChange={handleInputChange}
-                        placeholder="https://example.com/photo.jpg"
-                        style={{ 
-                          width: '100%', 
-                          padding: '10px 12px', 
-                          border: '1px solid #ddd', 
-                          borderRadius: '6px',
-                          fontSize: '0.95rem'
-                        }}
+                        className="image-upload-input"
+                        accept="image/*"
+                        onChange={handleImageUpload}
                       />
+                      <label htmlFor="thumbnail" className="image-upload-button">
+                        <i className="bi bi-cloud-arrow-up"></i>
+                        {formData.thumbnail ? "Change Image" : "Upload Image"}
+                      </label>
+                      
+                      {formData.thumbnail && (
+                        <div className="image-preview-container">
+                          <img src={formData.thumbnail.data} alt="Preview" className="image-preview" />
+                          <div className="image-preview-info">
+                            <div className="image-preview-name">{formData.thumbnail.name}</div>
+                            <div className="image-preview-size">
+                              {(formData.thumbnail.size / 1024).toFixed(2)} KB
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            className="btn-remove-image"
+                            onClick={handleRemoveImage}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
 
                   {successMessage && (
                     <div
-                      className="alert alert-success alert-dismissible fade show"
+                      className="alert alert-success"
                       role="alert"
-                      style={{ 
-                        padding: '12px 16px', 
-                        borderRadius: '6px',
-                        backgroundColor: '#d4edda',
-                        color: '#155724',
-                        border: '1px solid #c3e6cb'
-                      }}
                     >
                       {successMessage}
                     </div>
@@ -301,38 +316,18 @@ const Testimonials = () => {
 
                   {errorMessage && (
                     <div
-                      className="alert alert-danger alert-dismissible fade show"
+                      className="alert alert-danger"
                       role="alert"
-                      style={{ 
-                        padding: '12px 16px', 
-                        borderRadius: '6px',
-                        backgroundColor: '#f8d7da',
-                        color: '#721c24',
-                        border: '1px solid #f5c6cb'
-                      }}
                     >
                       {errorMessage}
                     </div>
                   )}
 
-                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '24px' }}>
+                  <div className="form-buttons">
                     <button
                       type="submit"
                       disabled={submitting}
-                      style={{ 
-                        padding: '12px 28px', 
-                        backgroundColor: '#d4af37', 
-                        color: '#1a1a1a', 
-                        border: 'none',
-                        borderRadius: '6px',
-                        fontWeight: '600',
-                        fontSize: '0.95rem',
-                        cursor: submitting ? 'not-allowed' : 'pointer',
-                        opacity: submitting ? 0.7 : 1,
-                        transition: 'all 0.3s ease'
-                      }}
-                      onMouseEnter={(e) => !submitting && (e.target.style.backgroundColor = '#c49a2f')}
-                      onMouseLeave={(e) => !submitting && (e.target.style.backgroundColor = '#d4af37')}
+                      className="btn-submit"
                     >
                       {submitting ? (
                         <>
@@ -347,19 +342,7 @@ const Testimonials = () => {
                       type="button"
                       onClick={() => setShowForm(false)}
                       disabled={submitting}
-                      style={{ 
-                        padding: '12px 28px', 
-                        backgroundColor: '#f0f0f0', 
-                        color: '#1a1a1a', 
-                        border: '1px solid #ddd',
-                        borderRadius: '6px',
-                        fontWeight: '600',
-                        fontSize: '0.95rem',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease'
-                      }}
-                      onMouseEnter={(e) => (e.target.style.backgroundColor = '#e0e0e0')}
-                      onMouseLeave={(e) => (e.target.style.backgroundColor = '#f0f0f0')}
+                      className="btn-cancel"
                     >
                       Cancel
                     </button>
@@ -376,102 +359,58 @@ const Testimonials = () => {
                 </div>
               ) : testimonials.length > 0 ? (
                 <div className="reviews-grid">
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '32px' }}>
+                  <div className="reviews-grid-container">
                     {testimonials.map((review, index) => (
                       <div
                         key={review._id}
                         data-aos="fade-up"
                         data-aos-delay={index * 100}
-                        style={{
-                          background: 'white',
-                          borderRadius: '12px',
-                          padding: '2.5rem',
-                          boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
-                          transition: 'all 0.3s ease',
-                          cursor: 'pointer',
-                          height: '100%',
-                          display: 'flex',
-                          flexDirection: 'column'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.12)';
-                          e.currentTarget.style.transform = 'translateY(-5px)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.08)';
-                          e.currentTarget.style.transform = 'translateY(0)';
-                        }}
+                        className="review-card"
                       >
                         {/* Quote Icon */}
-                        <div style={{ marginBottom: '16px' }}>
-                          <i className="bi bi-quote" style={{ fontSize: '2rem', color: '#d4af37', opacity: 0.5 }}></i>
+                        <div className="review-quote-icon">
+                          <i className="bi bi-quote"></i>
                         </div>
 
                         {/* Review Text */}
-                        <p style={{ 
-                          fontSize: '1rem', 
-                          lineHeight: '1.8', 
-                          color: '#666', 
-                          marginBottom: '20px',
-                          flexGrow: 1,
-                          fontStyle: 'italic'
-                        }}>
-                          "{expandedReviews[review._id] ? (review.fullDescription || '') : truncateText(review.fullDescription || '')} "
-                   
+                        <p className="review-text">
+                          "{expandedReviews[review._id] ? (review.fullDescription || '') : truncateText(review.fullDescription || '')}"
+                        </p>
 
                         {/* View More Button */}
-                        { review.fullDescription && review.fullDescription.split(' ').length > 50 && (
+                        {review.fullDescription && review.fullDescription.split(' ').length > 50 && (
                           <button
                             onClick={() => toggleExpandReview(review._id)}
-                            style={{
-                              display: 'Block',
-                              background: 'none',
-                              border: 'none',
-                              color: '#d4af37',
-                              cursor: 'pointer',
-                              fontWeight: '600',
-                              fontSize: '0.9rem',
-                              padding: '0 0 12px 0',
-                              textDecoration: 'none',
-                              transition: 'all 0.3s ease',
-                              marginBottom: '12px'
-                            }}
-                            onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
-                            onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+                            className="btn-view-more"
                           >
-                            {expandedReviews[review._id] ? ' View Less' : ' View More'}
+                            {expandedReviews[review._id] ? 'View Less' : 'View More'}
                           </button>
                         )}
-     </p>
+
                         {/* Star Rating */}
-                        <div style={{ marginBottom: '20px', color: '#ffc107' }}>
+                        <div className="review-stars">
                           {[...Array(review.rating || 5)].map((_, i) => (
-                            <i key={i} className="bi bi-star-fill" style={{ marginRight: '4px' }}></i>
+                            <i key={i} className="bi bi-star-fill"></i>
                           ))}
                         </div>
 
                         {/* Divider */}
-                        <div style={{ borderTop: '1px solid #eee', marginBottom: '16px' }}></div>
+                        <div className="review-divider"></div>
 
                         {/* Author Info */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div className="review-author">
                           {review.thumbnail && (
                             <img
                               src={review.thumbnail}
                               alt={review.coupleName}
-                              style={{
-                                width: '50px',
-                                height: '50px',
-                                borderRadius: '50%',
-                                objectFit: 'cover'
-                              }}
+                              className="review-avatar"
                             />
                           )}
-                          <div>
-                            <h4 style={{ fontSize: '1rem', fontWeight: '700', color: '#1a1a1a', margin: '0 0 4px 0' }}>
+                          <div className="review-author-info">
+                            <h4 className="review-author-name">
                               {review.coupleName}
                             </h4>
-                            <p style={{ fontSize: '0.85rem', color: '#999', margin: 0 }}>
+                            <p className="review-author-location">
                               {review.location}
                             </p>
                           </div>
@@ -490,30 +429,11 @@ const Testimonials = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="cta-banner" style={{ backgroundColor: '#1a1a1a', color: 'white', padding: '80px 0', textAlign: 'center' }} >
+        <section className="cta-banner-testimonials">
           <div className="container">
-            <h2 style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '16px', color: '#fff' }}>Ready to Create Your Love Story?</h2>
-            <p style={{ fontSize: '1.1rem', color: '#ccc', marginBottom: '32px' }}>Let us capture your special moments with the elegance they deserve.</p>
-            <a href="/quote" style={{ 
-              display: 'inline-block',
-              padding: '14px 32px',
-              backgroundColor: '#d4af37',
-              color: '#1a1a1a',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontWeight: '600',
-              fontSize: '0.95rem',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#c49a2f';
-              e.target.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#d4af37';
-              e.target.style.transform = 'translateY(0)';
-            }}
-            >
+            <h2 className="cta-banner-title">Ready to Create Your Love Story?</h2>
+            <p className="cta-banner-desc">Let us capture your special moments with the elegance they deserve.</p>
+            <a href="/quote" className="cta-link-btn">
               Get Your Quote
               <i className="bi bi-arrow-right ms-2"></i>
             </a>

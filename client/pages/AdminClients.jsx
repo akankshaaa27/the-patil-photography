@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
+import { formatDate } from "../lib/dateFormatter";
 import PageHeader from "../components/PageHeader";
 
 const seedClients = [
@@ -315,7 +316,7 @@ export default function AdminClients() {
                         {client.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-slate-500">{client.createdAt || "--"}</td>
+                    <td className="px-4 py-3 text-slate-500">{client.createdAt ? formatDate(client.createdAt) : "--"}</td>
                     <td className="px-4 py-3 text-right">
                       <div className="inline-flex gap-2">
                         <button

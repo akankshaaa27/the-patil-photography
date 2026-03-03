@@ -63,6 +63,23 @@ export const createQuotation = async (req, res) => {
 
     // Send Email to Client
     if (email) {
+      // Helper to extract readable service names from various frontend shapes
+      const formatServices = (services) => {
+        if (!Array.isArray(services)) return services || 'N/A';
+        const names = services
+          .map((s) => {
+            if (!s) return null;
+            if (typeof s === 'string') return s;
+            if (s.name) return s.name;
+            if (s.serviceName) return s.serviceName;
+            if (s.service && s.service.name) return s.service.name;
+            if (s.title) return s.title;
+            return null;
+          })
+          .filter(Boolean);
+        return names.length ? names.join(', ') : 'N/A';
+      };
+
       const htmlContent = generateEmailHtml({
         title: "Quotation Received",
         greeting: `Hello ${nameToSearch || 'Valued Customer'},`,
@@ -72,7 +89,7 @@ export const createQuotation = async (req, res) => {
           "Event Type": req.body.eventType || 'N/A',
           "Event Date": req.body.eventDate ? new Date(req.body.eventDate).toDateString() : 'N/A',
           "Location": req.body.location || 'N/A',
-          "Services": Array.isArray(req.body.services) ? req.body.services.map(s => s.name).join(", ") : (req.body.services || 'N/A'),
+          "Services": formatServices(req.body.services),
           "Total Amount": req.body.grandTotal ? `₹${Number(req.body.grandTotal).toLocaleString('en-IN')}` : 'N/A',
           "Terms & Conditions": req.body.termsAndConditions || 'As per standard policy',
           "Valid Until": req.body.validityDate ? new Date(req.body.validityDate).toDateString() : 'N/A'

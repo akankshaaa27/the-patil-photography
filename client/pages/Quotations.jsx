@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatDate } from "../lib/dateFormatter";
 import QuotationForm from "@/components/QuotationForm";
 import { generateQuotationPDF } from "@/utils/pdfGenerator";
 import { toast } from "sonner";
@@ -286,11 +287,11 @@ export default function Quotations() {
                     <div className="text-sm font-montserrat text-charcoal-500 dark:text-charcoal-400">
                       <p>
                         Quotation Date:{" "}
-                        {new Date(quotation.quotationDate).toLocaleDateString()}
+                        {formatDate(quotation.quotationDate)}
                       </p>
                       <p>
                         Valid Until:{" "}
-                        {new Date(quotation.validityDate).toLocaleDateString()}
+                        {formatDate(quotation.validityDate)}
                       </p>
                     </div>
                   </div>

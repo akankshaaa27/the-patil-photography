@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { formatDate } from "../lib/dateFormatter";
 import { Trash2, Phone, MapPin, Calendar, Zap, Eye, X, MessageCircle } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import { useConfirm } from "@/components/ConfirmModal";
@@ -149,16 +150,16 @@ export default function AdminEnquiries() {
                                         <h3 className="text-lg font-semibold text-charcoal-900 truncate">
                                             {enquiry.groomName} & {enquiry.brideName}
                                         </h3>
-                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(enquiry.status)}`}>
+                                        {/* <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(enquiry.status)}`}>
                                             {enquiry.status}
-                                        </span>
+                                        </span> */}
                                     </div>
                                     <div className="flex flex-wrap items-center text-sm text-gray-600 gap-3">
                                             <span className="flex items-center gap-1">
                                                 <Phone size={14} /> {enquiry.phoneNumber}
                                             </span>
                                             <span className="flex items-center gap-1">
-                                                <Calendar size={14} /> {new Date(enquiry.eventStartDate).toLocaleDateString()}
+                                                <Calendar size={14} /> {formatDate(enquiry.eventStartDate)}
                                             </span>
                                             <span className="flex items-center gap-1">
                                                 <MapPin size={14} /> {enquiry.location}
@@ -231,7 +232,7 @@ export default function AdminEnquiries() {
                                 </div>
                                 <div>
                                     <span className="text-slate-500 font-medium block mb-1">Date</span>
-                                    <p className="text-charcoal-900 font-medium">{new Date(viewDetails.createdAt).toLocaleDateString()}</p>
+                                    <p className="text-charcoal-900 font-medium">{formatDate(viewDetails.createdAt)}</p>
                                 </div>
                             </div>
 
@@ -256,7 +257,7 @@ export default function AdminEnquiries() {
                                 <div className="space-y-2 text-sm">
                                     <div className="flex justify-between">
                                         <span className="text-slate-600">Date Range:</span>
-                                        <span className="font-medium">{new Date(viewDetails.eventStartDate).toLocaleDateString()} - {new Date(viewDetails.eventEndDate).toLocaleDateString()}</span>
+                                        <span className="font-medium">{formatDate(viewDetails.eventStartDate)} - {formatDate(viewDetails.eventEndDate)}</span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-slate-600">Location:</span>

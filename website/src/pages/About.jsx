@@ -419,30 +419,59 @@ const About = () => {
                 <p style={{ color: '#666', maxWidth: '900px', margin: '10px auto 0' }}>A collective of storytellers, each handpicked for craft, discretion, and an eye for cinematic romance.</p>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '26px', alignItems: 'stretch' }}>
-                {team.map((member, idx) => (
-                  <div key={member._id || idx} data-aos="fade-up" data-aos-delay={idx * 60} style={{ background: '#fff', borderRadius: '12px', padding: '14px', boxShadow: '0 6px 18px rgba(24,24,24,0.06)', border: '1px solid #eee', transition: 'transform .22s ease', display: 'flex', flexDirection: 'column', gap: '12px' }} onMouseEnter={(e)=> e.currentTarget.style.transform='translateY(-4px)'} onMouseLeave={(e)=> e.currentTarget.style.transform='translateY(0)'}>
-                    <div style={{ borderRadius: '10px', overflow: 'hidden', background: '#d4a574' }}>
-                      <div style={{ width: '100%', height: '320px', overflow: 'hidden' }}>
-                        <img src={member.image || '/assets/img/logo.PNG'} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              {team.length === 1 ? (
+                <div className="row">
+                  {team.map((member, idx) => (
+                    <div key={member._id || idx} className="col-lg-3 col-md-3 col-sm-6">
+                      <div data-aos="fade-up" data-aos-delay={idx * 60} style={{ background: '#fff', borderRadius: '12px', padding: '14px', boxShadow: '0 6px 18px rgba(24,24,24,0.06)', border: '1px solid #eee', transition: 'transform .22s ease', display: 'flex', flexDirection: 'column', gap: '12px' }} onMouseEnter={(e)=> e.currentTarget.style.transform='translateY(-4px)'} onMouseLeave={(e)=> e.currentTarget.style.transform='translateY(0)'}>
+                        <div style={{ borderRadius: '10px', overflow: 'hidden', background: '#d4a574' }}>
+                          <div style={{ width: '100%', height: '320px', overflow: 'hidden' }}>
+                            <img src={member.image || '/assets/img/logo.PNG'} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                          </div>
+                        </div>
+
+                        <div style={{ textAlign: 'center', paddingTop: '6px' }}>
+                          <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111' }}>{member.name}</div>
+                          <div style={{  textAlign: 'center', fontSize: '0.9rem', color: '#666', marginTop: '6px' }}>{member.role}</div>
+                        </div>
+
+                        <p style={{ textAlign: 'center', color: '#444', lineHeight: 1.6, margin: 0 }}>{member.bio}</p>
+
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '8px' }}>
+                          {member.socialLinks?.instagram && <a href={member.socialLinks.instagram} target="_blank" rel="noreferrer" style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#1a1a1a', border: '1px solid #eee' }}><i className="bi bi-instagram"></i></a>}
+                          {member.socialLinks?.facebook && <a href={member.socialLinks.facebook} target="_blank" rel="noreferrer" style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#1a1a1a', border: '1px solid #eee' }}><i className="bi bi-facebook"></i></a>}
+                          {member.socialLinks?.website && <a href={member.socialLinks.website} target="_blank" rel="noreferrer" style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#1a1a1a', border: '1px solid #eee' }}><i className="bi bi-globe"></i></a>}
+                        </div>
                       </div>
                     </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '26px', alignItems: 'stretch' }}>
+                  {team.map((member, idx) => (
+                    <div key={member._id || idx} data-aos="fade-up" data-aos-delay={idx * 60} style={{ background: '#fff', borderRadius: '12px', padding: '14px', boxShadow: '0 6px 18px rgba(24,24,24,0.06)', border: '1px solid #eee', transition: 'transform .22s ease', display: 'flex', flexDirection: 'column', gap: '12px' }} onMouseEnter={(e)=> e.currentTarget.style.transform='translateY(-4px)'} onMouseLeave={(e)=> e.currentTarget.style.transform='translateY(0)'}>
+                      <div style={{ borderRadius: '10px', overflow: 'hidden', background: '#d4a574' }}>
+                        <div style={{ width: '100%', height: '320px', overflow: 'hidden' }}>
+                          <img src={member.image || '/assets/img/logo.PNG'} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        </div>
+                      </div>
 
-                    <div style={{ textAlign: 'center', paddingTop: '6px' }}>
-                      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111' }}>{member.name}</div>
-                      <div style={{  textAlign: 'center', fontSize: '0.9rem', color: '#666', marginTop: '6px' }}>{member.role}</div>
+                      <div style={{ textAlign: 'center', paddingTop: '6px' }}>
+                        <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111' }}>{member.name}</div>
+                        <div style={{  textAlign: 'center', fontSize: '0.9rem', color: '#666', marginTop: '6px' }}>{member.role}</div>
+                      </div>
+
+                      <p style={{ textAlign: 'center', color: '#444', lineHeight: 1.6, margin: 0 }}>{member.bio}</p>
+
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '8px' }}>
+                        {member.socialLinks?.instagram && <a href={member.socialLinks.instagram} target="_blank" rel="noreferrer" style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#1a1a1a', border: '1px solid #eee' }}><i className="bi bi-instagram"></i></a>}
+                        {member.socialLinks?.facebook && <a href={member.socialLinks.facebook} target="_blank" rel="noreferrer" style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#1a1a1a', border: '1px solid #eee' }}><i className="bi bi-facebook"></i></a>}
+                        {member.socialLinks?.website && <a href={member.socialLinks.website} target="_blank" rel="noreferrer" style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#1a1a1a', border: '1px solid #eee' }}><i className="bi bi-globe"></i></a>}
+                      </div>
                     </div>
-
-                    <p style={{ textAlign: 'center', color: '#444', lineHeight: 1.6, margin: 0 }}>{member.bio}</p>
-
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '8px' }}>
-                      {member.socialLinks?.instagram && <a href={member.socialLinks.instagram} target="_blank" rel="noreferrer" style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#1a1a1a', border: '1px solid #eee' }}><i className="bi bi-instagram"></i></a>}
-                      {member.socialLinks?.facebook && <a href={member.socialLinks.facebook} target="_blank" rel="noreferrer" style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#1a1a1a', border: '1px solid #eee' }}><i className="bi bi-facebook"></i></a>}
-                      {member.socialLinks?.website && <a href={member.socialLinks.website} target="_blank" rel="noreferrer" style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#1a1a1a', border: '1px solid #eee' }}><i className="bi bi-globe"></i></a>}
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </section>
         )}

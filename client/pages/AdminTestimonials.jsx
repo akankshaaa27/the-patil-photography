@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { formatDate } from "../lib/dateFormatter";
 import { toast } from "sonner";
 import { Trash2, Edit2, Plus, GripVertical, Star, AlertCircle, Search, ToggleLeft, ToggleRight, X, ArrowUp, ArrowDown } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -416,7 +417,7 @@ export default function AdminTestimonials() {
                                                 <div>
                                                     <p className="font-semibold text-charcoal-900">{t.coupleName}</p>
                                                     <p className="text-xs text-slate-500">{t.location || "No Location"}</p>
-                                                    <p className="text-[10px] text-slate-400">{new Date(t.createdAt).toLocaleDateString()}</p>
+                                                    <p className="text-[10px] text-slate-400">{formatDate(t.createdAt)}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -530,7 +531,7 @@ export default function AdminTestimonials() {
                                         />
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 gap-4">
                                         <div>
                                             <label className="block text-sm font-medium text-slate-700 mb-1">Rating</label>
                                             <input
@@ -542,7 +543,7 @@ export default function AdminTestimonials() {
                                                 onChange={e => setCurrentTestimonial({ ...currentTestimonial, rating: Number(e.target.value) })}
                                             />
                                         </div>
-                                        <div>
+                                        {/* <div>
                                             <label className="block text-sm font-medium text-slate-700 mb-1">Display Order</label>
                                             <input
                                                 type="number"
@@ -550,7 +551,7 @@ export default function AdminTestimonials() {
                                                 value={currentTestimonial.displayOrder}
                                                 onChange={e => setCurrentTestimonial({ ...currentTestimonial, displayOrder: Number(e.target.value) })}
                                             />
-                                        </div>
+                                        </div> */}
                                     </div>
 
                                     <div>

@@ -3,6 +3,7 @@ import { generatePDF, generateOrderPDF } from "../utils/pdfGenerator";
 import { useSettings } from "../hooks/useSettings";
 import { Eye, FileText, Edit, Trash2, Download, Plus, MessageCircle } from "lucide-react";
 import PageHeader from "../components/PageHeader";
+import { formatDate, formatDateForInput } from "../lib/dateFormatter";
 
 const emptyOrder = {
   name: "",
@@ -57,7 +58,7 @@ export default function AdminOrders() {
   }, []);
 
   useEffect(() => {
-    fetchPhotographyTypes();
+    fetchEventTypes();
   }, []);
 
   useEffect(() => {
@@ -172,14 +173,27 @@ export default function AdminOrders() {
 
   function handleChange(e) {
     const { name, value } = e.target;
+    // when user types a date (dd/mm/yyyy), convert to ISO internally
+    let processedValue = value;
+    if (name === "event_date" || name === "event_end_date" || name === "delivery_date") {
+      // convert dd/mm/yyyy to yyyy-mm-dd for storage
+      const parts = value.split("/");
+      if (parts.length === 3) {
+        const [d, m, y] = parts.map((p) => p.trim().padStart(2, "0"));
+        if (d && m && y) {
+          processedValue = `${y}-${m}-${d}`;
+        }
+      }
+    }
+
     setForm((f) => {
-      const updated = { ...f, [name]: value };
+      const updated = { ...f, [name]: processedValue };
 
       // keep end date >= start date
       if (name === "event_date") {
-        if (updated.event_end_date && updated.event_end_date < value) {
+        if (updated.event_end_date && updated.event_end_date < processedValue) {
           // push end date forward to match start
-          updated.event_end_date = value;
+          updated.event_end_date = processedValue;
         }
       }
 
@@ -410,9 +424,12 @@ export default function AdminOrders() {
     window.open(whatsappUrl, "_blank");
   }
 
-  const [photographyTypes, setPhotographyTypes] = useState(() => {
-    const saved = localStorage.getItem("photographyTypes");
-    return saved ? JSON.parse(saved) : ["Wedding", "Pre-Wedding", "Baby Shower", "Birthday", "Corporate"];
+  const [eventTypes, setEventTypes] = useState(() => {
+    const saved = localStorage.getItem("eventTypes");
+    // fallback list remains for first-time usage
+    return saved
+      ? JSON.parse(saved)
+      : ["Wedding", "Pre-Wedding", "Baby Shower", "Birthday", "Corporate"];
   });
   const [serviceTypes, setServiceTypes] = useState(() => {
     const saved = localStorage.getItem("serviceTypes");
@@ -428,7 +445,7 @@ export default function AdminOrders() {
   function addNewType() {
     if (!newType.trim()) return;
     const trimmed = newType.trim();
-    if (photographyTypes.includes(trimmed)) {
+    if (eventTypes.includes(trimmed)) {
       alert("Type already exists");
       return;
     }
@@ -436,17 +453,17 @@ export default function AdminOrders() {
     // Try persisting to server; fall back to localStorage if server unavailable
     (async () => {
       try {
-        const res = await fetch('/api/photography-types', {
+        const res = await fetch('/api/event-types', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: trimmed }),
         });
         if (res.ok) {
           const created = await res.json();
-          const updated = [...photographyTypes, created.name || trimmed];
-          setPhotographyTypes(updated);
+          const updated = [...eventTypes, created.name || trimmed];
+          setEventTypes(updated);
           setForm((f) => ({ ...f, photography_type: created.name || trimmed }));
-          localStorage.setItem("photographyTypes", JSON.stringify(updated));
+          localStorage.setItem("eventTypes", JSON.stringify(updated));
           setNewType("");
           setShowTypeModal(false);
           return;
@@ -455,28 +472,28 @@ export default function AdminOrders() {
         // ignore and fallback to local
       }
 
-      const updated = [...photographyTypes, trimmed];
-      setPhotographyTypes(updated);
-      localStorage.setItem("photographyTypes", JSON.stringify(updated));
+      const updated = [...eventTypes, trimmed];
+      setEventTypes(updated);
+      localStorage.setItem("eventTypes", JSON.stringify(updated));
       setForm((f) => ({ ...f, photography_type: trimmed }));
       setNewType("");
       setShowTypeModal(false);
     })();
   }
 
-  async function fetchPhotographyTypes() {
+  async function fetchEventTypes() {
     try {
-      const res = await fetch('/api/photography-types');
+      const res = await fetch('/api/event-types');
       if (!res.ok) throw new Error('No server types');
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
         const names = data.map(t => t.name || t);
-        setPhotographyTypes(names);
-        localStorage.setItem('photographyTypes', JSON.stringify(names));
+        setEventTypes(names);
+        localStorage.setItem('eventTypes', JSON.stringify(names));
       }
     } catch (err) {
       // keep local fallback
-      console.info('Photography types endpoint not available, using local list');
+      console.info('Event types endpoint not available, using local list');
     }
   }
 
@@ -533,7 +550,7 @@ export default function AdminOrders() {
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
           <h2 className="text-lg font-semibold text-charcoal-900">Manage Orders</h2>
-          <p className="text-xs text-slate-500">Last updated {new Date().toLocaleDateString()}</p>
+          <p className="text-xs text-slate-500">Last updated {formatDate(new Date())}</p>
         </div>
 
         {/* Mobile Card View */}
@@ -565,8 +582,8 @@ export default function AdminOrders() {
                         <span className="text-xs text-slate-400 block">Date</span>
                         <span className="text-slate-700">
                           {order.event_date
-                            ? new Date(order.event_date).toLocaleDateString()
-                            : order.date ? new Date(order.date).toLocaleDateString() : "--"
+                            ? formatDate(order.event_date)
+                            : order.date ? formatDate(order.date) : "--"
                           }
                         </span>
                       </div>
@@ -636,8 +653,8 @@ export default function AdminOrders() {
                       <td className="px-4 py-3">{order.event_name || "-"}</td>
                       <td className="px-4 py-3 text-slate-500">
                         {order.event_date
-                          ? new Date(order.event_date).toLocaleDateString()
-                          : order.date ? new Date(order.date).toLocaleDateString() : "--"
+                          ? formatDate(order.event_date)
+                          : order.date ? formatDate(order.date) : "--"
                         }
                       </td>
                       <td className="px-4 py-3 font-medium text-charcoal-900">
@@ -774,7 +791,7 @@ export default function AdminOrders() {
                   />
                 </FormField>
 
-                <FormField label="Photography Type" required>
+                <FormField label="Event Type" required>
                   <div className="flex gap-2">
                     <select
                       name="photography_type"
@@ -783,7 +800,7 @@ export default function AdminOrders() {
                       className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none bg-white"
                     >
                       <option value="">Choose type</option>
-                      {photographyTypes.map((type) => (
+                      {eventTypes.map((type) => (
                         <option key={type} value={type}>
                           {type}
                         </option>
@@ -793,7 +810,7 @@ export default function AdminOrders() {
                       type="button"
                       onClick={() => setShowTypeModal(true)}
                       className="shrink-0 rounded-lg border border-gold-200 bg-gold-50 px-3 text-gold-600 hover:bg-gold-100"
-                      title="Add new type"
+                      title="Add new event type"
                     >
                       +
                     </button>
@@ -810,19 +827,20 @@ export default function AdminOrders() {
                 <div className="grid grid-cols-2 gap-3">
                   <FormField label="Start Date" required>
                     <input
-                      type="date"
+                      type="text"
                       name="event_date"
-                      value={form.event_date}
+                      placeholder="dd/mm/yyyy"
+                      value={form.event_date ? formatDate(form.event_date) : ""}
                       onChange={handleChange}
                       className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none"
                     />
                   </FormField>
                   <FormField label="End Date">
                     <input
-                      type="date"
+                      type="text"
                       name="event_end_date"
-                      value={form.event_end_date}
-                      min={form.event_date || ""}
+                      placeholder="dd/mm/yyyy"
+                      value={form.event_end_date ? formatDate(form.event_end_date) : ""}
                       onChange={handleChange}
                       className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none"
                     />
@@ -919,9 +937,10 @@ export default function AdminOrders() {
                 </FormField>
                 <FormField label="Delivery Date">
                   <input
-                    type="date"
+                    type="text"
                     name="delivery_date"
-                    value={form.delivery_date}
+                    placeholder="dd/mm/yyyy"
+                    value={form.delivery_date ? formatDate(form.delivery_date) : ""}
                     onChange={handleChange}
                     className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none"
                   />
@@ -1009,8 +1028,8 @@ export default function AdminOrders() {
         showTypeModal && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4" onClick={() => setShowTypeModal(false)}>
             <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto custom-scrollbar" onClick={(e) => e.stopPropagation()}>
-              <h3 className="text-lg font-semibold text-charcoal-900">Add New Type</h3>
-              <p className="mt-1 text-xs text-slate-500">Enter a new photography type to add to the list.</p>
+              <h3 className="text-lg font-semibold text-charcoal-900">Add New Event Type</h3>
+              <p className="mt-1 text-xs text-slate-500">Enter a new event type to add to the list.</p>
               <div className="mt-4">
                 <label className="block text-sm font-medium text-slate-700">Type Name</label>
                 <input
@@ -1033,7 +1052,7 @@ export default function AdminOrders() {
                   className="rounded-md bg-gold-500 px-4 py-2 text-sm font-semibold text-white hover:bg-gold-600"
                   onClick={addNewType}
                 >
-                  Add Type
+                  Add Event Type
                 </button>
               </div>
             </div>
@@ -1105,7 +1124,7 @@ export default function AdminOrders() {
                     <div>
                       <span className="block text-slate-500 text-xs">Date</span>
                       <span className="font-medium text-slate-900">
-                        {viewOrder.event_date || viewOrder.date ? new Date(viewOrder.event_date || viewOrder.date).toLocaleDateString() : "-"}
+                        {viewOrder.event_date || viewOrder.date ? formatDate(viewOrder.event_date || viewOrder.date) : "-"}
                       </span>
                     </div>
 
@@ -1114,7 +1133,7 @@ export default function AdminOrders() {
                       <span className="font-medium text-slate-900">{viewOrder.location || "-"}</span>
                     </div>
                     <div>
-                      <span className="block text-slate-500 text-xs">Photography Type</span>
+                      <span className="block text-slate-500 text-xs">Event Type</span>
                       <span className="font-medium text-slate-900">{viewOrder.photography_type || viewOrder.photographyType || "-"}</span>
                     </div>
                   </div>

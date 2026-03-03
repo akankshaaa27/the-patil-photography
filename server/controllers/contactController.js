@@ -1,5 +1,5 @@
 import Contact from "../models/Contact.js";
-
+import SystemSettings from "../models/SystemSettings.js";
 import { sendEmail } from "../utils/emailService.js";
 import { generateEmailHtml } from "../utils/emailTemplates.js";
 
@@ -9,12 +9,14 @@ export const createContact = async (req, res) => {
         const contact = new Contact(req.body);
         await contact.save();
 
-        // Send Email Notification
-        const adminEmail = "pixelproitsolutions@gmail.com";
+        // Get admin email from settings
+        const settings = await SystemSettings.findOne();
+        const adminEmail = settings?.contactEmail || process.env.EMAIL_USER;
 
         const { name, email, subject, message } = req.body;
 
-        const htmlContent = generateEmailHtml({
+        // ===== SEND EMAIL TO ADMIN =====
+        const adminEmailHtml = generateEmailHtml({
             title: "New Contact Message",
             greeting: "Hello Admin,",
             intro: `You have received a new contact message from ${name} via the website contact form.`,
@@ -31,10 +33,32 @@ export const createContact = async (req, res) => {
 
         await sendEmail({
             to: adminEmail,
-            // cc: "pixelproitsolutions@gmail.com",
             subject: `Message Received: ${subject}`,
-            html: htmlContent,
+            html: adminEmailHtml,
             replyTo: email,
+        });
+
+        // ===== SEND CONFIRMATION EMAIL TO USER =====
+        const userEmailHtml = generateEmailHtml({
+            title: "We Received Your Message",
+            greeting: `Hello ${name},`,
+            intro: `Thank you for reaching out to us! We have received your message and will get back to you as soon as possible.`,
+            details: {
+                "Name": name,
+                "Email": email,
+                "Subject": subject,
+                "Message": message,
+                "Received At": new Date().toLocaleString()
+            },
+            actionText: "Visit Our Website",
+            actionUrl: `${process.env.SITE_URL || 'https://thepatilphotography.com'}`
+        });
+
+        await sendEmail({
+            to: email,
+            subject: `Thank You! We've Received Your Message`,
+            html: userEmailHtml,
+            replyTo: adminEmail,
         });
 
         res.status(201).json(contact);

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Trash2, MessageSquare, Mail, AlertCircle, CheckCircle2, Eye, X, User, Settings, Globe, Phone, MapPin, Users, FileText, ShoppingCart, MessageCircle, Zap } from "lucide-react";
+import { formatDate } from "../lib/dateFormatter";
 import PageHeader from "../components/PageHeader";
 import { useConfirm } from "@/components/ConfirmModal";
 
@@ -305,9 +306,9 @@ export default function AdminContacts() {
                                             <h3 className="text-lg font-semibold text-charcoal-900 truncate">
                                                 {msg.subject}
                                             </h3>
-                                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(msg.status)}`}>
+                                            {/* <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(msg.status)}`}>
                                                 {msg.status}
-                                            </span>
+                                            </span> */}
                                         </div>
                                         <div className="flex flex-wrap items-center text-sm text-gray-600 gap-3">
                                             <span className="flex items-center gap-1">
@@ -317,7 +318,7 @@ export default function AdminContacts() {
                                                 <Mail size={14} /> {msg.email}
                                             </span>
                                             <span className="text-xs text-gray-500">
-                                                {new Date(msg.createdAt).toLocaleDateString()}
+                                                {formatDate(msg.createdAt)}
                                             </span>
                                         </div>
                                     </div>
@@ -388,7 +389,7 @@ export default function AdminContacts() {
                                 </div>
                                 <div>
                                     <span className="text-slate-500 font-medium block mb-1">Date</span>
-                                    <p className="text-charcoal-900 font-medium">{new Date(viewDetails.createdAt).toLocaleDateString()}</p>
+                                    <p className="text-charcoal-900 font-medium">{formatDate(viewDetails.createdAt)}</p>
                                 </div>
                             </div>
 

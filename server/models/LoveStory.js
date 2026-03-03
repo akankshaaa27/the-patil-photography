@@ -8,6 +8,7 @@ const loveStorySchema = new mongoose.Schema(
         thumbnail: { type: String, required: true }, // Base64 or URL
         gallery: [{ type: String }], // Array of Base64 or URLs
         status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
+        order: { type: Number, default: 1 }, // display priority (1 = first)
     },
     { timestamps: true }
 );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+﻿import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -74,13 +74,17 @@ const Home = () => {
   // Refs for testimonial navigation (to avoid duplicate nav buttons)
   const testimonialsPrevRef = useRef(null);
   const testimonialsNextRef = useRef(null);
+  const glightboxRef = useRef(null);
 
   // Pop up
   useEffect(() => {
-    // Show tribute popup automatically on home page load (ALWAYS for now)
+    // only trigger the popup if user hasn't closed it before
+    const hasSeen = localStorage.getItem("popupClosed");
+    if (hasSeen) {
+      return;
+    }
     const timer = setTimeout(() => {
       setShowTribute(true);
-      // sessionStorage.setItem("hasSeenTributeWeb", "true"); // Disabled for testing
     }, 1500);
     return () => clearTimeout(timer);
   }, []);
@@ -212,9 +216,16 @@ const Home = () => {
 
       // Initialize other vendor libraries
       if (typeof window !== "undefined") {
-        // Initialize GLightbox
+        // Initialize GLightbox (store instance to refresh later)
         if (window.GLightbox) {
-          const lightbox = window.GLightbox({
+          try {
+            if (glightboxRef.current && glightboxRef.current.destroy) {
+              glightboxRef.current.destroy();
+            }
+          } catch (e) {
+            // ignore
+          }
+          glightboxRef.current = window.GLightbox({
             selector: ".glightbox",
           });
         }
@@ -230,11 +241,30 @@ const Home = () => {
     };
   }, []);
 
+  // Re-init GLightbox when portfolio images change (ensures dynamically loaded anchors open)
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.GLightbox) return;
+    try {
+      if (glightboxRef.current && glightboxRef.current.destroy) {
+        glightboxRef.current.destroy();
+      }
+    } catch (e) {
+      // ignore
+    }
+    glightboxRef.current = window.GLightbox({ selector: ".glightbox" });
+  }, [portfolioPreview]);
+
   return (
     <>
       <Header />
       {/* Pop up */}
-      <TributeModal isOpen={showTribute} onClose={() => setShowTribute(false)} />
+      <TributeModal
+        isOpen={showTribute}
+        onClose={() => {
+          setShowTribute(false);
+          localStorage.setItem("popupClosed", "true");
+        }}
+      />
       {/* Pop up end */}
       <main className="main">
         {/* Hero Section */}
@@ -868,6 +898,26 @@ const Home = () => {
           </div>
         </section>
 
+        {/* Share Your Review Section */}
+        <section className="share-review-section" style={{ backgroundColor: '#f9f7f4', padding: '60px 0', textAlign: 'center' }}>
+          <div className="container" data-aos="fade-up">
+            <h3 style={{ fontSize: '2rem', fontWeight: '700', marginBottom: '16px', color: '#1a1a1a' }}>
+              We'd Love to Hear From You!
+            </h3>
+            <p style={{ fontSize: '1.05rem', color: '#666', marginBottom: '32px', maxWidth: '600px', margin: '0 auto 32px' }}>
+              Your experience matters to us. Share your story and help other couples discover the magic of our photography.
+            </p>
+            <Link 
+              to="/reviews-feedback" 
+              className="cta-link"
+              style={{ display: 'inline-block', textDecoration: 'none' }}
+            >
+              <i className="bi bi-pencil-square me-2"></i>
+              Share Your Review
+            </Link>
+          </div>
+        </section>
+
         {/* Projects Section */}
         <section id="projects" className="projects section pt-3">
           <div
@@ -976,7 +1026,7 @@ const Home = () => {
         </section>
 
         {/* Our Values Section */}
-        <section id="experience" className="section" style={{ backgroundColor: '#f9f8f6', padding: '80px 0' }}>
+        <section id="experience" className="section d-none" style={{ backgroundColor: '#f9f8f6', padding: '80px 0' }}>
           <div className="container" data-aos="fade-up">
             {/* Section Header */}
             <div className="section-title text-center" style={{ marginBottom: '60px' }}>
