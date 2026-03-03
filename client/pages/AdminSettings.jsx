@@ -54,6 +54,8 @@ export default function AdminSettings() {
         primaryMobileNumber: "",
         secondaryMobileNumber: "",
         address: "",
+        gstNumber: "",
+        hideServices: false,
         socialLinks: []
     });
 
@@ -70,6 +72,8 @@ export default function AdminSettings() {
                 primaryMobileNumber: settings.primaryMobileNumber || "",
                 secondaryMobileNumber: settings.secondaryMobileNumber || "",
                 address: settings.address || "",
+                gstNumber: settings.gstNumber || "",
+                hideServices: settings.hideServices || false,
                 socialLinks: settings.socialLinks || []
             });
         }
@@ -127,6 +131,11 @@ export default function AdminSettings() {
         if (formData.businessName.trim().length === 0) {
             newErrors.businessName = "Business name is required";
         }
+        // optional gst: we don't require, but sanitize length
+        if (formData.gstNumber && formData.gstNumber.trim().length > 20) {
+            newErrors.gstNumber = "GST number seems too long";
+        }
+        // hideServices is boolean; no validation needed
 
         if (formData.contactEmail && !validateEmail(formData.contactEmail)) {
             newErrors.contactEmail = "Please enter a valid email address";
@@ -316,6 +325,27 @@ export default function AdminSettings() {
                                         placeholder="Studio address..."
                                     />
                                 </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">GST Number</label>
+                                <input
+                                    type="text"
+                                    value={formData.gstNumber}
+                                    onChange={(e) => handleInputChange('gstNumber', e.target.value)}
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 outline-none transition-all"
+                                    placeholder="GSTIN (optional)"
+                                />
+                                {errors.gstNumber && <p className="text-red-500 text-xs mt-1">{errors.gstNumber}</p>}
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.hideServices}
+                                    onChange={(e) => handleInputChange('hideServices', e.target.checked)}
+                                    id="hideServices"
+                                    className="h-4 w-4 text-gold-600 border-gray-300 rounded"
+                                />
+                                <label htmlFor="hideServices" className="text-sm font-medium text-gray-700">Hide Services menu</label>
                             </div>
                         </div>
                     </div>

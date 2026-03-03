@@ -76,14 +76,14 @@ const Header = () => {
         <nav id="navmenu" className="navmenu">
           <ul>
             <li><Link to="/" className={location.pathname === '/' ? 'active' : ''}>Home</Link></li>
-            <li><Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>About Us</Link></li>
+            {/*><Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>About Us</Link></li>
             <li className={`dropdown ${location.pathname.startsWith('/services') || location.pathname === '/service-details' ? 'active' : ''}`}>
               <Link to="/services">Services</Link>
-              {/* <ul>
+              <ul>
                 <li><Link to="/services" className={location.pathname === '/services' ? 'active' : ''}>All Services</Link></li>
                 <li><Link to="/service-details" className={location.pathname === '/service-details' ? 'active' : ''}>Service Details</Link></li>
-              </ul> */}
-            </li>
+              </ul>
+            </li> */}
             {/* {showTeamMenu && (
               <li><Link to="/team" className={location.pathname === '/team' ? 'active' : ''}>Team</Link></li>
             )} */}

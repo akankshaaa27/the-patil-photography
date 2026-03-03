@@ -268,7 +268,7 @@ h1, h2, h3, .section-title h2 {
 
 /* CTA Banner */
 .cta-banner {
-  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/assets/img/slider/hero6.jpg') center/cover fixed;
+  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/assets/img/slider/webbg.webp') center/cover fixed;
   color: white;
   padding: 100px 0;
   text-align: center;

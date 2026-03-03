@@ -118,7 +118,7 @@ const Stories = () => {
                             src={story.thumbnail}
                             alt={story.title}
                             className="img-fluid"
-                            style={{ width: '100%', height: '300px', objectFit: 'cover' }}
+                            style={{ width: '100%', height: '200px', objectFit: 'cover' }}
                           />
                         </div>
 

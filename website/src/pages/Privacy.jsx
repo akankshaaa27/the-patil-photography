@@ -16,7 +16,7 @@ const Privacy = () => {
       <Header />
       
       {/* Page Title */}
-      <div className="page-title dark-background" style={{backgroundImage: "url('/assets/img/slider/hero6.jpg')"}}>
+      <div className="page-title dark-background" style={{backgroundImage: "url('/assets/img/slider/webbg.webp')"}}>
         <div className="container position-relative">
           <h1>Privacy Policy</h1>
           <p>How we protect and handle your personal information</p>

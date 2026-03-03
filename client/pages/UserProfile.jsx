@@ -137,6 +137,12 @@ export default function UserProfile() {
                   <span>{settings.address}</span>
                 </div>
               )}
+              {settings?.gstNumber && (
+                <div className="flex items-center gap-4">
+                  <span className="font-semibold">GST:</span>
+                  <span>{settings.gstNumber}</span>
+                </div>
+              )}
             </div>
 
           </div>

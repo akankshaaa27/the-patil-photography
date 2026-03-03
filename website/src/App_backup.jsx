@@ -134,7 +134,7 @@ const Home = () => {
         {/* Hero Section */}
         <section id="hero" className="hero section dark-background">
           <div className="hero-video-container">
-            <img src="assets/img/slider/hero6.jpg" className="img-fluid" alt="" />
+            <img src="assets/img/slider/webbg.webp" className="img-fluid" alt="" />
             <div className="hero-overlay"></div>
           </div>
 
@@ -288,7 +288,7 @@ const Home = () => {
           <div className="container section-title text-center" data-aos="fade-up">
             <h2>Our Latest Love Stories</h2>
             <div className="d-flex justify-content-center">
-              <p className="w-50 d-block text-center">
+              <p className="w-50 d-block text-center sm-w-100">
                 Every couple carries a beautiful story of their own, and it's our privilege to capture those 
                 timeless moments meant to be cherished for generations.
               </p>

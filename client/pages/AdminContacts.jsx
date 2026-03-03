@@ -224,6 +224,10 @@ export default function AdminContacts() {
                                             <p className="text-slate-300 text-xs">Contract Template</p>
                                             <p className="font-semibold text-xs truncate">{globalSettings.contractTemplate || 'Standard'}</p>
                                         </div>
+                                        <div>
+                                            <p className="text-slate-300 text-xs">GST Number</p>
+                                            <p className="font-semibold text-xs truncate">{globalSettings.gstNumber || 'Not Set'}</p>
+                                        </div>
                                     </div>
                                 </div>
                             )}

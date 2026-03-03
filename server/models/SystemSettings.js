@@ -58,6 +58,14 @@ const systemSettingsSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    gstNumber: {
+        type: String,
+        default: ""
+    },
+    hideServices: {
+        type: Boolean,
+        default: false
+    },
     // Add more fields here as needed (GST, etc.)
 }, { timestamps: true });
 

@@ -926,7 +926,7 @@ const Home = () => {
           >
             <h2>Our Latest Love Stories</h2>
             <div className="d-flex justify-content-center">
-              <p className="w-50 d-block text-center">
+         <p className="d-block text-center sm-w-100">
                 Every couple carries a beautiful story of their own, and it's
                 our privilege to capture those timeless moments meant to be
                 cherished for generations.

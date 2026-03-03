@@ -8,6 +8,7 @@ import { useConfirm } from "@/components/ConfirmModal";
 
 export default function Quotations() {
   const [quotations, setQuotations] = useState([]);
+  const [settings, setSettings] = useState({});
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [selectedQuotation, setSelectedQuotation] = useState(null);
@@ -16,8 +17,20 @@ export default function Quotations() {
   const { confirm, ConfirmDialog } = useConfirm();
 
   useEffect(() => {
+    fetchSettings();
     fetchQuotations();
   }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch("/api/settings");
+      if (!res.ok) throw new Error("Failed to fetch settings");
+      const data = await res.json();
+      setSettings(data || {});
+    } catch (err) {
+      console.error("Error fetching settings:", err);
+    }
+  };
 
   const fetchQuotations = async () => {
     try {
@@ -171,7 +184,7 @@ export default function Quotations() {
           </div>
           <button
             onClick={handleAddNew}
-             className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:bg-gray-800 transition-all"
+            className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:bg-gray-800 transition-all"
           >
             <Plus className="w-5 h-5" />
             New Quotation
@@ -300,7 +313,7 @@ export default function Quotations() {
                   <div className="flex gap-2 ml-4 flex-wrap justify-end">
                     <button
                       onClick={() =>
-                        generateQuotationPDF(quotation, quotation.clientId)
+                        generateQuotationPDF(quotation, quotation.clientId, settings)
                       }
                       className="p-2 text-slate-500 hover:bg-purple-100 dark:hover:bg-charcoal-700 rounded transition-colors hover:text-purple-600"
                       title="Download PDF"

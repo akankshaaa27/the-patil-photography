@@ -40,10 +40,20 @@ export const generatePDF = async (elementId, filename) => {
       heightLeft -= pageHeight - 20;
     }
 
-    // Generate Blob URL and open in new tab
+    // Generate Blob URL and open in new tab, then save with provided filename if any
     const blobUrl = pdf.output("bloburl");
-    window.open(blobUrl, "_blank");
-    // pdf.save(filename); // Disabled auto-download
+    try {
+      window.open(blobUrl, "_blank");
+    } catch (e) {
+      // ignore popup blockers
+    }
+    if (filename) {
+      try {
+        pdf.save(filename);
+      } catch (e) {
+        console.error('Error saving PDF:', e);
+      }
+    }
   } catch (error) {
     console.error("Error generating PDF:", error);
     alert("Error generating PDF");
@@ -55,13 +65,15 @@ export const generateQuotationPDF = (quotation, client, settings = {}) => {
   const primaryLogo = settings.primaryLogo || ""; // URL or Base64
   const contactText = "Crafting beautiful moments, flawlessly documented";
   const address = settings.address || "";
+  const gstNumber = settings.gstNumber || "";
   const primaryPhone = settings.primaryMobileNumber || "";
   const secondaryPhone = settings.secondaryMobileNumber || "";
   const contactEmail = settings.contactEmail || "";
+  const accentColor = settings.accentColor || "#d4a574";
 
   const logoHtml = primaryLogo
-    ? `<img src="${primaryLogo}" style="height: 50px; object-fit: contain;" />`
-    : `<div style="width: 50px; height: 50px; background: linear-gradient(135deg, #d4a574, #c49561); border-radius: 8px; display: flex; align-items: center; justify-content: center;"><span style="color: white; font-weight: bold; font-size: 20px;">P</span></div>`;
+    ? `<div style="width:50px;height:50px;background:${accentColor};border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;"><img src="${primaryLogo}" style="width:100%;height:100%;object-fit:contain;" alt="logo"/></div>`
+    : `<div style="width: 50px; height: 50px; background: ${accentColor}; border-radius: 8px; display: flex; align-items: center; justify-content: center;"><span style="color: white; font-weight: bold; font-size: 20px;">P</span></div>`;
 
 
 
@@ -75,9 +87,9 @@ export const generateQuotationPDF = (quotation, client, settings = {}) => {
   `;
 
   const content = `
-    <div style="font-family: 'Playfair Display', serif; padding: 40px; background: white; color: #1a1a1a;">
+    <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 40px; background: white; color: #1a1a1a;">
       <!-- Header -->
-      <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #d4a574; padding-bottom: 20px;">
+      <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid ${accentColor}; padding-bottom: 20px;">
         <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 15px;">
           ${logoHtml}
           <div>
@@ -136,8 +148,8 @@ export const generateQuotationPDF = (quotation, client, settings = {}) => {
       <!-- Summary -->
       <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-bottom: 30px;">
         <div>
-          <h3 style="color: #d4a574; font-weight: bold; margin-bottom: 10px; font-size: 12px;">PAYMENT TERMS</h3>
-          <p style="margin: 0; font-size: 12px; line-height: 1.6;">${quotation.paymentTerms}</p>
+        ${quotation.paymentTerms ? `<h3 style="color: ${accentColor}; font-weight: bold; margin-bottom: 10px; font-size: 12px;">PAYMENT TERMS</h3>
+          <p style="margin: 0; font-size: 12px; line-height: 1.6;">${quotation.paymentTerms}</p>` : ''}
           ${quotation.notes ? `<h3 style="color: #d4a574; font-weight: bold; margin-top: 15px; margin-bottom: 10px; font-size: 12px;">NOTES</h3><p style="margin: 0; font-size: 12px; line-height: 1.6;">${quotation.notes}</p>` : ""}
         </div>
         <div style="background: #f5f5f5; padding: 15px; border-radius: 8px;">
@@ -195,11 +207,14 @@ export const generateQuotationPDF = (quotation, client, settings = {}) => {
       // include client name in filename if available
       const clientName =
         client?.name || quotation.client?.name || quotation.clientName || "client";
-      const clientLabel = clientName.replace(/\s+/g, "_");
-      await generatePDF(
-        "pdf-content",
-        `Quotation-${clientLabel}-${quotation.quotationNumber}.pdf`
-      );
+      // sanitize client name for filename
+      const clientLabel = clientName
+        .trim()
+        .replace(/\s+/g, "_")
+        .replace(/[^a-zA-Z0-9_\-\.]/g, "")
+        .slice(0, 120) || "client";
+      const filename = `${clientLabel}.pdf`;
+      await generatePDF("pdf-content", filename);
     } finally {
       document.body.removeChild(tempDiv);
     }
@@ -211,6 +226,7 @@ export const generateInvoicePDF = (invoice, client, settings = {}) => {
   const primaryLogo = settings.primaryLogo || "";
   const contactText = "Crafting beautiful moments, flawlessly documented";
   const address = settings.address || "";
+  const gstNumber = settings.gstNumber || "";
   const primaryPhone = settings.primaryMobileNumber || "";
   const secondaryPhone = settings.secondaryMobileNumber || "";
   const contactEmail = settings.contactEmail || "";
@@ -375,6 +391,7 @@ export const generateOrderPDF = (order, settings = {}) => {
   const primaryLogo = settings.primaryLogo || "";
   const contactText = "Crafting beautiful moments, flawlessly documented";
   const address = settings.address || "";
+  const gstNumber = settings.gstNumber || "";
   const primaryPhone = settings.primaryMobileNumber || "";
   const secondaryPhone = settings.secondaryMobileNumber || "";
   const contactEmail = settings.contactEmail || "";
