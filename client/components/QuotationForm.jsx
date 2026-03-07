@@ -23,6 +23,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function QuotationForm({ quotation, onSave, onCancel }) {
   const [formData, setFormData] = useState({
@@ -59,6 +66,7 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
   }, [settings, quotation]);
 
   const [isSaving, setIsSaving] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const [predefinedServices, setPredefinedServices] = useState([]);
   const [eventTypes, setEventTypes] = useState([]);
@@ -68,7 +76,7 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
   const [isEventTypeModalOpen, setIsEventTypeModalOpen] = useState(false);
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [newEventType, setNewEventType] = useState("");
-  const [newService, setNewService] = useState({ name: "", rate: 0 });
+  const [newService, setNewService] = useState({ name: "", rate: 0, category: "photography" });
 
   const [totals, setTotals] = useState({
     subtotal: 0,
@@ -106,6 +114,9 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
         validityDate: quotation.validityDate ? quotation.validityDate.split('T')[0] : "",
       });
     }
+    // Reset submission state when quotation changes
+    setHasSubmitted(false);
+    setIsSaving(false);
   }, [quotation]);
 
   useEffect(() => {
@@ -242,20 +253,24 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.clientName?.trim()) { alert("Client Name is required"); return; }
-    if (!formData.whatsapp_no?.trim()) { alert("Mobile Number is required"); return; }
+    // Prevent multiple submissions
+    if (hasSubmitted || isSaving) return;
+    setHasSubmitted(true);
+
+    if (!formData.clientName?.trim()) { alert("Client Name is required"); setHasSubmitted(false); return; }
+    if (!formData.whatsapp_no?.trim()) { alert("Mobile Number is required"); setHasSubmitted(false); return; }
 
     if (formData.services.length === 0) {
-      alert("Please add at least one service");
+      alert("Please add at least one service"); setHasSubmitted(false);
       return;
     }
     const invalidService = formData.services.find(s => !s.serviceName?.trim());
     if (invalidService) {
-      alert("All services must have a name");
+      alert("All services must have a name"); setHasSubmitted(false);
       return;
     }
 
-    if (!formData.eventDate) { alert("Event Date is required"); return; }
+    if (!formData.eventDate) { alert("Event Date is required"); setHasSubmitted(false); return; }
 
     setIsSaving(true);
     try {
@@ -279,6 +294,7 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
     } catch (error) {
       console.error("Error saving quotation:", error);
       alert(error.message);
+      setHasSubmitted(false); // Allow retry on error
     } finally {
       setIsSaving(false);
     }
@@ -298,7 +314,11 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
     if (!newService.name.trim()) return;
     (async () => {
       try {
-        const payload = { name: newService.name, ratePerDay: parseFloat(newService.rate) || 0 };
+        const payload = {
+          name: newService.name,
+          ratePerDay: parseFloat(newService.rate) || 0,
+          category: newService.category || 'photography'
+        };
         const res = await fetch('/api/services', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -311,7 +331,7 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
         const created = await res.json();
         setPredefinedServices(prev => [...prev, created]);
         setIsServiceModalOpen(false);
-        setNewService({ name: '', rate: 0 });
+        setNewService({ name: '', rate: 0, category: 'photography' });
       } catch (error) {
         console.error('Error creating service:', error);
         alert(error.message || 'Could not create service');
@@ -406,14 +426,29 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
               <div>
                 <label className="block text-sm font-medium mb-1">Event Type *</label>
                 <div className="flex gap-2">
-                  <input
-                    list="eventTypes"
-                    name="eventType"
-                    value={formData.eventType}
-                    onChange={handleChange}
-                    className="flex-1 px-4 py-2 border rounded-md dark:bg-charcoal-700 dark:border-gray-600"
-                    placeholder="Select or Type (e.g. Wedding)"
-                  />
+                  <Select value={formData.eventType} onValueChange={(value) => setFormData(prev => ({ ...prev, eventType: value }))}>
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Select event type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {eventTypes && eventTypes.length > 0 ? (
+                        eventTypes.map((et) => (
+                          <SelectItem key={et._id || et.name} value={et.name}>
+                            {et.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <>
+                          <SelectItem value="Wedding">Wedding</SelectItem>
+                          <SelectItem value="Pre-Wedding">Pre-Wedding</SelectItem>
+                          <SelectItem value="Engagement">Engagement</SelectItem>
+                          <SelectItem value="Birthday">Birthday</SelectItem>
+                          <SelectItem value="Anniversary">Anniversary</SelectItem>
+                          <SelectItem value="Baby Shower">Baby Shower</SelectItem>
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
                   <Button
                     type="button"
                     variant="outline"
@@ -423,20 +458,6 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
-                <datalist id="eventTypes">
-                  {eventTypes && eventTypes.length > 0 ? (
-                    eventTypes.map((et) => <option key={et._id || et.name} value={et.name} />)
-                  ) : (
-                    <>
-                      <option value="Wedding" />
-                      <option value="Pre-Wedding" />
-                      <option value="Engagement" />
-                      <option value="Birthday" />
-                      <option value="Anniversary" />
-                      <option value="Baby Shower" />
-                    </>
-                  )}
-                </datalist>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Event Location</label>
@@ -489,14 +510,21 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
                   <div className="flex-grow w-full md:w-auto">
                     <label className="block text-xs text-gray-500 mb-1">Service Name *</label>
                     <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={service.serviceName}
-                        onChange={(e) => handleServiceChange(index, "serviceName", e.target.value)}
-                        placeholder="Photography, Drone, etc."
-                        className="flex-1 px-3 py-2 border rounded text-sm dark:bg-charcoal-700 dark:border-gray-600"
-                        list={`serviceSuggestions-${index}`}
-                      />
+                      <Select 
+                        value={service.serviceName} 
+                        onValueChange={(value) => handleServiceChange(index, "serviceName", value)}
+                      >
+                        <SelectTrigger className="flex-1 h-9">
+                          <SelectValue placeholder="Select service" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {predefinedServices.map(s => (
+                            <SelectItem key={s._id} value={s.name}>
+                              {s.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <Button
                         type="button"
                         variant="outline"
@@ -507,9 +535,6 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
-                    <datalist id={`serviceSuggestions-${index}`}>
-                      {predefinedServices.map(s => <option key={s._id} value={s.name} />)}
-                    </datalist>
                   </div>
 
                   <div className="w-24">
@@ -604,13 +629,18 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
           <div className="flex gap-4 pt-4 border-t border-gray-100">
             <Button
               type="submit"
-              disabled={isSaving}
+              disabled={isSaving || hasSubmitted}
               className="flex-1 bg-gold-500 hover:bg-gold-600 text-white h-12 text-lg flex items-center justify-center gap-2"
             >
               {isSaving ? (
                 <>
                   <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                  Saving...
+                  Creating...
+                </>
+              ) : hasSubmitted ? (
+                <>
+                  <Check className="w-5 h-5" />
+                  Submitted
                 </>
               ) : (
                 quotation ? "Update Quotation" : "Create Quotation"
@@ -672,6 +702,20 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
                 className="w-full px-3 py-2 border rounded-md"
                 placeholder="0"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Category</label>
+              <select
+                value={newService.category || "photography"}
+                onChange={(e) => setNewService(prev => ({ ...prev, category: e.target.value }))}
+                className="w-full px-3 py-2 border rounded-md"
+              >
+                <option value="photography">Photography</option>
+                <option value="video">Video</option>
+                <option value="drone">Drone</option>
+                <option value="product">Product</option>
+                <option value="other">Other</option>
+              </select>
             </div>
           </div>
           <DialogFooter>

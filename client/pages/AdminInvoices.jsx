@@ -6,6 +6,13 @@ import PageHeader from "../components/PageHeader";
 import { generateInvoicePDF } from "../utils/pdfGenerator";
 import { useSettings } from "../hooks/useSettings";
 import { formatDate } from "../lib/dateFormatter";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const seedInvoices = [
   // ... (keep seed data if needed, but we rely on API)
@@ -613,16 +620,20 @@ export default function AdminInvoices() {
                 />
               </Field>
               <Field label="Event">
-                <select
+                <Select
                   value={form.event}
-                  onChange={(e) => setForm((prev) => ({ ...prev, event: e.target.value }))}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500"
+                  onValueChange={(value) => setForm((prev) => ({ ...prev, event: value }))}
                 >
-                  <option>Wedding</option>
-                  <option>Pre-Wedding</option>
-                  <option>Engagement</option>
-                  <option>Commercial</option>
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select event type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Wedding">Wedding</SelectItem>
+                    <SelectItem value="Pre-Wedding">Pre-Wedding</SelectItem>
+                    <SelectItem value="Engagement">Engagement</SelectItem>
+                    <SelectItem value="Commercial">Commercial</SelectItem>
+                  </SelectContent>
+                </Select>
               </Field>
               <Field label="Issue Date">
                 <input
@@ -657,42 +668,54 @@ export default function AdminInvoices() {
                 />
               </Field>
               <Field label="Status">
-                <select
+                <Select
                   value={form.status}
-                  onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value }))}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500"
+                  onValueChange={(value) => setForm((prev) => ({ ...prev, status: value }))}
                 >
-                  <option>Draft</option>
-                  <option>Sent</option>
-                  <option>Partial</option>
-                  <option>Paid</option>
-                  <option>Overdue</option>
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Draft">Draft</SelectItem>
+                    <SelectItem value="Sent">Sent</SelectItem>
+                    <SelectItem value="Partial">Partial</SelectItem>
+                    <SelectItem value="Paid">Paid</SelectItem>
+                    <SelectItem value="Overdue">Overdue</SelectItem>
+                  </SelectContent>
+                </Select>
               </Field>
               <Field label="Workflow Stage">
-                <select
+                <Select
                   value={form.stage}
-                  onChange={(e) => setForm((prev) => ({ ...prev, stage: e.target.value }))}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500"
+                  onValueChange={(value) => setForm((prev) => ({ ...prev, stage: value }))}
                 >
-                  <option>Planning</option>
-                  <option>Shoot</option>
-                  <option>Editing</option>
-                  <option>Album Design</option>
-                  <option>Delivered</option>
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select stage" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Planning">Planning</SelectItem>
+                    <SelectItem value="Shoot">Shoot</SelectItem>
+                    <SelectItem value="Editing">Editing</SelectItem>
+                    <SelectItem value="Album Design">Album Design</SelectItem>
+                    <SelectItem value="Delivered">Delivered</SelectItem>
+                  </SelectContent>
+                </Select>
               </Field>
               <Field label="Payment Method">
-                <select
+                <Select
                   value={form.paymentMethod}
-                  onChange={(e) => setForm((prev) => ({ ...prev, paymentMethod: e.target.value }))}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500"
+                  onValueChange={(value) => setForm((prev) => ({ ...prev, paymentMethod: value }))}
                 >
-                  <option>UPI</option>
-                  <option>Bank Transfer</option>
-                  <option>NEFT</option>
-                  <option>Cash</option>
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select payment method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="UPI">UPI</SelectItem>
+                    <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                    <SelectItem value="NEFT">NEFT</SelectItem>
+                    <SelectItem value="Cash">Cash</SelectItem>
+                  </SelectContent>
+                </Select>
               </Field>
               <div className="md:col-span-2">
                 <Field label="Notes">

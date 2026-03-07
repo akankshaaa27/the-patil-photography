@@ -3,6 +3,13 @@ import { Edit, Trash2, Plus, ArrowUp, ArrowDown, GripVertical } from "lucide-rea
 import Skeleton from "../components/Skeleton";
 import PageHeader from "../components/PageHeader";
 import { useConfirm } from "@/components/ConfirmModal";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function AdminLoveStories() {
     const [loading, setLoading] = useState(true);
@@ -252,15 +259,18 @@ export default function AdminLoveStories() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                                        <select
-                                            name="status"
+                                        <Select
                                             value={form.status}
-                                            onChange={handleChange}
-                                            className="w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-gold-500 outline-none bg-white"
+                                            onValueChange={(value) => setForm({ ...form, status: value })}
                                         >
-                                            <option value="Active">Active</option>
-                                            <option value="Inactive">Inactive</option>
-                                        </select>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Active">Active</SelectItem>
+                                                <SelectItem value="Inactive">Inactive</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                                                         {/* <div>
                                                                                 <label className="block text-sm font-medium text-gray-700 mb-2">

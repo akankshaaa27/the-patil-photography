@@ -90,11 +90,11 @@ export const getDashboardStats = async (req, res) => {
 
         // 4. Calendar / Schedule - Next 5 shoots
         const upcomingShoots = await Order.find({
-            event_date: { $gte: today }
+            start_date: { $gte: today }
         })
-            .sort({ event_date: 1 })
+            .sort({ start_date: 1 })
             .limit(5)
-            .select('_id name event_name event_date location photography_type order_status');
+            .select('_id name event_name start_date location photography_type order_status');
 
         // 5. Revenue Snapshot (This Month)
         const revenueStats = await Invoice.aggregate([

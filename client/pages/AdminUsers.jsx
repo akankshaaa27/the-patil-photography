@@ -1,8 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, Search, Users, UserCheck, UserX } from "lucide-react";
 import PageHeader from "../components/PageHeader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function AdminUsers() {
   const queryClient = useQueryClient();
@@ -10,6 +17,11 @@ export default function AdminUsers() {
   const [form, setForm] = useState({ id: null, name: "", email: "", phone: "", role: "user", status: "Active", password: "" });
 
   const [deleteId, setDeleteId] = useState(null);
+
+  // Search and filter states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All");
 
   // Password Reveal State
   const [revealModalOpen, setRevealModalOpen] = useState(false);
@@ -97,6 +109,27 @@ export default function AdminUsers() {
     },
   });
 
+  // Statistics calculation
+  const stats = useMemo(() => {
+    const total = users.length;
+    const active = users.filter(u => u.status === "Active").length;
+    const inactive = users.filter(u => u.status === "Inactive").length;
+    const admins = users.filter(u => u.role === "admin").length;
+    return { total, active, inactive, admins };
+  }, [users]);
+
+  // Filtered users based on search and filters
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      const matchesSearch = user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          user.phone?.includes(searchTerm);
+      const matchesRole = roleFilter === "All" || user.role === roleFilter;
+      const matchesStatus = statusFilter === "All" || user.status === statusFilter;
+      return matchesSearch && matchesRole && matchesStatus;
+    });
+  }, [users, searchTerm, roleFilter, statusFilter]);
+
   return (
     <div className="mt-0 container mx-auto px-0 pt-0 pb-6 animate-in fade-in duration-500">
       <PageHeader
@@ -112,17 +145,104 @@ export default function AdminUsers() {
         }
       />
 
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-50 rounded-lg">
+              <Users className="text-blue-600" size={20} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
+              <p className="text-sm text-slate-600">Total Users</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-emerald-50 rounded-lg">
+              <UserCheck className="text-emerald-600" size={20} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">{stats.active}</p>
+              <p className="text-sm text-slate-600">Active</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-slate-50 rounded-lg">
+              <UserX className="text-slate-600" size={20} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">{stats.inactive}</p>
+              <p className="text-sm text-slate-600">Inactive</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-purple-50 rounded-lg">
+              <UserCheck className="text-purple-600" size={20} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">{stats.admins}</p>
+              <p className="text-sm text-slate-600">Admins</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="mb-6 space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search by name, email, or phone..."
+              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500/20 text-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-2">
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="Role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Roles</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="user">User</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Status</SelectItem>
+                <SelectItem value="Active">Active</SelectItem>
+                <SelectItem value="Inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
       {/* Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        {/* Mobile Card View */}
         <div className="block md:hidden">
           {isLoading ? (
             <div className="p-8 text-center text-gray-500">Loading users...</div>
-          ) : users.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">No users found</div>
+          ) : filteredUsers.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">
+              {users.length === 0 ? "No users found" : "No users match your search criteria"}
+            </div>
           ) : (
             <div className="divide-y divide-gray-100">
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <div key={user._id} className="p-4 space-y-3">
                   <div className="flex justify-between items-start">
                     <div>
@@ -179,11 +299,13 @@ export default function AdminUsers() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {isLoading ? (
-                <tr><td colSpan={6} className="p-8 text-center text-gray-500">Loading users...</td></tr>
-              ) : users.length === 0 ? (
-                <tr><td colSpan={6} className="p-8 text-center text-gray-500">No users found</td></tr>
+                <tr><td colSpan={7} className="p-8 text-center text-gray-500">Loading users...</td></tr>
+              ) : filteredUsers.length === 0 ? (
+                <tr><td colSpan={7} className="p-8 text-center text-gray-500">
+                  {users.length === 0 ? "No users found" : "No users match your search criteria"}
+                </td></tr>
               ) : (
-                users.map((user) => (
+                filteredUsers.map((user) => (
                   <tr key={user._id} className="hover:bg-gray-50 transition-colors">
                     <td className="p-4 font-semibold text-gray-900">{user.name}</td>
                     <td className="p-4 text-gray-600">{user.email}</td>

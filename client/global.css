@@ -96,6 +96,71 @@
     @apply border-border;
   }
 
+  /* Modern Scrollbars - Sleek & Contemporary */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Webkit Scrollbars (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: all 0.3s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    background-clip: padding-box;
+  }
+
+  /* Firefox Scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #9ca3af transparent;
+  }
+
+  /* Dark Mode Scrollbars */
+  .dark ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    background-clip: padding-box;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    background-clip: padding-box;
+  }
+
+  .dark {
+    scrollbar-color: #374151 transparent;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: "Montserrat", sans-serif;
@@ -131,16 +196,89 @@
 
 /* Luxury styling */
 @layer components {
+  /* Modern Custom Scrollbar Class */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #9ca3af transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: all 0.3s ease;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+    background-clip: padding-box;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    background-clip: padding-box;
+  }
+
+  .dark .custom-scrollbar {
+    scrollbar-color: #374151 transparent;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    background-clip: padding-box;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    background-clip: padding-box;
+  }
+
+  /* Crisp UI Elements with 4px refinements */
+  .input,
+  input,
+  textarea,
+  select {
+    border-radius: 4px;
+  }
+
+  button {
+    border-radius: 4px;
+  }
+
   .luxury-section {
     @apply bg-white dark:bg-charcoal-900 border border-gold-200 dark:border-charcoal-700 rounded-lg shadow-sm;
+    border-radius: 4px;
   }
 
   .luxury-card {
     @apply bg-white dark:bg-charcoal-800 border border-gold-100 dark:border-charcoal-700 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow;
+    border-radius: 4px;
   }
 
   .luxury-button {
     @apply bg-gold-500 hover:bg-gold-600 text-white font-montserrat font-medium py-2 px-4 rounded transition-colors;
+    border-radius: 4px;
   }
 
   .luxury-text-title {

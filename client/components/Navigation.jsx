@@ -12,7 +12,8 @@ const items = [
   { to: "/admin-love-stories", label: "Love Stories" },
   { to: "/admin-reviews-feedback", label: "Reviews & Feedback" },
   { to: "/admin-popup", label: "Popup Manager" },
-  { to: "/admin-team", label: "Team Management" },  { to: "/admin-accessories", label: "Inventory" },
+  { to: "/admin-team", label: "Team Management" },
+  { to: "/admin-accessories", label: "Inventory" },
   { to: "/admin-invoices", label: "Invoices" },
   { to: "/admin-clients", label: "Clients" },
   { to: "/admin-enquiries", label: "Enquiries" },
@@ -110,11 +111,21 @@ function BrandHeader({ compact = false }) {
 }
 
 function NavList({ onNavigate }) {
+  const { data: settings } = useSettings();
   const handleClick = onNavigate ? () => onNavigate() : undefined;
+
+  // Filter out services menu if hideServices is enabled
+  const filteredItems = items.filter(item => {
+    if (item.to === "/admin-accessories" && settings?.hideServices) {
+      return false;
+    }
+    return true;
+  });
+
   return (
     <nav className="flex-1">
       <ul className="space-y-2">
-        {items.map((it) => (
+        {filteredItems.map((it) => (
           <li key={it.to}>
             <NavLink
               to={it.to}

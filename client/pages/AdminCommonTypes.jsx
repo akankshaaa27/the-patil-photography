@@ -10,6 +10,13 @@ import {
 } from "@/components/ui/dialog";
 import PageHeader from "../components/PageHeader";
 import { useConfirm } from "@/components/ConfirmModal";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function AdminCommonTypes() {
     const [activeTab, setActiveTab] = useState("event-types");
@@ -237,17 +244,21 @@ export default function AdminCommonTypes() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Category</label>
-                                    <select
+                                    <Select
                                         value={formData.category || "photography"}
-                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                        className="w-full px-3 py-2 border rounded-md dark:bg-charcoal-700 dark:border-gray-600"
+                                        onValueChange={(value) => setFormData({ ...formData, category: value })}
                                     >
-                                        <option value="photography">Photography</option>
-                                        <option value="video">Video</option>
-                                        <option value="drone">Drone</option>
-                                        <option value="product">Product</option>
-                                        <option value="other">Other</option>
-                                    </select>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select category" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="photography">Photography</SelectItem>
+                                            <SelectItem value="video">Video</SelectItem>
+                                            <SelectItem value="drone">Drone</SelectItem>
+                                            <SelectItem value="product">Product</SelectItem>
+                                            <SelectItem value="other">Other</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </>
                         )}

@@ -3,6 +3,13 @@ import { Trash2, MessageSquare, Mail, AlertCircle, CheckCircle2, Eye, X, User, S
 import { formatDate } from "../lib/dateFormatter";
 import PageHeader from "../components/PageHeader";
 import { useConfirm } from "@/components/ConfirmModal";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function AdminContacts() {
     const [messages, setMessages] = useState([]);
@@ -329,19 +336,23 @@ export default function AdminContacts() {
 
                                     {/* Actions */}
                                     <div className="flex items-center gap-2 flex-shrink-0">
-                                        <select
+                                        <Select
                                             value={msg.status}
-                                            onChange={(e) => updateStatus(msg._id, e.target.value)}
-                                            className={`text-xs py-1 px-2 rounded border-0 cursor-pointer font-medium focus:outline-none focus:ring-1 focus:ring-charcoal-600 ${
+                                            onValueChange={(value) => updateStatus(msg._id, value)}
+                                        >
+                                            <SelectTrigger className={`w-20 h-8 text-xs border-0 focus:ring-1 focus:ring-charcoal-600 ${
                                                 msg.status === 'New' ? 'bg-blue-100 text-blue-700' :
                                                 msg.status === 'Read' ? 'bg-amber-100 text-amber-700' :
                                                 'bg-emerald-100 text-emerald-700'
-                                            }`}
-                                        >
-                                            <option value="New">New</option>
-                                            <option value="Read">Read</option>
-                                            <option value="Replied">Replied</option>
-                                        </select>
+                                            }`}>
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="New">New</SelectItem>
+                                                <SelectItem value="Read">Read</SelectItem>
+                                                <SelectItem value="Replied">Replied</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                         <button
                                             onClick={() => setViewDetails(msg)}
                                             className="p-1.5 text-slate-500 hover:text-charcoal-900 hover:bg-slate-100 rounded transition"
@@ -429,22 +440,26 @@ export default function AdminContacts() {
                             >
                                 Close
                             </button>
-                            <select
+                            <Select
                                 value={viewDetails.status}
-                                onChange={(e) => {
-                                    updateStatus(viewDetails._id, e.target.value);
-                                    setViewDetails({...viewDetails, status: e.target.value});
+                                onValueChange={(value) => {
+                                    updateStatus(viewDetails._id, value);
+                                    setViewDetails({...viewDetails, status: value});
                                 }}
-                                className={`flex-1 px-3 py-2 rounded font-medium border-0 cursor-pointer focus:outline-none focus:ring-1 focus:ring-charcoal-600 ${
-                                    viewDetails.status === 'New' ? 'bg-blue-100 text-blue-700' :
-                                    viewDetails.status === 'Read' ? 'bg-amber-100 text-amber-700' :
-                                    'bg-emerald-100 text-emerald-700'
-                                }`}
                             >
-                                <option value="New">New</option>
-                                <option value="Read">Read</option>
-                                <option value="Replied">Replied</option>
-                            </select>
+                                <SelectTrigger className={`flex-1 focus:ring-1 focus:ring-charcoal-600 ${
+                                    viewDetails.status === 'New' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                                    viewDetails.status === 'Read' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                                    'bg-emerald-100 text-emerald-700 border-emerald-200'
+                                }`}>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="New">New</SelectItem>
+                                    <SelectItem value="Read">Read</SelectItem>
+                                    <SelectItem value="Replied">Replied</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
                 </div>

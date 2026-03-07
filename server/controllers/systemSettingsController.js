@@ -36,7 +36,8 @@ export const updateSettings = async (req, res) => {
             secondaryMobileNumber,
             address,
             gstNumber,
-            hideServices
+            hideServices,
+            websiteUrl
         } = req.body;
 
         if (businessName !== undefined) settings.businessName = businessName;
@@ -51,6 +52,7 @@ export const updateSettings = async (req, res) => {
         if (address !== undefined) settings.address = address;
         if (gstNumber !== undefined) settings.gstNumber = gstNumber;
         if (hideServices !== undefined) settings.hideServices = hideServices;
+        if (websiteUrl !== undefined) settings.websiteUrl = websiteUrl;
 
         const updatedSettings = await settings.save();
         res.json(updatedSettings);

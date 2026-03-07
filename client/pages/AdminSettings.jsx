@@ -36,6 +36,16 @@ const validateMobileNumber = (mobile) => {
     return clean.length >= 10 && clean.length <= 15;
 };
 
+const validateWebsiteUrl = (url) => {
+    if (!url) return true; // Optional field
+    try {
+        new URL(url);
+        return true;
+    } catch {
+        return false;
+    }
+};
+
 import SettingsCard from "../components/SettingsCard";
 
 export default function AdminSettings() {
@@ -56,6 +66,7 @@ export default function AdminSettings() {
         address: "",
         gstNumber: "",
         hideServices: false,
+        websiteUrl: "",
         socialLinks: []
     });
 
@@ -74,6 +85,7 @@ export default function AdminSettings() {
                 address: settings.address || "",
                 gstNumber: settings.gstNumber || "",
                 hideServices: settings.hideServices || false,
+                websiteUrl: settings.websiteUrl || "",
                 socialLinks: settings.socialLinks || []
             });
         }
@@ -139,6 +151,10 @@ export default function AdminSettings() {
 
         if (formData.contactEmail && !validateEmail(formData.contactEmail)) {
             newErrors.contactEmail = "Please enter a valid email address";
+        }
+
+        if (formData.websiteUrl && !validateWebsiteUrl(formData.websiteUrl)) {
+            newErrors.websiteUrl = "Please enter a valid website URL (e.g., https://www.example.com)";
         }
 
         if (formData.primaryMobileNumber && !validateMobileNumber(formData.primaryMobileNumber)) {
@@ -310,8 +326,20 @@ export default function AdminSettings() {
                                 </div>
                             </div>
 
-
-
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Website URL</label>
+                                <div className="relative">
+                                    <Globe className="absolute left-3 top-2.5 text-gray-400 h-4 w-4" />
+                                    <input
+                                        type="url"
+                                        value={formData.websiteUrl}
+                                        onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
+                                        className={`w-full pl-9 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500/20 outline-none transition-all ${errors.websiteUrl ? 'border-red-500' : 'border-gray-200'}`}
+                                        placeholder="https://www.yourwebsite.com"
+                                    />
+                                </div>
+                                {errors.websiteUrl && <p className="text-red-500 text-xs mt-1">{errors.websiteUrl}</p>}
+                            </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
@@ -336,16 +364,6 @@ export default function AdminSettings() {
                                     placeholder="GSTIN (optional)"
                                 />
                                 {errors.gstNumber && <p className="text-red-500 text-xs mt-1">{errors.gstNumber}</p>}
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    checked={formData.hideServices}
-                                    onChange={(e) => handleInputChange('hideServices', e.target.checked)}
-                                    id="hideServices"
-                                    className="h-4 w-4 text-gold-600 border-gray-300 rounded"
-                                />
-                                <label htmlFor="hideServices" className="text-sm font-medium text-gray-700">Hide Services menu</label>
                             </div>
                         </div>
                     </div>

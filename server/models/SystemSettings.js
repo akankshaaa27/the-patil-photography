@@ -66,6 +66,10 @@ const systemSettingsSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    websiteUrl: {
+        type: String,
+        default: ""
+    },
     // Add more fields here as needed (GST, etc.)
 }, { timestamps: true });
 

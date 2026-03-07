@@ -1,5 +1,6 @@
 import Quotation from '../models/Quotation.js';
 import Client from '../models/Client.js';
+import SystemSettings from '../models/SystemSettings.js';
 import { sendEmail } from '../utils/emailService.js';
 import { generateEmailHtml } from "../utils/emailTemplates.js";
 
@@ -80,6 +81,9 @@ n       // Helper to extract readable service names from various frontend shapes
         return names.length ? names.join(', ') : 'N/A';
       };
 
+      // Fetch settings for website URL
+      const settings = await SystemSettings.getSettings();
+
       const htmlContent = generateEmailHtml({
         title: "Quotation Received",
         greeting: `Hello ${nameToSearch || 'Valued Customer'},`,
@@ -95,7 +99,8 @@ n       // Helper to extract readable service names from various frontend shapes
           "Valid Until": req.body.validityDate ? new Date(req.body.validityDate).toDateString() : 'N/A'
         },
         actionText: "Contact Us to Book",
-        actionUrl: process.env.CLIENT_URL || "#"
+        actionUrl: process.env.CLIENT_URL || "#",
+        websiteUrl: settings.websiteUrl
       });
 
       await sendEmail({

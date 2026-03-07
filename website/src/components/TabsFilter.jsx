@@ -9,6 +9,8 @@ const TabsFilter = ({
   loading = false,
   variant = "pill" // "pill" or "underline"
 }) => {
+  const shouldScroll = tabs.length > 7;
+
   if (loading) {
     return (
       <div className="tabs-filter__skeleton">
@@ -22,25 +24,27 @@ const TabsFilter = ({
   }
 
   return (
-    <div className={`tabs-filter tabs-filter--${variant}`}>
-      <ul className="tabs-filter__list">
-        {tabs.map((tab) => (
-          <li
-            key={tab.id || tab.name}
-            className={`tabs-filter__item ${activeTab === (tab.id || tab.name) ? "tabs-filter__item--active" : ""}`}
-            onClick={() => onChange(tab.id || tab.name)}
-          >
-            <button
-              type="button"
-              className="tabs-filter__button"
-              aria-selected={activeTab === (tab.id || tab.name)}
-              aria-label={`Filter by ${tab.label || tab.name}`}
+    <div className={`tabs-filter tabs-filter--${variant} ${shouldScroll ? 'tabs-filter--scrollable' : ''}`}>
+      <div className="tabs-filter__container">
+        <ul className="tabs-filter__list">
+          {tabs.map((tab) => (
+            <li
+              key={tab.id || tab.name}
+              className={`tabs-filter__item ${activeTab === (tab.id || tab.name) ? "tabs-filter__item--active" : ""}`}
+              onClick={() => onChange(tab.id || tab.name)}
             >
-              {tab.label || tab.name}
-            </button>
-          </li>
-        ))}
-      </ul>
+              <button
+                type="button"
+                className="tabs-filter__button"
+                aria-selected={activeTab === (tab.id || tab.name)}
+                aria-label={`Filter by ${tab.label || tab.name}`}
+              >
+                {tab.label || tab.name}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

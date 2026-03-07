@@ -1,8 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Video, PlayCircle, AlertCircle } from "lucide-react";
+import { Plus, Pencil, Trash2, Video, PlayCircle, AlertCircle, Search, Filter } from "lucide-react";
 import PageHeader from "../components/PageHeader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function AdminFilms() {
     const queryClient = useQueryClient();
@@ -11,6 +18,11 @@ export default function AdminFilms() {
     const [deleteId, setDeleteId] = useState(null);
     const [showSuccess, setShowSuccess] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+
+    // Search and filter states
+    const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState("All");
+    const [categoryFilter, setCategoryFilter] = useState("All");
 
     const { data: films = [], isLoading } = useQuery({
         queryKey: ["films"],
@@ -88,8 +100,81 @@ export default function AdminFilms() {
         return null;
     };
 
+    // Statistics calculation
+    const stats = useMemo(() => {
+        const total = films.length;
+        const active = films.filter(f => f.status === "Active").length;
+        const inactive = films.filter(f => f.status === "Inactive").length;
+        const categories = [...new Set(films.map(f => f.category))].length;
+        return { total, active, inactive, categories };
+    }, [films]);
+
+    // Filtered films based on search and filters
+    const filteredFilms = useMemo(() => {
+        return films.filter(film => {
+            const matchesSearch = film.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                film.category?.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesStatus = statusFilter === "All" || film.status === statusFilter;
+            const matchesCategory = categoryFilter === "All" || film.category === categoryFilter;
+            return matchesSearch && matchesStatus && matchesCategory;
+        });
+    }, [films, searchTerm, statusFilter, categoryFilter]);
+
+    // Get unique categories for filter dropdown
+    const uniqueCategories = useMemo(() => {
+        return ["All", ...new Set(films.map(f => f.category).filter(Boolean))];
+    }, [films]);
+
     return (
         <div className="container mx-auto mt-0 px-0 pt-0 pb-6 animate-in fade-in duration-500">
+            {/* Statistics Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-50 rounded-lg">
+                            <Video className="text-blue-600" size={20} />
+                        </div>
+                        <div>
+                            <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
+                            <p className="text-sm text-slate-600">Total Films</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-emerald-50 rounded-lg">
+                            <PlayCircle className="text-emerald-600" size={20} />
+                        </div>
+                        <div>
+                            <p className="text-2xl font-bold text-slate-900">{stats.active}</p>
+                            <p className="text-sm text-slate-600">Active</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-slate-50 rounded-lg">
+                            <Video className="text-slate-600" size={20} />
+                        </div>
+                        <div>
+                            <p className="text-2xl font-bold text-slate-900">{stats.inactive}</p>
+                            <p className="text-sm text-slate-600">Inactive</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-purple-50 rounded-lg">
+                            <Filter className="text-purple-600" size={20} />
+                        </div>
+                        <div>
+                            <p className="text-2xl font-bold text-slate-900">{stats.categories}</p>
+                            <p className="text-sm text-slate-600">Categories</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Header */}
             <PageHeader
                 title="Films"
@@ -104,14 +189,56 @@ export default function AdminFilms() {
                 }
             />
 
+            {/* Search and Filters */}
+            <div className="mb-6 space-y-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="relative flex-1 max-w-md">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        <input
+                            type="text"
+                            placeholder="Search films by title or category..."
+                            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500/20 text-sm"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <div className="flex gap-2">
+                        <Select value={statusFilter} onValueChange={setStatusFilter}>
+                            <SelectTrigger className="w-32">
+                                <SelectValue placeholder="Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="All">All Status</SelectItem>
+                                <SelectItem value="Active">Active</SelectItem>
+                                <SelectItem value="Inactive">Inactive</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                            <SelectTrigger className="w-40">
+                                <SelectValue placeholder="Category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {uniqueCategories.map(category => (
+                                    <SelectItem key={category} value={category}>
+                                        {category}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+            </div>
+
             {/* Films Grid */}
             {isLoading ? (
                 <div className="text-center py-12 text-gray-500">Loading films...</div>
-            ) : films.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">No films found. Add your first masterpiece!</div>
+            ) : filteredFilms.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                    {films.length === 0 ? "No films found. Add your first masterpiece!" : "No films match your search criteria."}
+                </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {films.map((item) => {
+                    {filteredFilms.map((item) => {
                         const platform = getVideoPlatform(item.youtubeUrl);
                         let thumbnail = null;
                         if (platform === 'youtube') {
@@ -203,29 +330,37 @@ export default function AdminFilms() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-1.5">Category</label>
-                                    <select
+                                    <Select
                                         value={form.category}
-                                        onChange={(e) => setForm({ ...form, category: e.target.value })}
-                                        className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-shadow bg-white"
+                                        onValueChange={(value) => setForm({ ...form, category: value })}
                                     >
-                                        <option value="Wedding">Wedding</option>
-                                        {eventTypes.map((type) => (
-                                            <option key={type._id} value={type.name}>
-                                                {type.label || type.name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select category" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Wedding">Wedding</SelectItem>
+                                            {eventTypes.map((type) => (
+                                                <SelectItem key={type._id} value={type.name}>
+                                                    {type.label || type.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-1.5">Status</label>
-                                    <select
+                                    <Select
                                         value={form.status}
-                                        onChange={(e) => setForm({ ...form, status: e.target.value })}
-                                        className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-shadow bg-white"
+                                        onValueChange={(value) => setForm({ ...form, status: value })}
                                     >
-                                        <option value="Active">Active</option>
-                                        <option value="Inactive">Inactive</option>
-                                    </select>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Active">Active</SelectItem>
+                                            <SelectItem value="Inactive">Inactive</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
                         </div>

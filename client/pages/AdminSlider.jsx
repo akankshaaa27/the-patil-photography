@@ -4,6 +4,13 @@ import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Image as ImageIcon, ChevronUp, ChevronDown, GripVertical, ArrowUp, ArrowDown } from "lucide-react";
 import Skeleton from "../components/Skeleton";
 import PageHeader from "../components/PageHeader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function AdminSlider() {
   const queryClient = useQueryClient();
@@ -389,14 +396,15 @@ export default function AdminSlider() {
                 </div> */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Status</label>
-                  <select
-                    value={form.status}
-                    onChange={(e) => setForm({ ...form, status: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-shadow bg-white"
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
+                  <Select value={form.status} onValueChange={(value) => setForm({ ...form, status: value })}>
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Active">Active</SelectItem>
+                      <SelectItem value="Inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 

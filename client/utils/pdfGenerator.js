@@ -113,7 +113,7 @@ export const generateQuotationPDF = (quotation, client, settings = {}) => {
           <p style="margin: 5px 0; font-size: 12px;"><strong>Date:</strong> ${new Date(quotation.quotationDate).toLocaleDateString()}</p>
           <p style="margin: 5px 0; font-size: 12px;"><strong>Event Date:</strong> ${new Date(quotation.eventDate).toLocaleDateString()}</p>
           <p style="margin: 5px 0; font-size: 12px;"><strong>Valid Till:</strong> ${new Date(quotation.validityDate).toLocaleDateString()}</p>
-          <p style="margin: 5px 0; font-size: 12px;"><strong>Event Type:</strong> ${quotation.eventType}</p>
+          <p style="margin: 8px 0; padding: 4px 0; font-size: 12px;"><strong>Event Type:</strong> ${quotation.eventType}</p>
         </div>
       </div>
 
@@ -455,7 +455,7 @@ export const generateOrderPDF = (order, settings = {}) => {
         </thead>
         <tbody>
           <tr style="border: 1px solid #e5e5e5;">
-            <td style="padding: 12px; border: 1px solid #e5e5e5;">Total Project Value (${order.photography_type || "Service"})</td>
+            <td style="padding: 15px; border: 1px solid #e5e5e5;">Total Project Value (${order.photography_type || "Service"})</td>
             <td style="padding: 12px; text-align: right; border: 1px solid #e5e5e5;">₹${total.toLocaleString()}</td>
           </tr>
           <tr style="border: 1px solid #e5e5e5;">

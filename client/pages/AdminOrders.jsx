@@ -1,9 +1,16 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { generatePDF, generateOrderPDF } from "../utils/pdfGenerator";
 import { useSettings } from "../hooks/useSettings";
 import { Eye, FileText, Edit, Trash2, Download, Plus, MessageCircle } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import { formatDate, formatDateForInput } from "../lib/dateFormatter";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const emptyOrder = {
   name: "",
@@ -44,13 +51,12 @@ export default function AdminOrders() {
   const [clientSearch, setClientSearch] = useState("");
   const [showClientDropdown, setShowClientDropdown] = useState(false);
 
+  // Services from Common Types Management
+  const [predefinedServices, setPredefinedServices] = useState([]);
+
   /* New states for UI enhancements */
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [showServiceDropdown, setShowServiceDropdown] = useState(false); // For service multi-select
-
-  // Dropdown Ref
-  const dropdownRef = useRef(null);
 
   useEffect(() => {
     fetchOrders();
@@ -59,21 +65,8 @@ export default function AdminOrders() {
 
   useEffect(() => {
     fetchEventTypes();
+    fetchServices();
   }, []);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowServiceDropdown(false);
-      }
-    }
-    if (showServiceDropdown) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showServiceDropdown]);
 
   const stats = useMemo(() => {
     const total = orders.length;
@@ -440,7 +433,7 @@ export default function AdminOrders() {
   const [showServiceModal, setShowServiceModal] = useState(false);
 
   const [newType, setNewType] = useState("");
-  const [newService, setNewService] = useState("");
+  const [newService, setNewService] = useState({ name: "", rate: 0, category: "photography" });
 
   function addNewType() {
     if (!newType.trim()) return;
@@ -497,30 +490,45 @@ export default function AdminOrders() {
     }
   }
 
-  function addNewService() {
-    if (!newService.trim()) return;
-    if (serviceTypes.includes(newService.trim())) {
-      alert("Service already exists");
-      return;
+  async function fetchServices() {
+    try {
+      const response = await fetch("/api/services");
+      if (!response.ok) throw new Error("Failed to fetch services");
+      const data = await response.json();
+      setPredefinedServices(data);
+    } catch (error) {
+      console.error("Error fetching services:", error);
     }
-    const updated = [...serviceTypes, newService.trim()];
-    setServiceTypes(updated);
-    localStorage.setItem("serviceTypes", JSON.stringify(updated));
-    setNewService("");
-    setShowServiceModal(false);
   }
 
-  function handleServiceChange(e) {
-    const { value, checked } = e.target;
-    let current = form.service ? form.service.split(",").map(s => s.trim()).filter(Boolean) : [];
-
-    if (checked) {
-      if (!current.includes(value)) current.push(value);
-    } else {
-      current = current.filter(item => item !== value);
-    }
-
-    setForm(f => ({ ...f, service: current.join(", ") }));
+  function addNewService() {
+    if (!newService.name.trim()) return;
+    
+    (async () => {
+      try {
+        const payload = { 
+          name: newService.name, 
+          ratePerDay: parseFloat(newService.rate) || 0,
+          category: newService.category || 'photography'
+        };
+        const res = await fetch('/api/services', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || 'Failed to create service');
+        }
+        const created = await res.json();
+        setPredefinedServices(prev => [...prev, created]);
+        setShowServiceModal(false);
+        setNewService({ name: '', rate: 0, category: 'photography' });
+      } catch (error) {
+        console.error('Error creating service:', error);
+        alert(error.message || 'Could not create service');
+      }
+    })();
   }
 
   return (
@@ -793,19 +801,18 @@ export default function AdminOrders() {
 
                 <FormField label="Event Type" required>
                   <div className="flex gap-2">
-                    <select
-                      name="photography_type"
-                      value={form.photography_type}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none bg-white"
-                    >
-                      <option value="">Choose type</option>
-                      {eventTypes.map((type) => (
-                        <option key={type} value={type}>
-                          {type}
-                        </option>
-                      ))}
-                    </select>
+                    <Select value={form.photography_type} onValueChange={(value) => setForm(prev => ({ ...prev, photography_type: value }))}>
+                      <SelectTrigger className="flex-1">
+                        <SelectValue placeholder="Choose event type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {eventTypes.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <button
                       type="button"
                       onClick={() => setShowTypeModal(true)}
@@ -827,20 +834,18 @@ export default function AdminOrders() {
                 <div className="grid grid-cols-2 gap-3">
                   <FormField label="Start Date" required>
                     <input
-                      type="text"
+                      type="date"
                       name="event_date"
-                      placeholder="dd/mm/yyyy"
-                      value={form.event_date ? formatDate(form.event_date) : ""}
+                      value={form.event_date}
                       onChange={handleChange}
                       className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none"
                     />
                   </FormField>
                   <FormField label="End Date">
                     <input
-                      type="text"
+                      type="date"
                       name="event_end_date"
-                      placeholder="dd/mm/yyyy"
-                      value={form.event_end_date ? formatDate(form.event_end_date) : ""}
+                      value={form.event_end_date}
                       onChange={handleChange}
                       className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none"
                     />
@@ -848,45 +853,73 @@ export default function AdminOrders() {
                 </div>
 
                 <FormField label="Service" required>
-                  <div className="relative" ref={dropdownRef}>
+                  <div className="flex gap-2">
+                    <Select>
+                      <SelectTrigger className="flex-1">
+                        <SelectValue placeholder="Select services">
+                          {form.service ? (
+                            <span className="text-slate-900">
+                              {(() => {
+                                const services = form.service.split(", ").filter(Boolean);
+                                if (services.length === 0) return "";
+                                if (services.length < 4) return services.join(", ");
+                                return `${services[0]} +${services.length - 1}`;
+                              })()}
+                            </span>
+                          ) : null}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <div className="p-2 max-h-60 overflow-y-auto">
+                          <div className="space-y-1">
+                            {predefinedServices.map((service) => {
+                              const isSelected = (form.service || "").split(", ").includes(service.name);
+                              return (
+                                <label key={service._id || service.name} className="flex items-center gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={(e) => {
+                                      const checked = e.target.checked;
+                                      let current = form.service ? form.service.split(", ").filter(Boolean) : [];
+                                      if (checked) {
+                                        if (!current.includes(service.name)) current.push(service.name);
+                                      } else {
+                                        current = current.filter(item => item !== service.name);
+                                      }
+                                      setForm(prev => ({ ...prev, service: current.join(", ") }));
+                                    }}
+                                    className="h-4 w-4 rounded border-slate-300 text-gold-500 focus:ring-gold-500"
+                                  />
+                                  <span className="text-sm text-slate-700">{service.name}</span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </SelectContent>
+                    </Select>
                     <button
                       type="button"
-                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-left focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none bg-white flex justify-between items-center"
-                      onClick={() => setShowServiceDropdown(!showServiceDropdown)}
+                      onClick={() => setShowServiceModal(true)}
+                      className="shrink-0 rounded-lg border border-gold-200 bg-gold-50 px-3 text-gold-600 hover:bg-gold-100"
+                      title="Add new service"
                     >
-                      <span className={form.service ? "text-slate-900" : "text-slate-400"}>
-                        {form.service || "Select services..."}
-                      </span>
-                      <span className="text-slate-400">▼</span>
+                      +
                     </button>
-                    {showServiceDropdown && (
-                      <div className="absolute z-20 mt-1 w-full rounded-md border border-slate-200 bg-white shadow-xl max-h-60 overflow-y-auto">
-                        <div className="p-2 space-y-1">
-                          {serviceTypes.map((svc) => (
-                            <label key={svc} className="flex items-center gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer">
-                              <input
-                                type="checkbox"
-                                value={svc}
-                                checked={(form.service || "").split(", ").map(s => s.trim()).includes(svc)}
-                                onChange={handleServiceChange}
-                                className="h-4 w-4 rounded border-slate-300 text-gold-500 focus:ring-gold-500"
-                              />
-                              <span className="text-sm text-slate-700">{svc}</span>
-                            </label>
-                          ))}
-                        </div>
-                        <div className="border-t border-slate-100 p-2">
-                          <button
-                            type="button"
-                            onClick={() => { setShowServiceModal(true); setShowServiceDropdown(false); }}
-                            className="w-full text-left px-2 py-1 text-xs font-semibold text-gold-600 hover:text-gold-700 hover:bg-gold-50 rounded"
-                          >
-                            + Add New Service
-                          </button>
-                        </div>
-                      </div>
-                    )}
                   </div>
+                  {form.service && form.service.trim() && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {form.service.split(", ").filter(Boolean).map((service, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center rounded-full bg-gold-100 px-2 py-1 text-xs font-medium text-gold-700"
+                        >
+                          {service}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </FormField>
                 <FormField label="Album Pages">
                   <textarea
@@ -927,7 +960,7 @@ export default function AdminOrders() {
                     />
                   </FormField>
                 </div>
-                <FormField label="Deliverables">
+                <FormField label="Deliverables days">
                   <input
                     name="deliverables"
                     value={form.deliverables}
@@ -937,27 +970,25 @@ export default function AdminOrders() {
                 </FormField>
                 <FormField label="Delivery Date">
                   <input
-                    type="text"
+                    type="date"
                     name="delivery_date"
-                    placeholder="dd/mm/yyyy"
-                    value={form.delivery_date ? formatDate(form.delivery_date) : ""}
+                    value={form.delivery_date}
                     onChange={handleChange}
                     className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none"
                   />
                 </FormField>
                 <FormField label="Order Status">
-                  <select
-                    name="order_status"
-                    value={form.order_status}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none bg-white"
-                  >
-                    <option value="">Select status</option>
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Delivered">Delivered</option>
-                    <option value="Cancelled">Cancelled</option>
-                  </select>
+                  <Select value={form.order_status} onValueChange={(value) => setForm(prev => ({ ...prev, order_status: value }))}>
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Pending">Pending</SelectItem>
+                      <SelectItem value="In Progress">In Progress</SelectItem>
+                      <SelectItem value="Delivered">Delivered</SelectItem>
+                      <SelectItem value="Cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </FormField>
                 <div className="md:col-span-2">
                   <FormField label="Notes">
@@ -1066,22 +1097,55 @@ export default function AdminOrders() {
           <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4" onClick={() => setShowServiceModal(false)}>
             <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto custom-scrollbar" onClick={(e) => e.stopPropagation()}>
               <h3 className="text-lg font-semibold text-charcoal-900">Add New Service</h3>
-              <p className="mt-1 text-xs text-slate-500">Enter a new service name to add to the checklist.</p>
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-slate-700">Service Name</label>
-                <input
-                  type="text"
-                  value={newService}
-                  onChange={(e) => setNewService(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500"
-                  placeholder="e.g. Drone, Live Streaming"
-                  autoFocus
-                />
+              <p className="mt-1 text-xs text-slate-500">Add a new service to the Common Types Management.</p>
+              <div className="mt-4 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700">Service Name</label>
+                  <input
+                    type="text"
+                    value={newService.name}
+                    onChange={(e) => setNewService(prev => ({ ...prev, name: e.target.value }))}
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500"
+                    placeholder="e.g. Candid Photography"
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700">Default Rate (Per Day)</label>
+                  <input
+                    type="number"
+                    value={newService.rate}
+                    onChange={(e) => setNewService(prev => ({ ...prev, rate: e.target.value }))}
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500"
+                    placeholder="0"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700">Category</label>
+                  <Select
+                    value={newService.category}
+                    onValueChange={(value) => setNewService(prev => ({ ...prev, category: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="photography">Photography</SelectItem>
+                      <SelectItem value="video">Video</SelectItem>
+                      <SelectItem value="drone">Drone</SelectItem>
+                      <SelectItem value="product">Product</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="mt-6 flex justify-end gap-3">
                 <button
                   className="rounded-md border border-slate-200 px-4 py-2 text-sm hover:bg-slate-50"
-                  onClick={() => setShowServiceModal(false)}
+                  onClick={() => {
+                    setShowServiceModal(false);
+                    setNewService({ name: '', rate: 0, category: 'photography' });
+                  }}
                 >
                   Cancel
                 </button>

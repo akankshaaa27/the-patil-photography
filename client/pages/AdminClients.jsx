@@ -4,6 +4,13 @@ import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { formatDate } from "../lib/dateFormatter";
 import PageHeader from "../components/PageHeader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const seedClients = [
   {
@@ -379,16 +386,20 @@ export default function AdminClients() {
                 />
               </Field>
               <Field label="Event Type">
-                <select
+                <Select
                   value={form.event}
-                  onChange={(e) => setForm((prev) => ({ ...prev, event: e.target.value }))}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500"
+                  onValueChange={(value) => setForm((prev) => ({ ...prev, event: value }))}
                 >
-                  <option>Wedding</option>
-                  <option>Pre-Wedding</option>
-                  <option>Engagement</option>
-                  <option>Baby Shower</option>
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select event type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Wedding">Wedding</SelectItem>
+                    <SelectItem value="Pre-Wedding">Pre-Wedding</SelectItem>
+                    <SelectItem value="Engagement">Engagement</SelectItem>
+                    <SelectItem value="Baby Shower">Baby Shower</SelectItem>
+                  </SelectContent>
+                </Select>
               </Field>
               <Field label="City">
                 <input
@@ -406,15 +417,19 @@ export default function AdminClients() {
                 />
               </Field>
               <Field label="Status">
-                <select
+                <Select
                   value={form.status}
-                  onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value }))}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-gold-500 focus:ring-1 focus:ring-gold-500"
+                  onValueChange={(value) => setForm((prev) => ({ ...prev, status: value }))}
                 >
-                  <option value="Lead">Lead</option>
-                  <option value="Active">Active</option>
-                  <option value="Archived">Archived</option>
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Lead">Lead</SelectItem>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Archived">Archived</SelectItem>
+                  </SelectContent>
+                </Select>
               </Field>
             </div>
             <div className="mt-6 flex justify-end gap-3 border-t border-slate-200 pt-4">

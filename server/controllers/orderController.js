@@ -1,4 +1,5 @@
 import Order from "../models/Order.js";
+import SystemSettings from "../models/SystemSettings.js";
 import { sendEmail } from "../utils/emailService.js";
 import { generateEmailHtml } from "../utils/emailTemplates.js";
 
@@ -51,8 +52,10 @@ export const createOrder = async (req, res) => {
         await order.save();
 
         // Send Email Notification if email is provided
-        // Send Email Notification if email is provided
         if (email) {
+            // Fetch settings for website URL
+            const settings = await SystemSettings.getSettings();
+
             const htmlContent = generateEmailHtml({
                 title: "Order Confirmation",
                 greeting: `Hello ${name || 'Valued Customer'},`,
@@ -73,7 +76,8 @@ export const createOrder = async (req, res) => {
                     "Delivery Date": orderData.delivery_date ? new Date(orderData.delivery_date).toDateString() : 'TBD'
                 },
                 actionText: "Contact Us",
-                actionUrl: process.env.CLIENT_URL || "#"
+                actionUrl: process.env.CLIENT_URL || "#",
+                websiteUrl: settings.websiteUrl
             });
 
             await sendEmail({

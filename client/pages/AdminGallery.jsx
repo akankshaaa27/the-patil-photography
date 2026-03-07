@@ -4,6 +4,13 @@ import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Image as ImageIcon, Filter } from "lucide-react";
 import Skeleton from "../components/Skeleton";
 import PageHeader from "../components/PageHeader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function AdminGallery() {
   const queryClient = useQueryClient();
@@ -170,29 +177,37 @@ export default function AdminGallery() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Category</label>
-                  <select
+                  <Select
                     value={form.category}
-                    onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-shadow bg-white"
+                    onValueChange={(value) => setForm({ ...form, category: value })}
                   >
-                    <option value="General">General</option>
-                    {eventTypes.map((type) => (
-                      <option key={type._id} value={type.name}>
-                        {type.label || type.name}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="General">General</SelectItem>
+                      {eventTypes.map((type) => (
+                        <SelectItem key={type._id} value={type.name}>
+                          {type.label || type.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Status</label>
-                  <select
+                  <Select
                     value={form.status}
-                    onChange={(e) => setForm({ ...form, status: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-shadow bg-white"
+                    onValueChange={(value) => setForm({ ...form, status: value })}
                   >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Active">Active</SelectItem>
+                      <SelectItem value="Inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 

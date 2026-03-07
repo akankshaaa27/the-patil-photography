@@ -7,6 +7,19 @@
   justify-content: center;
   /* margin: 2rem 0; */
   animation: fadeInDown 0.5s ease-out;
+  padding: 8px 0; /* Add padding to prevent hover clipping */
+}
+
+.tabs-filter__container {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  padding: 4px 0; /* Additional padding for hover effects */
+}
+
+.tabs-filter__container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
 }
 
 .tabs-filter__list {
@@ -17,10 +30,23 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.75rem;
+  min-width: max-content;
+}
+
+.tabs-filter--scrollable .tabs-filter__list {
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  padding: 0 1rem;
+}
+
+.tabs-filter--scrollable .tabs-filter__container {
+  justify-content: flex-start;
+  max-width: 100%;
 }
 
 .tabs-filter__item {
   flex-shrink: 0;
+  margin: 2px 0; /* Add margin to prevent clipping */
 }
 
 .tabs-filter__button {
@@ -51,7 +77,8 @@
 .tabs-filter--pill .tabs-filter__button:hover {
   border-color: #daa520;
   color: #daa520;
-  transform: translateY(-2px);
+  transform: translateY(-1px); /* Reduced from -2px to prevent clipping */
+  box-shadow: 0 2px 8px rgba(218, 165, 32, 0.2);
 }
 
 .tabs-filter--pill .tabs-filter__item--active .tabs-filter__button {
@@ -109,13 +136,22 @@
     margin: 1.5rem 0;
   }
 
-  .tabs-filter__button {
-    padding: 0.5rem 1.25rem;
-    font-size: 0.9rem;
+  .tabs-filter__container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .tabs-filter__list {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
     gap: 0.5rem;
+    padding: 0 1rem;
+  }
+
+  .tabs-filter__button {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
   }
 }
 
@@ -123,6 +159,11 @@
   .tabs-filter__button {
     padding: 0.5rem 1rem;
     font-size: 0.85rem;
+  }
+
+  .tabs-filter__container {
+    /* Ensure smooth scrolling on mobile */
+    scroll-behavior: smooth;
   }
 
   .tabs-filter__list {

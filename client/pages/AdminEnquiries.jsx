@@ -1,13 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { formatDate } from "../lib/dateFormatter";
-import { Trash2, Phone, MapPin, Calendar, Zap, Eye, X, MessageCircle } from "lucide-react";
+import { Trash2, Phone, MapPin, Calendar, Zap, Eye, X, MessageCircle, Search } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import { useConfirm } from "@/components/ConfirmModal";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function AdminEnquiries() {
     const [enquiries, setEnquiries] = useState([]);
     const [viewDetails, setViewDetails] = useState(null);
     const [filter, setFilter] = useState("All");
+    const [searchTerm, setSearchTerm] = useState("");
     const { confirm, ConfirmDialog } = useConfirm();
 
     useEffect(() => {
@@ -74,9 +82,16 @@ export default function AdminEnquiries() {
         }
     };
 
-    const filteredEnquiries = filter === "All" 
-        ? enquiries 
-        : enquiries.filter(e => e.status === filter);
+    const filteredEnquiries = useMemo(() => {
+        return enquiries.filter(enquiry => {
+            const matchesSearch = enquiry.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                enquiry.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                enquiry.eventType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                enquiry.phone?.includes(searchTerm);
+            const matchesFilter = filter === "All" || enquiry.status === filter;
+            return matchesSearch && matchesFilter;
+        });
+    }, [enquiries, searchTerm, filter]);
 
     const stats = {
         total: enquiries.length,
@@ -92,6 +107,34 @@ export default function AdminEnquiries() {
                 title="Book Us Enquiries"
                 description="Manage enquiry requests and track customer interest"
             />
+
+            {/* Search and Filters */}
+            <div className="mb-6 space-y-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="relative flex-1 max-w-md">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        <input
+                            type="text"
+                            placeholder="Search by name, email, phone, or event..."
+                            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500/20 text-sm"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <Select value={filter} onValueChange={setFilter}>
+                        <SelectTrigger className="w-40">
+                            <SelectValue placeholder="Filter by status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="All">All Status</SelectItem>
+                            <SelectItem value="New">New</SelectItem>
+                            <SelectItem value="Contacted">Contacted</SelectItem>
+                            <SelectItem value="Booked">Booked</SelectItem>
+                            <SelectItem value="Closed">Closed</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
 
             {/* Stats Header with Gradient Background */}
             <div className="bg-gradient-to-r from-charcoal-900 to-charcoal-800 text-white px-6 py-8 mb-8 rounded-lg">
@@ -172,16 +215,20 @@ export default function AdminEnquiries() {
 
                                 {/* Actions */}
                                 <div className="flex items-center gap-2 flex-shrink-0">
-                                    <select
+                                    <Select
                                         value={enquiry.status}
-                                        onChange={(e) => updateStatus(enquiry._id, e.target.value)}
-                                        className={`text-xs py-1 px-2 rounded border-0 cursor-pointer font-medium focus:outline-none focus:ring-1 focus:ring-charcoal-600 ${getStatusColor(enquiry.status)}`}
+                                        onValueChange={(value) => updateStatus(enquiry._id, value)}
                                     >
-                                        <option value="New">New</option>
-                                        <option value="Contacted">Contacted</option>
-                                        <option value="Booked">Booked</option>
-                                        <option value="Closed">Closed</option>
-                                    </select>
+                                        <SelectTrigger className={`w-24 h-8 text-xs border-0 focus:ring-1 focus:ring-charcoal-600 ${getStatusColor(enquiry.status)}`}>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="New">New</SelectItem>
+                                            <SelectItem value="Contacted">Contacted</SelectItem>
+                                            <SelectItem value="Booked">Booked</SelectItem>
+                                            <SelectItem value="Closed">Closed</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                     <button
                                         onClick={() => setViewDetails(enquiry)}
                                         className="p-1.5 text-slate-500 hover:text-charcoal-900 hover:bg-slate-100 rounded transition"
@@ -313,19 +360,23 @@ export default function AdminEnquiries() {
                             >
                                 Close
                             </button>
-                            <select
+                            <Select
                                 value={viewDetails.status}
-                                onChange={(e) => {
-                                    updateStatus(viewDetails._id, e.target.value);
-                                    setViewDetails({...viewDetails, status: e.target.value});
+                                onValueChange={(value) => {
+                                    updateStatus(viewDetails._id, value);
+                                    setViewDetails({...viewDetails, status: value});
                                 }}
-                                className={`flex-1 px-3 py-2 rounded font-medium border-0 cursor-pointer focus:outline-none focus:ring-1 focus:ring-charcoal-600 ${getStatusColor(viewDetails.status)}`}
                             >
-                                <option value="New">New</option>
-                                <option value="Contacted">Contacted</option>
-                                <option value="Booked">Booked</option>
-                                <option value="Closed">Closed</option>
-                            </select>
+                                <SelectTrigger className={`flex-1 focus:ring-1 focus:ring-charcoal-600 ${getStatusColor(viewDetails.status)}`}>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="New">New</SelectItem>
+                                    <SelectItem value="Contacted">Contacted</SelectItem>
+                                    <SelectItem value="Booked">Booked</SelectItem>
+                                    <SelectItem value="Closed">Closed</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
                 </div>
