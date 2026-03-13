@@ -4595,7 +4595,7 @@ section,
 }
 
 .modal-body {
-  background-color: var(--background-color);
+  /* background-color: var(--background-color); */
 }
 
 .accent-color {
@@ -4604,7 +4604,7 @@ section,
 
 .modal-header {
   border: 0px !important;
-  background-color: var(--background-color) !important;
+  /* background-color: var(--background-color) !important; */
 }
 
 .founder {

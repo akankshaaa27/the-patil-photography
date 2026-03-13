@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import './App.css'
 import ErrorBoundary from './components/ErrorBoundary'
 import Home from './pages/Home'
+import PageLoader from './components/PageLoader'
 import { useSettings } from './hooks/useSettings'
 import WhatsAppButton from './components/WhatsAppButton'
 
@@ -96,7 +97,7 @@ function App() {
   return (
     <div className="App">
       <ErrorBoundary>
-        <Suspense fallback={<div style={{ padding: '50px', textAlign: 'center', fontSize: '20px' }}>Loading page...</div>}>
+        <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />

@@ -1,31 +1,15 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Modal from "react-bootstrap/Modal";
 import LuxGallery from "./LuxGallery";
 import "./StoryModal.css";
 
 /* ═══════════════════════════════════════════════════════════
    STORY MODAL — minimal dark luxury editorial
+   Class prefix: pp-sm-*
    Palette: Ink #0d0b09 · Cream #f5f0e8 · Gold #c9974a
 ═══════════════════════════════════════════════════════════ */
 
 const StoryModal = ({ show, onHide, story }) => {
-  useEffect(() => {
-    if (!show || !window.GLightbox) return;
-    setTimeout(() => {
-      try {
-        window.GLightbox({
-          selector: ".glightbox",
-          loop: true,
-          touchNavigation: true,
-          keyboardNavigation: true,
-          zoomable: true,
-        });
-      } catch (e) {
-        console.warn("GLightbox init error:", e);
-      }
-    }, 0);
-  }, [show, story]);
-
   if (!story) return null;
 
   const imageCount = story.images?.length ?? 0;
@@ -36,38 +20,41 @@ const StoryModal = ({ show, onHide, story }) => {
       onHide={onHide}
       size="xl"
       centered
-      scrollable={false}
-      className="sm-modal"
+      className="pp-sm-modal"
     >
-      {/* ── Header ── */}
-      <Modal.Header closeButton className="sm-header">
-        <div className="sm-header-left">
-          <span className="sm-header-dot" />
-          <span className="sm-header-label">Love Story</span>
+
+      {/* ── Header ─────────────────────────────────────────── */}
+      <Modal.Header closeButton className="pp-sm-header">
+        <div className="pp-sm-header-left">
+          <span className="pp-sm-header-dot" />
+          <span className="pp-sm-header-label">Love Story</span>
         </div>
       </Modal.Header>
 
-      {/* ── Body ── */}
-      <Modal.Body className="sm-body">
+      {/* ── Body ───────────────────────────────────────────── */}
+      <Modal.Body className="pp-sm-body">
 
         {/* Title block */}
-        <div className="sm-hero">
-          <span className="sm-orn">✦ &nbsp; ✦ &nbsp; ✦</span>
-          <h2 className="sm-title">{story.title}</h2>
+        <div className="pp-sm-hero">
+          <span className="pp-sm-orn">✦ ✦ ✦</span>
+
+          <h2 className="pp-sm-title">{story.title}</h2>
+
           {story.subtitle && (
-            <p className="sm-subtitle">{story.subtitle}</p>
+            <p className="pp-sm-subtitle">{story.subtitle}</p>
           )}
+
           {story.description && (
-            <p className="sm-desc">{story.description}</p>
+            <p className="pp-sm-desc">{story.description}</p>
           )}
         </div>
 
-        {/* Decorative divider */}
-        <div className="sm-divider" />
+        {/* Gradient divider */}
+        <div className="pp-sm-divider" />
 
         {/* Gallery */}
         {imageCount > 0 && (
-          <div className="sm-gallery-wrap">
+          <div className="pp-sm-gallery-wrap">
             <LuxGallery
               images={story.images}
               galleryId={`story-${story._id}`}
@@ -76,11 +63,12 @@ const StoryModal = ({ show, onHide, story }) => {
         )}
 
         {/* Footer */}
-        <div className="sm-footer">
-          <span className="sm-counter">
+        <div className="pp-sm-footer">
+          <span className="pp-sm-counter">
             {imageCount} photograph{imageCount !== 1 ? "s" : ""}
           </span>
-          <a href="/quote" className="pp-btn-primary sm-cta">
+
+          <a href="/quote" className="pp-btn-primary pp-sm-cta">
             Book Your Date
           </a>
         </div>

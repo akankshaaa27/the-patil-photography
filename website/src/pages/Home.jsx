@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import StoryModal from "../components/StoryModal";
 import TributeModal from "../components/TributeModal";
+import LuxGallery from "../components/LuxGallery";
 import { useSettings } from "../hooks/useSettings";
 import "../styles/home.css";
 
@@ -82,24 +83,27 @@ export default function Home() {
   const [ldTestimonials, setLdTestimonials] = useState(true);
   const [ldGallery, setLdGallery] = useState(true);
 
+  /* overall page loading */
+  const [pageLoading, setPageLoading] = useState(true);
+
   /* ── fetch ── */
   useEffect(() => {
     fetch("/api/slider")
       .then(r => r.json())
       .then(d => setSlides(Array.isArray(d) ? d.filter(s => s.status === "Active") : []))
-      .catch(() => { })
+      .catch(() => {})
       .finally(() => setLdSlider(false));
 
     fetch("/api/love-stories")
       .then(r => r.json())
       .then(d => setStories(Array.isArray(d) ? d.filter(s => s.status === "Active") : []))
-      .catch(() => { })
+      .catch(() => {})
       .finally(() => setLdStories(false));
 
     fetch("/api/testimonials?type=active")
       .then(r => r.json())
       .then(d => setTestimonials(Array.isArray(d) ? d : []))
-      .catch(() => { })
+      .catch(() => {})
       .finally(() => setLdTestimonials(false));
 
     fetch("/api/gallery")
@@ -108,7 +112,7 @@ export default function Home() {
         const active = Array.isArray(d) ? d.filter(i => i.status === "Active") : [];
         setGallery(active.slice(0, 12));
       })
-      .catch(() => { })
+      .catch(() => {})
       .finally(() => setLdGallery(false));
 
     /* tribute popup */
@@ -117,6 +121,13 @@ export default function Home() {
       return () => clearTimeout(t);
     }
   }, []);
+
+  /* check if all loading is complete */
+  useEffect(() => {
+    if (!ldSlider && !ldStories && !ldTestimonials && !ldGallery) {
+      setPageLoading(false);
+    }
+  }, [ldSlider, ldStories, ldTestimonials, ldGallery]);
 
   /* ── auto slide ── */
   useEffect(() => {
@@ -127,6 +138,9 @@ export default function Home() {
 
   /* ── helpers ── */
   const openStory = (story) => { setSelectedStory(story); setShowModal(true); };
+
+  /* Extract image URLs for LuxGallery */
+  const galleryImageUrls = gallery.map(item => item.image);
 
   const SERVICES = [
     { icon: "◉", title: "Wedding Photography", desc: "Full-day coverage from pre-ceremony to reception — every genuine emotion preserved." },
@@ -141,6 +155,16 @@ export default function Home() {
     <>
       <Header />
 
+      {/* Page Loading Overlay */}
+      {pageLoading && (
+        <div className="pp-page-loader">
+          <div className="pp-loader-content">
+            <div className="pp-loader-spinner"></div>
+            <p className="pp-loader-text">Loading beautiful moments...</p>
+          </div>
+        </div>
+      )}
+
       <TributeModal
         isOpen={showTribute}
         onClose={() => { setShowTribute(false); localStorage.setItem("popupClosed", "true"); }}
@@ -150,7 +174,6 @@ export default function Home() {
 
         {/* ══ HERO ══════════════════════════════════════════════ */}
         <section className="pp-hero">
-          {/* slides */}
           {!ldSlider && slides.length > 0 ? (
             slides.map((s, i) => (
               <div key={i} className={`pp-hero-bg ${i === slideIdx ? "active" : ""}`}>
@@ -179,7 +202,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* dot nav */}
           {slides.length > 1 && (
             <div className="pp-hero-dots">
               {slides.map((_, i) => (
@@ -254,30 +276,42 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ══ GALLERY ═══════════════════════════════════════════ */}
+        {/* ══ GALLERY — A Glimpse Into Our Craft ═══════════════ */}
         <section className="pp-gallery">
           <div className="pp-section-head pp-section-head--light">
             <span className="pp-tag pp-tag--gold">Our Portfolio</span>
-            <h2 className="pp-section-title pp-section-title--light">A Glimpse Into Our Craft</h2>
+            <h2 className="pp-section-title pp-section-title--light">
+              A Glimpse Into Our Craft
+            </h2>
           </div>
 
           {ldGallery ? (
-            <div className="pp-gallery-grid">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="pp-gallery-skel" />
+            /* Skeleton matches pp-gal-grid 4-col layout */
+            <div className="pp-gallery-skel-wrap">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`pp-gallery-skel${i === 0 || i === 4 ? " pp-gallery-skel--tall" : ""}`}
+                />
               ))}
             </div>
-          ) : gallery.length > 0 ? (
+          ) : galleryImageUrls.length > 0 ? (
             <>
-              <div className="pp-gallery-grid">
-                {gallery.map((item, i) => (
-                  <div key={i} className="pp-gallery-item">
-                    <img src={item.image} alt={item.title || `Gallery ${i + 1}`} />
-                  </div>
-                ))}
-              </div>
+              {/*
+                LuxGallery handles:
+                  • pp-gal-grid CSS grid (4-col → 3 → 2 responsive)
+                  • pp-gal-item--tall visual rhythm
+                  • Gold shine sweep + expand overlay on hover
+                  • GLightbox init/destroy (scoped to galleryId)
+              */}
+              <LuxGallery
+                images={galleryImageUrls}
+                galleryId="home-craft"
+              />
               <div className="pp-center-cta">
-                <Link to="/portfolio" className="pp-btn-ghost pp-btn-ghost--light">See More Projects</Link>
+                <Link to="/portfolio" className="pp-btn-ghost pp-btn-ghost--light">
+                  See More Projects
+                </Link>
               </div>
             </>
           ) : (
