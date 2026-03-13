@@ -65,16 +65,16 @@ export default function Home() {
   const businessName = settings?.businessName || "Photography";
 
   /* data */
-  const [slides,       setSlides]       = useState([]);
-  const [stories,      setStories]      = useState([]);
+  const [slides, setSlides] = useState([]);
+  const [stories, setStories] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
-  const [gallery,      setGallery]      = useState([]);
+  const [gallery, setGallery] = useState([]);
 
   /* ui */
-  const [slideIdx,       setSlideIdx]       = useState(0);
-  const [selectedStory,  setSelectedStory]  = useState(null);
-  const [showModal,      setShowModal]      = useState(false);
-  const [showTribute,    setShowTribute]    = useState(false);
+  const [slideIdx, setSlideIdx] = useState(0);
+  const [selectedStory, setSelectedStory] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showTribute, setShowTribute] = useState(false);
 
   /* loading flags */
   const [ldSlider, setLdSlider] = useState(true);
@@ -87,19 +87,19 @@ export default function Home() {
     fetch("/api/slider")
       .then(r => r.json())
       .then(d => setSlides(Array.isArray(d) ? d.filter(s => s.status === "Active") : []))
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLdSlider(false));
 
     fetch("/api/love-stories")
       .then(r => r.json())
       .then(d => setStories(Array.isArray(d) ? d.filter(s => s.status === "Active") : []))
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLdStories(false));
 
     fetch("/api/testimonials?type=active")
       .then(r => r.json())
       .then(d => setTestimonials(Array.isArray(d) ? d : []))
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLdTestimonials(false));
 
     fetch("/api/gallery")
@@ -108,7 +108,7 @@ export default function Home() {
         const active = Array.isArray(d) ? d.filter(i => i.status === "Active") : [];
         setGallery(active.slice(0, 12));
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLdGallery(false));
 
     /* tribute popup */
@@ -457,8 +457,6 @@ export default function Home() {
       <a href="#" id="scroll-top" className="scroll-top d-flex align-items-center justify-content-center">
         <i className="bi bi-arrow-up-short" />
       </a>
-
-      <div id="preloader" />
     </>
   );
 }

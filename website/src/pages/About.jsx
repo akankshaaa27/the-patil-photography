@@ -6,19 +6,19 @@ import { useSettings } from "../hooks/useSettings";
 import "./about.css";
 
 const WHY_CHOOSE = [
-  { icon: "bi-camera",   title: "Timeless Storytelling",     desc: "We believe your wedding is a once-in-a-lifetime story. Our approach blends cinematic vision with genuine emotions." },
-  { icon: "bi-gem",      title: "Luxury Aesthetic",          desc: "From soft lighting to refined compositions, our style is elegant, graceful, and cinematic." },
-  { icon: "bi-heart",    title: "Emotion-Driven Expertise",  desc: "The most beautiful moments are unspoken. We capture genuine emotions naturally and authentically." },
-  { icon: "bi-stars",    title: "Stress-Free Experience",    desc: "From consultation to delivery, we ensure a smooth, professional journey you can trust." },
-  { icon: "bi-people",   title: "Tailored Stories",          desc: "No two love stories are the same. Every wedding is customised to reflect your unique vision." },
-  { icon: "bi-infinity", title: "Lasting Memories",          desc: "Your wedding visuals are heirlooms — timeless, emotional, and crafted to last forever." },
+  { icon: "bi-camera", title: "Timeless Storytelling", desc: "We believe your wedding is a once-in-a-lifetime story. Our approach blends cinematic vision with genuine emotions." },
+  { icon: "bi-gem", title: "Luxury Aesthetic", desc: "From soft lighting to refined compositions, our style is elegant, graceful, and cinematic." },
+  { icon: "bi-heart", title: "Emotion-Driven Expertise", desc: "The most beautiful moments are unspoken. We capture genuine emotions naturally and authentically." },
+  { icon: "bi-stars", title: "Stress-Free Experience", desc: "From consultation to delivery, we ensure a smooth, professional journey you can trust." },
+  { icon: "bi-people", title: "Tailored Stories", desc: "No two love stories are the same. Every wedding is customised to reflect your unique vision." },
+  { icon: "bi-infinity", title: "Lasting Memories", desc: "Your wedding visuals are heirlooms — timeless, emotional, and crafted to last forever." },
 ];
 
 export default function About() {
   const { settings } = useSettings();
   const businessName = settings?.businessName || "Photography";
 
-  const [team,        setTeam]        = useState([]);
+  const [team, setTeam] = useState([]);
   const [teamLoading, setTeamLoading] = useState(true);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function About() {
     fetch("/api/team?publicOnly=true")
       .then(r => r.json())
       .then(d => { if (Array.isArray(d)) setTeam(d); })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setTeamLoading(false));
   }, []);
 
@@ -184,7 +184,6 @@ export default function About() {
       <a href="#" id="scroll-top" className="scroll-top d-flex align-items-center justify-content-center">
         <i className="bi bi-arrow-up-short" />
       </a>
-      <div id="preloader" />
     </>
   );
 }
