@@ -1,0 +1,141 @@
+/* ═══════════════════════════════════════════════════════════
+   THE PATIL PHOTOGRAPHY — 404 NOT FOUND PAGE
+   Design system: Dark Luxury Editorial
+═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap');
+
+:root {
+  --nf-ink:    #0d0b09;
+  --nf-cream:  #f5f0e8;
+  --nf-gold:   #c9974a;
+  --nf-gold-2: #e0b876;
+  --nf-muted:  rgba(245,240,232,0.45);
+  --nf-border: rgba(201,151,74,0.2);
+}
+
+@keyframes nf-fade  { from{opacity:0;transform:translateY(32px)} to{opacity:1;transform:translateY(0)} }
+@keyframes nf-pulse { 0%,100%{opacity:0.06} 50%{opacity:0.1} }
+
+/* ── Root ─────────────────────────────────────────────────── */
+.nf-root {
+  min-height: 100vh;
+  background: var(--nf-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 48px 24px;
+  font-family: 'Outfit', system-ui, sans-serif;
+}
+
+/* subtle grain overlay */
+.nf-root::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* gold ring decoration */
+.nf-root::after {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,151,74,0.08);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Background 404 ───────────────────────────────────────── */
+.nf-bg-number {
+  position: absolute;
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: clamp(200px, 30vw, 420px);
+  font-weight: 400;
+  color: rgba(201,151,74,0.07);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+  letter-spacing: -0.04em;
+  z-index: 1;
+  animation: nf-pulse 6s ease-in-out infinite;
+}
+
+/* ── Content ──────────────────────────────────────────────── */
+.nf-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 560px;
+  animation: nf-fade 1s ease both;
+}
+
+.nf-eyebrow {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--nf-gold);
+  margin-bottom: 20px;
+}
+
+.nf-title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-weight: 400;
+  color: var(--nf-cream);
+  line-height: 1.1;
+  margin: 0 0 22px;
+}
+
+.nf-sub {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--nf-muted);
+  font-style: italic;
+  margin: 0 0 44px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Button ───────────────────────────────────────────────── */
+.nf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--nf-gold);
+  color: var(--nf-ink) !important;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 14px 38px;
+  border-radius: 4px;
+  text-decoration: none !important;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.nf-btn:hover {
+  background: var(--nf-gold-2);
+  box-shadow: 0 10px 32px rgba(201,151,74,0.35);
+}
+
+.nf-arrow {
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 0.3s;
+}
+.nf-btn:hover .nf-arrow { transform: translate(2px, -2px); }

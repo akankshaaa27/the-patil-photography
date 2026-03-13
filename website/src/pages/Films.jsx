@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import TabsFilter from "../components/TabsFilter";
-import Skeleton from "../components/Skeleton";
+import "./films.css";
 
-// Extract YouTube ID
+/* ─── helpers ──────────────────────────────────────────── */
 const getYouTubeId = (url) => {
   if (!url) return "";
   const regExp =
@@ -13,31 +13,32 @@ const getYouTubeId = (url) => {
   return match ? match[1] : "";
 };
 
-const Films = () => {
-  const [films, setFilms] = useState([]);
-  const [categories, setCategories] = useState([]);
+/* ─── component ────────────────────────────────────────── */
+export default function Films() {
+  const [films,          setFilms]          = useState([]);
+  const [categories,     setCategories]     = useState([]);
   const [activeCategory, setActiveCategory] = useState("All");
-  const [loading, setLoading] = useState(true);
+  const [loading,        setLoading]        = useState(true);
+  const [lightboxUrl,    setLightboxUrl]    = useState(null);
 
+  /* fetch */
   useEffect(() => {
-    document.body.className = "portfolio-page";
-
     const fetchData = async () => {
       try {
         const [filmsRes, typesRes] = await Promise.all([
           fetch("/api/films"),
-          fetch("/api/event-types")
+          fetch("/api/event-types"),
         ]);
-
         const filmsData = await filmsRes.json();
         const typesData = await typesRes.json();
 
-        const activeFilms = filmsData.filter(f => f.status === "Active");
+        const activeFilms = filmsData.filter((f) => f.status === "Active");
         setFilms(activeFilms);
 
-        // Filter types to only show those that have films
-        const usedCategories = new Set(activeFilms.map(f => f.category));
-        setCategories(typesData.filter(t => t.isActive && usedCategories.has(t.name)));
+        const usedCategories = new Set(activeFilms.map((f) => f.category));
+        setCategories(
+          typesData.filter((t) => t.isActive && usedCategories.has(t.name))
+        );
       } catch (err) {
         console.error(err);
       } finally {
@@ -45,140 +46,212 @@ const Films = () => {
       }
     };
     fetchData();
-
-    return () => {
-      document.body.className = "";
-    };
   }, []);
 
-  const filteredFilms = activeCategory === "All"
-    ? films
-    : films.filter(film => film.category === activeCategory);
-
-  // Initialize GLightbox
+  /* close lightbox on Escape */
   useEffect(() => {
-    if (!loading && window.GLightbox) {
-      const lightbox = window.GLightbox({
-        selector: ".glightbox",
-        touchNavigation: true,
-        loop: true,
-      });
-    }
-  }, [loading, filteredFilms]);
+    const handler = (e) => e.key === "Escape" && setLightboxUrl(null);
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  /* lock body scroll when lightbox open */
+  useEffect(() => {
+    document.body.style.overflow = lightboxUrl ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [lightboxUrl]);
+
+  const filteredFilms =
+    activeCategory === "All"
+      ? films
+      : films.filter((f) => f.category === activeCategory);
+
+  const tabs = [
+    { id: "All", label: "All Films" },
+    ...categories.map((c) => ({ id: c.name, label: c.label || c.name })),
+  ];
 
   return (
     <>
       <Header />
 
-      <main className="main">
-        {/* Page Title */}
-        <div
-          className="page-title dark-background"
-          style={{ backgroundImage: "url('/assets/img/HomePage/84.webp')" }}
-        >
-          <div className="container position-relative text-center">
-            <h1>Our Films</h1>
-            <p>
-              Capturing life’s most precious moments through cinematic
-              storytelling
+      <main className="pf-main">
+
+        {/* ══ HERO ═══════════════════════════════════════════ */}
+        <section className="pf-hero">
+          <div className="pf-hero-bg">
+            <img src="/assets/img/HomePage/84.webp" alt="Films hero" />
+          </div>
+          <div className="pf-hero-veil" />
+          <div className="pf-hero-body">
+            <span className="pf-eyebrow">Cinematic Storytelling</span>
+            <h1 className="pf-hero-title">Our Films</h1>
+            <p className="pf-hero-sub">
+              Every love story deserves to be felt, not just remembered.
             </p>
-            <nav className="breadcrumbs">
-              <ol>
-                <li><a href="/">Home</a></li>
-                <li className="current">Films</li>
-              </ol>
+            <nav className="pf-breadcrumb">
+              <Link to="/">Home</Link>
+              <span className="pf-crumb-sep">✦</span>
+              <span className="pf-crumb-cur">Films</span>
             </nav>
           </div>
 
-        </div>
+          {/* decorative film-strip lines */}
+          <div className="pf-filmstrip" aria-hidden="true">
+            {Array.from({ length: 18 }).map((_, i) => (
+              <div key={i} className="pf-fs-hole" />
+            ))}
+          </div>
+        </section>
 
-        {/* Films Section */}
-        <section className="section py-5">
-          <div className="container">
-            <div className="section-title text-center portfolioHeader" data-aos="fade-up">
-              <h2>A Cinematic Journey of Love</h2>
-              <p className="text-muted mt-2">
-                Cinematic love stories crafted to capture the emotion, joy, and beauty of your wedding day—preserving every precious moment for a lifetime.
-              </p>
+        {/* ══ INTRO ══════════════════════════════════════════ */}
+        <section className="pf-intro">
+          <div className="pf-intro-inner">
+            <span className="pp-tag">A Cinematic Journey</span>
+            <h2 className="pp-section-title">
+              Love Stories,<br /><em>Frame by Frame</em>
+            </h2>
+            <p className="pf-intro-body">
+              Our cinematic films are crafted to capture the emotion, joy, and
+              beauty of your wedding day — preserving every precious moment as a
+              timeless work of art, to be relived for generations.
+            </p>
+          </div>
+        </section>
+
+        {/* ══ FILTER TABS ════════════════════════════════════ */}
+        <section className="pf-films-section">
+          <div className="pf-container">
+
+            <div className="pf-tabs">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  className={`pf-tab ${activeCategory === tab.id ? "active" : ""}`}
+                  onClick={() => setActiveCategory(tab.id)}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
 
-            {/* Category Filter Tabs */}
-            <div className="row mb-5">
-              <div className="col-12">
-                <TabsFilter
-                  tabs={[
-                    { id: "All", label: "All" },
-                    ...categories.map(cat => ({ id: cat.name, label: cat.label || cat.name }))
-                  ]}
-                  activeTab={activeCategory}
-                  onChange={setActiveCategory}
-                  loading={loading}
-                  variant="pill"
-                />
-              </div>
-            </div>
-
+            {/* ── GRID ── */}
             {loading ? (
-              <div className="films-grid">
-                {[1, 2, 3, 4, 5, 6].map((_, index) => (
-                  <div key={index} className="film-card">
-                    <Skeleton width="100%" height="250px" borderRadius="8px" />
-                  </div>
+              <div className="pf-grid">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="pf-card-skel" />
                 ))}
               </div>
-            ) : (
-              <div className="films-grid">
-                {filteredFilms.length > 0 ? filteredFilms.map((film) => {
+            ) : filteredFilms.length > 0 ? (
+              <div className="pf-grid">
+                {filteredFilms.map((film, idx) => {
                   const videoId = getYouTubeId(film.youtubeUrl);
                   if (!videoId) return null;
-                  const thumbnail = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                  const thumb = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
 
                   return (
-                    <a
+                    <article
                       key={film._id}
-                      href={film.youtubeUrl}
-                      className="glightbox film-card shadow-sm"
-                      data-gallery="films"
-                      data-title={film.title}
-                      data-description={film.category}
+                      className="pf-card"
+                      style={{ animationDelay: `${idx * 60}ms` }}
+                      onClick={() =>
+                        setLightboxUrl(
+                          `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`
+                        )
+                      }
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) =>
+                        e.key === "Enter" &&
+                        setLightboxUrl(
+                          `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`
+                        )
+                      }
+                      aria-label={`Play ${film.title}`}
                     >
-                      <div className="film-thumb">
-                        <img src={thumbnail} alt={film.title} />
+                      {/* thumbnail */}
+                      <div className="pf-card-thumb">
+                        <img src={thumb} alt={film.title} loading="lazy" />
+                        <div className="pf-card-veil" />
 
-                        <div className="film-overlay">
-                          <div className="play-btn">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="26"
-                              height="26"
-                              viewBox="0 0 24 24"
-                              fill="currentColor"
-                            >
-                              <polygon points="6 3 20 12 6 21 6 3" />
-                            </svg>
-                          </div>
-                          <div className="film-info">
-                            <h5 className="film-title">{film.title}</h5>
-                            <p className="film-category">{film.category}</p>
-                          </div>
+                        {/* play button */}
+                        <div className="pf-play-btn" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="6 3 20 12 6 21 6 3" />
+                          </svg>
                         </div>
+
+                        {/* category badge */}
+                        <span className="pf-cat-badge">{film.category}</span>
                       </div>
-                    </a>
+
+                      {/* info */}
+                      <div className="pf-card-info">
+                        <h3 className="pf-card-title">{film.title}</h3>
+                        <span className="pf-card-watch">Watch Film →</span>
+                      </div>
+                    </article>
                   );
-                }) : (
-                  <div className="col-12 text-center">
-                    <p>No films found {activeCategory !== "All" && `for ${activeCategory}`}.</p>
-                  </div>
-                )}
+                })}
               </div>
+            ) : (
+              <p className="pf-empty">
+                No films found{activeCategory !== "All" && ` for ${activeCategory}`}.
+              </p>
             )}
           </div>
         </section>
+
+        {/* ══ QUOTE BAND ═════════════════════════════════════ */}
+        <section className="pp-quote-band">
+          <div className="pp-quote-orn">✦</div>
+          <blockquote className="pp-quote-text">
+            "A film doesn't just record a wedding — it keeps alive the heartbeat
+            of the day you said forever."
+          </blockquote>
+          <div className="pp-quote-orn">✦</div>
+        </section>
+
+        {/* ══ CTA BANNER ═════════════════════════════════════ */}
+        <section className="pp-cta-banner">
+          <h2 className="pp-cta-title">Want a Film Like This?</h2>
+          <p className="pp-cta-sub">
+            Let's craft a cinematic story that is entirely, beautifully yours.
+          </p>
+          <Link to="/quote" className="pp-btn-primary">Book Your Date</Link>
+        </section>
+
       </main>
 
       <Footer />
+
+      {/* ══ LIGHTBOX ═══════════════════════════════════════ */}
+      {lightboxUrl && (
+        <div
+          className="pf-lightbox"
+          onClick={(e) => e.target === e.currentTarget && setLightboxUrl(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Film player"
+        >
+          <button
+            className="pf-lb-close"
+            onClick={() => setLightboxUrl(null)}
+            aria-label="Close"
+          >
+            ✕
+          </button>
+          <div className="pf-lb-frame">
+            <iframe
+              src={lightboxUrl}
+              title="Film"
+              allow="autoplay; fullscreen"
+              allowFullScreen
+              frameBorder="0"
+            />
+          </div>
+        </div>
+      )}
     </>
   );
-};
-
-export default Films;
+}

@@ -1,0 +1,380 @@
+/* ═══════════════════════════════════════════════════════════
+   THE PATIL PHOTOGRAPHY — PORTFOLIO PAGE STYLES
+   Inherits design tokens from home.css
+   Aesthetic: Dark Luxury Editorial
+═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap');
+
+/* ── Variables (mirrors home.css) ───────────────────────── */
+:root {
+  --ink:      #0d0b09;
+  --ink-2:    #1a1410;
+  --ink-3:    #2a2018;
+  --cream:    #f5f0e8;
+  --cream-2:  #faf7f2;
+  --gold:     #c9974a;
+  --gold-2:   #e0b876;
+  --body:     #6b5a48;
+  --muted:    #9a8878;
+  --border:   rgba(201,151,74,0.2);
+
+  --ff-display: 'DM Serif Display', Georgia, serif;
+  --ff-body:    'Outfit', system-ui, sans-serif;
+
+  --max-w: 1200px;
+  --px: clamp(24px, 5vw, 72px);
+  --section-py: clamp(72px, 9vw, 120px);
+}
+
+/* ── Keyframes (re-declared so portfolio.css is self-contained) ── */
+@keyframes pp-kb   { from{transform:scale(1)} to{transform:scale(1.07)} }
+@keyframes pp-fade { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pp-skel { 0%,100%{opacity:.5} 50%{opacity:1} }
+
+
+/* ══════════════════════════════════════════════════════════
+   HERO
+══════════════════════════════════════════════════════════ */
+.port-hero {
+  position: relative;
+  height: 62vh;
+  min-height: 420px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.port-hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.port-hero-bg img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transform: scale(1.06);
+  animation: pp-kb 18s ease-in-out alternate infinite;
+}
+
+.port-hero-veil {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(13,11,9,0.93) 0%,
+    rgba(13,11,9,0.5)  50%,
+    rgba(13,11,9,0.18) 100%
+  );
+  z-index: 1;
+}
+
+.port-hero-body {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 var(--px) clamp(48px, 7vh, 80px);
+  animation: pp-fade 1.1s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.port-eyebrow {
+  display: block;
+  font-family: var(--ff-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+
+.port-hero-title {
+  font-family: var(--ff-display);
+  font-size: clamp(2.8rem, 6vw, 5.5rem);
+  font-weight: 400;
+  color: var(--cream);
+  line-height: 1.05;
+  margin: 0 0 18px;
+}
+
+.port-hero-sub {
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+  color: rgba(245,240,232,0.6);
+  font-style: italic;
+  margin: 0 0 28px;
+  max-width: 480px;
+  line-height: 1.75;
+}
+
+.port-breadcrumb {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.port-breadcrumb a {
+  color: rgba(245,240,232,0.5);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.port-breadcrumb a:hover { color: var(--gold); }
+.port-breadcrumb .sep    { color: rgba(201,151,74,0.5); }
+.port-breadcrumb .current{ color: var(--gold); font-weight: 600; }
+
+
+/* ══════════════════════════════════════════════════════════
+   INTRO BAND
+══════════════════════════════════════════════════════════ */
+.port-intro {
+  background: var(--ink);
+  padding: clamp(56px, 7vw, 88px) var(--px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.port-intro-orn {
+  color: var(--gold);
+  font-size: 1rem;
+  opacity: 0.6;
+}
+
+.port-intro-title {
+  font-family: var(--ff-display);
+  font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+  font-weight: 400;
+  color: var(--cream);
+  margin: 0;
+  line-height: 1.2;
+}
+.port-intro-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.port-intro-desc {
+  font-size: 0.98rem;
+  line-height: 1.9;
+  color: rgba(245,240,232,0.5);
+  max-width: 640px;
+  margin: 0;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   STICKY FILTER TABS
+══════════════════════════════════════════════════════════ */
+.port-filter-bar {
+  background: var(--ink-2);
+  border-bottom: 1px solid rgba(201,151,74,0.12);
+  padding: 0 var(--px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(8px);
+}
+
+.port-filter-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.port-filter-inner::-webkit-scrollbar { display: none; }
+
+.port-filter-btn {
+  font-family: var(--ff-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: rgba(245,240,232,0.45);
+  padding: 20px 28px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.3s, border-color 0.3s;
+  flex-shrink: 0;
+}
+.port-filter-btn:hover {
+  color: rgba(245,240,232,0.75);
+}
+.port-filter-btn.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+/* skeleton tabs */
+.port-filter-skel {
+  width: 90px;
+  height: 10px;
+  margin: 24px 28px;
+  border-radius: 4px;
+  background: rgba(201,151,74,0.1);
+  animation: pp-skel 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   GALLERY GRID
+══════════════════════════════════════════════════════════ */
+.port-gallery {
+  background: var(--ink);
+  padding: clamp(48px, 6vw, 80px) var(--px);
+}
+
+.port-gallery-grid {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 280px;
+  gap: 12px;
+}
+
+.port-gallery-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  cursor: pointer;
+  display: block;
+  background: var(--ink-3);
+}
+
+/* Make select items taller for visual rhythm */
+.port-gallery-item:nth-child(3n+1):not(:nth-child(1)) { /* even row starts */ }
+.port-gallery-item:nth-child(1),
+.port-gallery-item:nth-child(7),
+.port-gallery-item:nth-child(12) {
+  grid-row: span 2;
+}
+
+.port-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+}
+.port-gallery-item:hover img { transform: scale(1.07); }
+
+/* Hover overlay */
+.port-gallery-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(13,11,9,0.7) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  display: flex;
+  align-items: flex-end;
+  padding: 20px 18px;
+}
+.port-gallery-item:hover .port-gallery-overlay { opacity: 1; }
+.port-gallery-overlay-icon {
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-family: var(--ff-body);
+}
+
+/* ── Skeletons ── */
+.port-skel-grid {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 280px;
+  gap: 12px;
+}
+.port-skel-item {
+  border-radius: 12px;
+  background: linear-gradient(90deg, #1a1410 25%, #2a2018 50%, #1a1410 75%);
+  background-size: 200% 100%;
+  animation: pp-skel 1.5s ease-in-out infinite;
+}
+.port-skel-item:nth-child(1),
+.port-skel-item:nth-child(7) { grid-row: span 2; }
+
+/* Empty */
+.port-empty {
+  text-align: center;
+  color: rgba(245,240,232,0.3);
+  padding: 80px 0;
+  font-size: 0.95rem;
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   CTA BANNER
+══════════════════════════════════════════════════════════ */
+.port-cta {
+  background:
+    linear-gradient(rgba(13,11,9,0.78), rgba(13,11,9,0.78)),
+    url('/assets/img/slider/webbg.webp') center/cover fixed;
+  padding: clamp(72px, 9vw, 110px) var(--px);
+  text-align: center;
+}
+.port-cta-title {
+  font-family: var(--ff-display);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 400;
+  color: var(--cream);
+  margin: 0 0 14px;
+}
+.port-cta-sub {
+  font-size: 1.05rem;
+  color: rgba(245,240,232,0.55);
+  margin: 0 0 38px;
+  font-style: italic;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .port-gallery-grid,
+  .port-skel-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 240px;
+  }
+  .port-gallery-item:nth-child(12) { grid-row: span 1; }
+}
+
+@media (max-width: 768px) {
+  .port-gallery-grid,
+  .port-skel-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 180px;
+    gap: 8px;
+  }
+  .port-gallery-item:nth-child(1),
+  .port-gallery-item:nth-child(7),
+  .port-gallery-item:nth-child(12) { grid-row: span 1; }
+
+  .port-filter-btn { padding: 16px 20px; }
+}
+
+@media (max-width: 480px) {
+  .port-gallery-grid,
+  .port-skel-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 150px;
+  }
+}

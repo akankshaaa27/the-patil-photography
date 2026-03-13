@@ -1,54 +1,90 @@
-import React, { useEffect } from 'react';
-import Modal from 'react-bootstrap/Modal';
-import LuxGallery from './LuxGallery';
-import './StoryModal.css';
+import React, { useEffect } from "react";
+import Modal from "react-bootstrap/Modal";
+import LuxGallery from "./LuxGallery";
+import "./StoryModal.css";
+
+/* ═══════════════════════════════════════════════════════════
+   STORY MODAL — minimal dark luxury editorial
+   Palette: Ink #0d0b09 · Cream #f5f0e8 · Gold #c9974a
+═══════════════════════════════════════════════════════════ */
 
 const StoryModal = ({ show, onHide, story }) => {
   useEffect(() => {
-    if (show && window.GLightbox) {
-      // Cleanup previous GLightbox instances
-      const existing = document.querySelector('.glightbox');
-      if (existing && existing.glightbox) {
-        try {
-          existing.glightbox.destroy();
-        } catch (e) {
-          // Ignore cleanup errors
-        }
+    if (!show || !window.GLightbox) return;
+    setTimeout(() => {
+      try {
+        window.GLightbox({
+          selector: ".glightbox",
+          loop: true,
+          touchNavigation: true,
+          keyboardNavigation: true,
+          zoomable: true,
+        });
+      } catch (e) {
+        console.warn("GLightbox init error:", e);
       }
-      
-      // Initialize GLightbox for modal images
-      setTimeout(() => {
-        try {
-          window.GLightbox({
-            selector: '.glightbox',
-            loop: true,
-            touchNavigation: true,
-            keyboardNavigation: true,
-            zoomable: true,
-          });
-        } catch (e) {
-          console.warn('GLightbox initialization error:', e);
-        }
-      }, 0);
-    }
+    }, 0);
   }, [show, story]);
 
   if (!story) return null;
 
+  const imageCount = story.images?.length ?? 0;
+
   return (
-    <Modal show={show} onHide={onHide} size="xl" centered scrollable={false}>
-      <Modal.Header closeButton>
+    <Modal
+      show={show}
+      onHide={onHide}
+      size="xl"
+      centered
+      scrollable={false}
+      className="sm-modal"
+    >
+      {/* ── Header ── */}
+      <Modal.Header closeButton className="sm-header">
+        <div className="sm-header-left">
+          <span className="sm-header-dot" />
+          <span className="sm-header-label">Love Story</span>
+        </div>
       </Modal.Header>
-      <Modal.Body className="px-4 pb-4 pt-0" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
-        <h2 className="text-center fw-bolder">{story.title}</h2>
-        <h5 className="text-center text-muted accent-color">{story.subtitle}</h5>
-        <div className="section-title pb-0"><h2></h2></div>
-        <p className="mt-3 mb-5 text-center">{story.description}</p>
-        {story.images && story.images.length > 0 && (
-          <div style={{ padding: '10px 0' }}>
-            <LuxGallery images={story.images} galleryId={`story-${story._id}`} />
+
+      {/* ── Body ── */}
+      <Modal.Body className="sm-body">
+
+        {/* Title block */}
+        <div className="sm-hero">
+          <span className="sm-orn">✦ &nbsp; ✦ &nbsp; ✦</span>
+          <h2 className="sm-title">{story.title}</h2>
+          {story.subtitle && (
+            <p className="sm-subtitle">{story.subtitle}</p>
+          )}
+          {story.description && (
+            <p className="sm-desc">{story.description}</p>
+          )}
+        </div>
+
+        {/* Decorative divider */}
+        <div className="sm-divider" />
+
+        {/* Gallery */}
+        {imageCount > 0 && (
+          <div className="sm-gallery-wrap">
+            <LuxGallery
+              images={story.images}
+              galleryId={`story-${story._id}`}
+            />
           </div>
         )}
+
+        {/* Footer */}
+        <div className="sm-footer">
+          <span className="sm-counter">
+            {imageCount} photograph{imageCount !== 1 ? "s" : ""}
+          </span>
+          <a href="/quote" className="pp-btn-primary sm-cta">
+            Book Your Date
+          </a>
+        </div>
+
       </Modal.Body>
     </Modal>
   );

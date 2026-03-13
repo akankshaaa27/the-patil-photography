@@ -1,106 +1,70 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import { useSettings } from '../hooks/useSettings';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import { useSettings } from "../hooks/useSettings";
+import "./Quote.css";
 
-const Quote = () => {
+const EVENTS   = ["Haldi", "Mehendi", "Sangeet", "Wedding", "Reception", "Engagement", "Prewedding", "Other"];
+const SERVICES = ["Photography", "Films", "Both"];
+
+const EMPTY_FORM = {
+  groomName: "", brideName: "", phoneNumber: "",
+  eventStartDate: "", eventEndDate: "",
+  events: [], budget: "", location: "",
+  services: [], message: "",
+};
+
+export default function Quote() {
   const { settings } = useSettings();
   const businessName = settings?.businessName || "Photography";
-  const [formData, setFormData] = useState({
-    groomName: '',
-    brideName: '',
-    phoneNumber: '',
-    eventStartDate: '',
-    eventEndDate: '',
-    events: [],
-    budget: '',
-    location: '',
-    services: [],
-    message: ''
-  });
+
+  const [formData,       setFormData]       = useState(EMPTY_FORM);
+  const [submitting,     setSubmitting]      = useState(false);
+  const [successMessage, setSuccessMessage]  = useState("");
+  const [errorMessage,   setErrorMessage]    = useState("");
 
   useEffect(() => {
-    document.body.className = 'quote-page';
-
-    return () => {
-      document.body.className = '';
-    };
+    document.body.className = "quote-page";
+    return () => { document.body.className = ""; };
   }, []);
 
-  const handleInputChange = (e) => {
+  useEffect(() => {
+    if (!successMessage && !errorMessage) return;
+    const t = setTimeout(() => { setSuccessMessage(""); setErrorMessage(""); }, 5000);
+    return () => clearTimeout(t);
+  }, [successMessage, errorMessage]);
+
+  const handleInput = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    setFormData(p => ({ ...p, [name]: value }));
   };
 
-  const handleCheckboxChange = (e, field) => {
+  const handleCheckbox = (e, field) => {
     const { value, checked } = e.target;
-
-    // custom logic for services checkboxes: "Both" should select/deselect all
-    if (field === 'services') {
-      setFormData(prev => {
-        let updated = [...prev.services];
-
-        if (value === 'Both') {
-          if (checked) {
-            // when "Both" is checked ensure Photography and Films are also selected
-            updated = Array.from(new Set([...updated, 'Photography', 'Films', 'Both']));
-          } else {
-            // unchecking "Both" clears all service selections
-            updated = [];
-          }
+    if (field === "services") {
+      setFormData(p => {
+        let updated = [...p.services];
+        if (value === "Both") {
+          updated = checked ? ["Photography", "Films", "Both"] : [];
         } else {
-          // toggling Photography or Films
-          if (checked) {
-            updated.push(value);
-            // if both individual services are selected, add "Both"
-            if (updated.includes('Photography') && updated.includes('Films') && !updated.includes('Both')) {
-              updated.push('Both');
-            }
-          } else {
-            updated = updated.filter(item => item !== value);
-            // if we removed one of the pair, drop "Both" as well
-            if (updated.includes('Both')) {
-              updated = updated.filter(item => item !== 'Both');
-            }
-          }
+          updated = checked ? [...updated, value] : updated.filter(i => i !== value);
+          if (updated.includes("Photography") && updated.includes("Films") && !updated.includes("Both")) updated.push("Both");
+          if (!checked && updated.includes("Both")) updated = updated.filter(i => i !== "Both");
         }
-
-        return { ...prev, services: updated };
+        return { ...p, services: updated };
       });
       return;
     }
-
-    setFormData(prev => ({
-      ...prev,
-      [field]: checked
-        ? [...prev[field], value]
-        : prev[field].filter(item => item !== value)
+    setFormData(p => ({
+      ...p,
+      [field]: checked ? [...p[field], value] : p[field].filter(i => i !== value),
     }));
   };
-
-  const [submitting, setSubmitting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-
-  // automatically clear messages after 5 seconds
-  useEffect(() => {
-    if (successMessage || errorMessage) {
-      const timer = setTimeout(() => {
-        setSuccessMessage('');
-        setErrorMessage('');
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [successMessage, errorMessage]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (submitting) return;
-
     setSubmitting(true);
     try {
       const res = await fetch("/api/enquiries", {
@@ -108,30 +72,14 @@ const Quote = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
       if (res.ok) {
-        setSuccessMessage("Thank you for your enquiry! We will get back to you soon.");
-        setErrorMessage('');
-        setFormData({
-          groomName: '',
-          brideName: '',
-          phoneNumber: '',
-          eventStartDate: '',
-          eventEndDate: '',
-          events: [],
-          budget: '',
-          location: '',
-          services: [],
-          message: ''
-        });
+        setSuccessMessage("Thank you for your enquiry! We will get back to you within 48 hours.");
+        setFormData(EMPTY_FORM);
       } else {
         setErrorMessage("Something went wrong. Please try again.");
-        setSuccessMessage('');
       }
-    } catch (error) {
-      console.error("Submission error:", error);
+    } catch {
       setErrorMessage("Error submitting. Please try again later.");
-      setSuccessMessage('');
     } finally {
       setSubmitting(false);
     }
@@ -141,289 +89,191 @@ const Quote = () => {
     <>
       <Header />
 
-      {/* Page Title */}
-      <div className="page-title dark-background" style={{ backgroundImage: "url('/assets/img/HomePage/3.webp')" }}>
-        <div className="container position-relative">
-          <h1>Book Us</h1>
-          <p>Let's create unforgettable memories together</p>
-          <nav className="breadcrumbs">
-            <ol>
-              <li><Link to="/">Home</Link></li>
-              <li className="current">Book Us</li>
-            </ol>
-          </nav>
+      <main className="qt-main">
+
+        {/* ── PAGE TITLE ── */}
+        <div className="qt-page-title" style={{ backgroundImage: "url('/assets/img/HomePage/3.webp')" }}>
+          <div className="qt-page-title-inner">
+            <p className="qt-eyebrow">Reserve Your Date</p>
+            <h1 className="qt-page-heading">Book Us</h1>
+            <p className="qt-page-sub">Let's create unforgettable memories together</p>
+            <nav className="qt-breadcrumb">
+              <Link to="/">Home</Link>
+              <span>/</span>
+              <span>Book Us</span>
+            </nav>
+          </div>
         </div>
-      </div>
 
-      <main className="main">
-
-        {/* New Introductory Section */}
-        <section className="pt-5 pb-0 px-4">
-          <div
-            className="container section-title portfolioHeader"
-            data-aos="fade-up"
-          >
-            <h2>Let's Create Something <br /> Beautiful Together</h2>
-
-            <div className="text-left mx-auto mt-5" >
-              <p className="lead text-muted mb-3">Book your special wedding day with {businessName}.</p>
-              <p className="lead text-muted mb-3">We turn your most cherished moments into timeless memories. From heartfelt candid emotions to cinematic storytelling, every frame is captured with passion and creativity. Reserve your date today and let us make your big day truly unforgettable.</p>
-              <p className="lead text-muted mb-3">Kindly complete the form below with as much detail as possible to help us provide an accurate quotation. We aim to respond within 48 hours.</p>
-              <p className="lead text-muted mb-3">If you do not hear from us within this timeframe, or if your request is urgent, please feel free to contact us directly at the number provided below.</p>
-              <p className="font-weight-bold text-primary">We're happy to assist you!</p>
+        {/* ── INTRO ── */}
+        <section className="qt-intro">
+          <div className="qt-intro-inner">
+            <span className="qt-tag">Begin Your Story</span>
+            <h2 className="qt-intro-title">
+              Let's Create Something <em>Beautiful Together</em>
+            </h2>
+            <div className="qt-intro-body">
+              <p>Book your special wedding day with <strong>{businessName}</strong>. We turn your most cherished moments into timeless memories — heartfelt candid emotions, cinematic storytelling, every frame captured with passion.</p>
+              <p>Kindly complete the form below with as much detail as possible. We aim to respond within <strong>48 hours</strong>. If urgent, please contact us directly on the number provided.</p>
             </div>
           </div>
         </section>
 
-        {/* Quote Section */}
-        <section id="quote" className="quote section">
-          <div className="container" data-aos="fade-up" data-aos-delay="100">
-            <div className="row justify-content-center">
-              <div className="col-lg-11">
-                <div className="quote-container">
-                  <div className="row">
+        {/* ── MAIN FORM SECTION ── */}
+        <section className="qt-section">
+          <div className="qt-container">
+            <div className="qt-layout">
 
-                    <div className="col-lg-5" data-aos="fade-right" data-aos-delay="200">
-                      <div className="quote-content">
-                        <h2>Capture Your Perfect Moments</h2>
-                        <p>Experience photography excellence with our dedicated team. We bring artistry, passion, and uncompromising quality to every shoot, ensuring your memories are preserved beautifully forever.</p>
+              {/* ─ LEFT — info panel ─ */}
+              <aside className="qt-info">
+                <h2 className="qt-info-title">Capture Your <em>Perfect Moments</em></h2>
+                <p className="qt-info-sub">
+                  Experience photography excellence with our dedicated team — artistry, passion, and uncompromising quality in every shoot.
+                </p>
 
-                        <div className="quote-benefits">
-                          <div className="benefit-item">
-                            <div className="benefit-icon">
-                              <i className="bi bi-camera"></i>
-                            </div>
-                            <div className="benefit-content">
-                              <h4>Professional Excellence</h4>
-                              <p>Expert photography with artistic vision and technical precision</p>
-                            </div>
-                          </div>
-
-                          <div className="benefit-item">
-                            <div className="benefit-icon">
-                              <i className="bi bi-heart"></i>
-                            </div>
-                            <div className="benefit-content">
-                              <h4>Personalized Service</h4>
-                              <p>Tailored photography sessions that reflect your unique story</p>
-                            </div>
-                          </div>
-
-                          <div className="benefit-item">
-                            <div className="benefit-icon">
-                              <i className="bi bi-clock"></i>
-                            </div>
-                            <div className="benefit-content">
-                              <h4>Timely Delivery</h4>
-                              <p>Professional turnaround times with exceptional quality</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="contact-info">
-                          <div className="contact-detail">
-                            <i className="bi bi-telephone-fill"></i>
-                            <span>{settings?.primaryMobileNumber}</span>
-                            {settings?.secondaryMobileNumber && <span>, {settings?.secondaryMobileNumber}</span>}
-                          </div>
-                          <div className="contact-detail">
-                            <i className="bi bi-envelope-fill"></i>
-                            <span>{settings?.contactEmail || 'quotes@photography.com'}</span>
-                          </div>
-                        </div>
+                <div className="qt-benefits">
+                  {[
+                    { icon: "bi-camera",   title: "Professional Excellence",  desc: "Expert photography with artistic vision and technical precision" },
+                    { icon: "bi-heart",    title: "Personalised Service",     desc: "Tailored sessions that reflect your unique love story" },
+                    { icon: "bi-clock",    title: "Timely Delivery",          desc: "Professional turnaround times with exceptional quality" },
+                  ].map(({ icon, title, desc }) => (
+                    <div className="qt-benefit" key={title}>
+                      <div className="qt-benefit-icon"><i className={`bi ${icon}`} /></div>
+                      <div>
+                        <h4 className="qt-benefit-title">{title}</h4>
+                        <p className="qt-benefit-desc">{desc}</p>
                       </div>
                     </div>
-
-                    <div className="col-lg-7" data-aos="fade-left" data-aos-delay="300">
-                      <div className="quote-form">
-                        <div className="form-intro">
-                          <h3>Wedding Enquiry Form</h3>
-                          <p>Share your wedding details and receive a personalized quote tailored to your vision and budget.</p>
-                        </div>
-
-                        <div className="card">
-                          <div className="card-body">
-                            <form onSubmit={handleSubmit}>
-                              {successMessage && (
-                                <div className="alert alert-success alert-dismissible fade show" role="alert">
-                                  {successMessage}
-                                </div>
-                              )}
-                              {errorMessage && (
-                                <div className="alert alert-danger alert-dismissible fade show" role="alert">
-                                  {errorMessage}
-                                </div>
-                              )}
-                              <div className="row">
-                                <div className="col-md-6 mb-3">
-                                  <label htmlFor="groomName" className="form-label font-weight-bold">Groom Name</label>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    id="groomName"
-                                    name="groomName"
-                                    value={formData.groomName}
-                                    onChange={handleInputChange}
-                                    required
-                                  />
-                                </div>
-                                <div className="col-md-6 mb-3">
-                                  <label htmlFor="brideName" className="form-label font-weight-bold">Bride Name</label>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    id="brideName"
-                                    name="brideName"
-                                    value={formData.brideName}
-                                    onChange={handleInputChange}
-                                    required
-                                  />
-                                </div>
-                              </div>
-                              <div className="mb-3">
-                                <label htmlFor="phoneNumber" className="form-label font-weight-bold">Phone Number</label>
-                                <input
-                                  type="tel"
-                                  className="form-control"
-                                  id="phoneNumber"
-                                  name="phoneNumber"
-                                  value={formData.phoneNumber}
-                                  onChange={handleInputChange}
-                                  required
-                                />
-                              </div>
-                              <div className="row">
-                                <div className="col-md-6 mb-3">
-                                  <label htmlFor="eventStartDate" className="form-label font-weight-bold">Event Start Date</label>
-                                  <input
-                                    type="date"
-                                    className="form-control"
-                                    id="eventStartDate"
-                                    name="eventStartDate"
-                                    value={formData.eventStartDate}
-                                    onChange={handleInputChange}
-                                    min="2026-01-11"
-                                    max="2028-01-11"
-                                    required
-                                  />
-                                </div>
-                                <div className="col-md-6 mb-3">
-                                  <label htmlFor="eventEndDate" className="form-label font-weight-bold">Event End Date</label>
-                                  <input
-                                    type="date"
-                                    className="form-control"
-                                    id="eventEndDate"
-                                    name="eventEndDate"
-                                    value={formData.eventEndDate}
-                                    onChange={handleInputChange}
-                                    min="2026-01-11"
-                                    max="2028-01-11"
-                                    required
-                                  />
-                                </div>
-                              </div>
-                              <div className="mb-3">
-                                <label className="form-label font-weight-bold">Select Your Events (Tick all that apply)</label>
-                                <div className="row">
-                                  {['Haldi', 'Mehendi', 'Sangeet', 'Wedding', 'Reception', 'Engagement', 'Prewedding', 'Other'].map(event => (
-                                    <div key={event} className="col-md-3 mb-2">
-                                      <div className="form-check">
-                                        <input
-                                          className="form-check-input"
-                                          type="checkbox"
-                                          id={event}
-                                          value={event}
-                                          checked={formData.events.includes(event)}
-                                          onChange={(e) => handleCheckboxChange(e, 'events')}
-                                        />
-                                        <label className="form-check-label" htmlFor={event}>
-                                          {event}
-                                        </label>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                              <div className="mb-3">
-                                <label htmlFor="budget" className="form-label font-weight-bold">Your Estimate Budget for Event</label>
-                                <input
-                                  type="number"
-                                  className="form-control"
-                                  id="budget"
-                                  name="budget"
-                                  placeholder="e.g. 200000"
-                                  value={formData.budget}
-                                  onChange={handleInputChange}
-                                />
-                              </div>
-                              <div className="mb-3">
-                                <label htmlFor="location" className="form-label font-weight-bold">Location of Event</label>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  id="location"
-                                  name="location"
-                                  value={formData.location}
-                                  onChange={handleInputChange}
-                                  required
-                                />
-                              </div>
-                              <div className="mb-3">
-                                <label className="form-label font-weight-bold">What service are you looking for?</label>
-                                <div className="d-flex flex-wrap gap-3">
-                                  {['Photography', 'Films', 'Both'].map(service => (
-                                    <div key={service} className="form-check">
-                                      <input
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        id={service}
-                                        value={service}
-                                        checked={formData.services.includes(service)}
-                                        onChange={(e) => handleCheckboxChange(e, 'services')}
-                                      />
-                                      <label className="form-check-label" htmlFor={service}>
-                                        {service}
-                                      </label>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                              <div className="mb-3">
-                                <label htmlFor="message" className="form-label font-weight-bold">Tell us more about your wedding thoughts</label>
-                                <textarea
-                                  className="form-control"
-                                  id="message"
-                                  rows="4"
-                                  name="message"
-                                  placeholder="Share your vision, preferences, or any special requests..."
-                                  value={formData.message}
-                                  onChange={handleInputChange}
-                                ></textarea>
-                              </div>
-                              <button
-                                type="submit"
-                                className="submit-btn d-flex mt-0 w-100 justify-content-center align-items-center"
-                                disabled={submitting}
-                                style={{ opacity: submitting ? 0.7 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
-                              >
-                                {submitting ? (
-                                  <>
-                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                    Sending Enquiry...
-                                  </>
-                                ) : (
-                                  "Submit Enquiry"
-                                )}
-                              </button>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
+                  ))}
                 </div>
+
+                <div className="qt-contact-info">
+                  {settings?.primaryMobileNumber && (
+                    <a href={`tel:${settings.primaryMobileNumber}`} className="qt-contact-row">
+                      <i className="bi bi-telephone-fill" />
+                      <span>
+                        {settings.primaryMobileNumber}
+                        {settings?.secondaryMobileNumber && `, ${settings.secondaryMobileNumber}`}
+                      </span>
+                    </a>
+                  )}
+                  {settings?.contactEmail && (
+                    <a href={`mailto:${settings.contactEmail}`} className="qt-contact-row">
+                      <i className="bi bi-envelope-fill" />
+                      <span>{settings.contactEmail}</span>
+                    </a>
+                  )}
+                </div>
+              </aside>
+
+              {/* ─ RIGHT — form ─ */}
+              <div className="qt-form-wrap">
+                <div className="qt-form-head">
+                  <h3 className="qt-form-title">Wedding Enquiry Form</h3>
+                  <p className="qt-form-sub">Share your details and receive a personalised quote tailored to your vision.</p>
+                </div>
+
+                <form onSubmit={handleSubmit} className="qt-form">
+
+                  {successMessage && <div className="qt-alert qt-alert--success">{successMessage}</div>}
+                  {errorMessage   && <div className="qt-alert qt-alert--error">{errorMessage}</div>}
+
+                  {/* Names */}
+                  <div className="qt-row">
+                    <div className="qt-group">
+                      <label htmlFor="groomName" className="qt-label">Groom Name *</label>
+                      <input type="text" id="groomName" name="groomName" className="qt-input"
+                        value={formData.groomName} onChange={handleInput} placeholder="Groom's name" required />
+                    </div>
+                    <div className="qt-group">
+                      <label htmlFor="brideName" className="qt-label">Bride Name *</label>
+                      <input type="text" id="brideName" name="brideName" className="qt-input"
+                        value={formData.brideName} onChange={handleInput} placeholder="Bride's name" required />
+                    </div>
+                  </div>
+
+                  {/* Phone */}
+                  <div className="qt-group">
+                    <label htmlFor="phoneNumber" className="qt-label">Phone Number *</label>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" className="qt-input"
+                      value={formData.phoneNumber} onChange={handleInput} placeholder="+91 00000 00000" required />
+                  </div>
+
+                  {/* Dates */}
+                  <div className="qt-row">
+                    <div className="qt-group">
+                      <label htmlFor="eventStartDate" className="qt-label">Event Start Date *</label>
+                      <input type="date" id="eventStartDate" name="eventStartDate" className="qt-input"
+                        value={formData.eventStartDate} onChange={handleInput}
+                        min="2026-01-11" max="2028-01-11" required />
+                    </div>
+                    <div className="qt-group">
+                      <label htmlFor="eventEndDate" className="qt-label">Event End Date *</label>
+                      <input type="date" id="eventEndDate" name="eventEndDate" className="qt-input"
+                        value={formData.eventEndDate} onChange={handleInput}
+                        min="2026-01-11" max="2028-01-11" required />
+                    </div>
+                  </div>
+
+                  {/* Events */}
+                  <div className="qt-group">
+                    <label className="qt-label">Select Your Events</label>
+                    <div className="qt-checkbox-grid">
+                      {EVENTS.map(ev => (
+                        <label key={ev} className={`qt-chip ${formData.events.includes(ev) ? "qt-chip--on" : ""}`}>
+                          <input type="checkbox" value={ev}
+                            checked={formData.events.includes(ev)}
+                            onChange={e => handleCheckbox(e, "events")} />
+                          {ev}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Budget */}
+                  <div className="qt-group">
+                    <label htmlFor="budget" className="qt-label">Estimated Budget (₹)</label>
+                    <input type="number" id="budget" name="budget" className="qt-input"
+                      value={formData.budget} onChange={handleInput} placeholder="e.g. 200000" />
+                  </div>
+
+                  {/* Location */}
+                  <div className="qt-group">
+                    <label htmlFor="location" className="qt-label">Event Location *</label>
+                    <input type="text" id="location" name="location" className="qt-input"
+                      value={formData.location} onChange={handleInput} placeholder="City / Venue" required />
+                  </div>
+
+                  {/* Services */}
+                  <div className="qt-group">
+                    <label className="qt-label">Services Required</label>
+                    <div className="qt-services-row">
+                      {SERVICES.map(svc => (
+                        <label key={svc} className={`qt-chip qt-chip--lg ${formData.services.includes(svc) ? "qt-chip--on" : ""}`}>
+                          <input type="checkbox" value={svc}
+                            checked={formData.services.includes(svc)}
+                            onChange={e => handleCheckbox(e, "services")} />
+                          {svc}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Message */}
+                  <div className="qt-group">
+                    <label htmlFor="message" className="qt-label">Your Wedding Vision</label>
+                    <textarea id="message" name="message" rows="4" className="qt-textarea"
+                      value={formData.message} onChange={handleInput}
+                      placeholder="Share your vision, preferences, or any special requests…" />
+                  </div>
+
+                  <button type="submit" className="qt-submit-btn" disabled={submitting}>
+                    {submitting ? "Sending Enquiry…" : "Submit Enquiry"}
+                  </button>
+
+                </form>
               </div>
+
             </div>
           </div>
         </section>
@@ -432,12 +282,9 @@ const Quote = () => {
 
       <Footer />
 
-      {/* Scroll Top Button */}
       <a href="#" id="scroll-top" className="scroll-top d-flex align-items-center justify-content-center">
-        <i className="bi bi-arrow-up-short"></i>
+        <i className="bi bi-arrow-up-short" />
       </a>
     </>
   );
-};
-
-export default Quote;
+}

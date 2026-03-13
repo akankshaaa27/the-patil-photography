@@ -3,46 +3,27 @@ import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import StoryModal from "../components/StoryModal";
-import Skeleton from "../components/Skeleton";
+import "./stories.css";
 
-const Stories = () => {
-  const [stories, setStories] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+export default function Stories() {
+  const [stories,       setStories]       = useState([]);
+  const [loading,       setLoading]       = useState(true);
+  const [showModal,     setShowModal]     = useState(false);
   const [selectedStory, setSelectedStory] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      document.body.className = "Stories-page";
-    } catch (error) {
-      console.error('Error in Stories useEffect:', error);
-    }
-
-    // Fetch Love Stories
-    fetch('/api/love-stories')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          // Show only Active stories on public page
-          setStories(data.filter(s => s.status === 'Active'));
-        }
-        setLoading(false);
+    fetch("/api/love-stories")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data))
+          setStories(data.filter((s) => s.status === "Active"));
       })
-      .catch(err => {
-        console.error("Error fetching love stories:", err);
-        setLoading(false);
-      });
-
-    return () => (document.body.className = "");
+      .catch((err) => console.error("Error fetching love stories:", err))
+      .finally(() => setLoading(false));
   }, []);
 
   const openStory = (story) => {
-    setSelectedStory({
-      ...story,
-      subtitle: story.location,
-      // Ensure gallery is formatted correctly if needed, matching Home.jsx logic
-      images: story.gallery || []
-    });
+    setSelectedStory({ ...story, subtitle: story.location, images: story.gallery || [] });
     setShowModal(true);
   };
 
@@ -50,117 +31,139 @@ const Stories = () => {
     <>
       <Header />
 
-      {/* Page Title */}
-      <div className="page-title dark-background" style={{ backgroundImage: "url('/assets/img/HomePage/128.webp')" }}>
-        <div className="container position-relative">
-          <h1>Stories</h1>
-          <p>Real love stories captured through our lens</p>
-          <nav className="breadcrumbs">
-            <ol>
-              <li><Link to="/">Home</Link></li>
-              <li className="current">Stories</li>
-            </ol>
-          </nav>
-        </div>
-      </div>
+      <main className="ps-main">
 
-      <main className="main">
-        {/* Intro */}
-        <section className="portfolio-intro pb-0">
-          <div
-            className="container section-title text-center portfolioHeader"
-            data-aos="fade-up"
-          >
-            <h2 className="mb-3">Moments That Become Forever</h2>
-            <p>Beyond rituals and celebrations, we capture genuine emotions and meaningful moments—crafted into timeless love stories.
+        {/* ══ HERO ═══════════════════════════════════════════ */}
+        <section className="ps-hero">
+          <div className="ps-hero-bg">
+            <img src="/assets/img/HomePage/128.webp" alt="Love Stories" />
+          </div>
+          <div className="ps-hero-veil" />
+          <div className="ps-hero-body">
+            <span className="ps-eyebrow">Captured Forever</span>
+            <h1 className="ps-hero-title">Love Stories</h1>
+            <p className="ps-hero-sub">
+              Real moments, genuine emotions — each one a world of its own.
+            </p>
+            <nav className="ps-breadcrumb">
+              <Link to="/">Home</Link>
+              <span className="ps-crumb-sep">✦</span>
+              <span className="ps-crumb-cur">Stories</span>
+            </nav>
+          </div>
+
+          {/* scattered ornamental petals */}
+          <div className="ps-hero-orns" aria-hidden="true">
+            {["✦","◎","✦","◈","✦"].map((o, i) => (
+              <span key={i} className={`ps-orn ps-orn-${i}`}>{o}</span>
+            ))}
+          </div>
+        </section>
+
+        {/* ══ INTRO ══════════════════════════════════════════ */}
+        <section className="ps-intro">
+          <div className="ps-intro-inner">
+            <span className="pp-tag">Moments That Become Forever</span>
+            <h2 className="pp-section-title">
+              Every Couple Has<br /><em>A Story Worth Telling</em>
+            </h2>
+            <p className="ps-intro-body">
+              Beyond rituals and celebrations, we capture genuine emotions
+              and meaningful moments — crafted into timeless love stories
+              that you will return to, again and again.
             </p>
           </div>
         </section>
 
-        {/* Stories Grid */}
-        <section className="projects section pt-3">
-          <div className="container">
+        {/* ══ STORIES GRID ═══════════════════════════════════ */}
+        <section className="ps-stories-section">
+          <div className="ps-container">
+
             {loading ? (
-              <div className="row gy-4">
-                {[...Array(6)].map((_, index) => (
-                  <div className="col-lg-4 col-md-6" key={index}>
-                    <div className="project-card">
-                      <div className="project-image" style={{ overflow: 'hidden' }}>
-                        <Skeleton width="100%" height="300px" borderRadius="8px" />
-                      </div>
-                      <div className="project-info" style={{ padding: '20px' }}>
-                        <Skeleton width="70%" height="24px" borderRadius="4px" style={{ marginBottom: '12px' }} />
-                        <Skeleton width="100%" height="16px" borderRadius="4px" style={{ marginBottom: '8px' }} />
-                        <Skeleton width="100%" height="16px" borderRadius="4px" style={{ marginBottom: '16px' }} />
-                        <Skeleton width="120px" height="20px" borderRadius="4px" />
-                      </div>
-                    </div>
-                  </div>
+              <div className="ps-grid">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="ps-card-skel" />
                 ))}
               </div>
+            ) : stories.length === 0 ? (
+              <p className="ps-empty">No stories found. Check back soon!</p>
             ) : (
-              <div className="row gy-4">
-                {stories.length === 0 ? (
-                  <div className="col-12 text-center p-5">
-                    <p>No stories found.</p>
-                  </div>
-                ) : (
-                  stories.map((story, index) => (
-                    <div
-                      className="col-lg-4 col-md-6"
-                      key={story._id}
-                      data-aos="fade-up"
-                      data-aos-delay={index * 100}
-                    >
-                      <div className="project-card">
-                        <div className="project-image">
-                          <img
-                            src={story.thumbnail}
-                            alt={story.title}
-                            className="img-fluid"
-                            style={{ width: '100%', height: '200px', objectFit: 'cover' }}
-                          />
-                        </div>
+              <div className="ps-grid">
+                {stories.map((story, idx) => (
+                  <article
+                    key={story._id}
+                    className="ps-card"
+                    style={{ animationDelay: `${idx * 70}ms` }}
+                    onClick={() => openStory(story)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === "Enter" && openStory(story)}
+                    aria-label={`View story: ${story.title}`}
+                  >
+                    {/* thumbnail */}
+                    <div className="ps-card-thumb">
+                      <img src={story.thumbnail} alt={story.title} loading="lazy" />
+                      <div className="ps-card-veil" />
 
-                        <div className="project-info">
-                          <h4 className="project-title">{story.title}</h4>
-                          <p className="project-description">
-                            {story.description && story.description.length > 100
-                              ? story.description.substring(0, 100) + "..."
-                              : story.description}
-                          </p>
-
-                          <a
-                            href="#"
-                            className="cta-link"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              openStory(story);
-                            }}
-                          >
-                            View Story <i className="bi bi-arrow-right ms-2"></i>
-                          </a>
-                        </div>
+                      {/* hover cta */}
+                      <div className="ps-card-hover-cta" aria-hidden="true">
+                        <span className="ps-play-ring">✦</span>
+                        <span className="ps-open-label">View Story</span>
                       </div>
+
+                      {/* location badge */}
+                      {story.location && (
+                        <span className="ps-loc-badge">{story.location}</span>
+                      )}
                     </div>
-                  ))
-                )}
+
+                    {/* info */}
+                    <div className="ps-card-info">
+                      <h3 className="ps-card-title">{story.title}</h3>
+                      {story.description && (
+                        <p className="ps-card-desc">
+                          {story.description.length > 90
+                            ? story.description.slice(0, 90) + "…"
+                            : story.description}
+                        </p>
+                      )}
+                      <span className="ps-card-cta">View Story →</span>
+                    </div>
+                  </article>
+                ))}
               </div>
             )}
           </div>
         </section>
 
-        {/* Modal */}
-        <StoryModal
-          show={showModal}
-          onHide={() => setShowModal(false)}
-          story={selectedStory}
-        />
+        {/* ══ QUOTE BAND ═════════════════════════════════════ */}
+        <section className="pp-quote-band">
+          <div className="pp-quote-orn">✦</div>
+          <blockquote className="pp-quote-text">
+            "The best stories are the ones that leave you feeling something
+            long after the last page."
+          </blockquote>
+          <div className="pp-quote-orn">✦</div>
+        </section>
+
+        {/* ══ CTA BANNER ═════════════════════════════════════ */}
+        <section className="pp-cta-banner">
+          <h2 className="pp-cta-title">Let's Write Your Story</h2>
+          <p className="pp-cta-sub">
+            Your love deserves to be preserved as beautifully as it is lived.
+          </p>
+          <Link to="/quote" className="pp-btn-primary">Book Your Date</Link>
+        </section>
+
       </main>
 
       <Footer />
+
+      <StoryModal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        story={selectedStory}
+      />
     </>
   );
-};
-
-export default Stories;
+}

@@ -1,40 +1,56 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useSettings } from "../hooks/useSettings";
+import "./contact.css";
 
-const Contact = () => {
+/* ═══════════════════════════════════════════════════════════
+   THE PATIL PHOTOGRAPHY — CONTACT PAGE
+   Matches dark luxury editorial design system
+═══════════════════════════════════════════════════════════ */
+
+const INFO_CARDS = (settings) => [
+  {
+    icon: "◎",
+    label: "Location",
+    lines: [settings?.address || "Maharashtra, India"],
+  },
+  {
+    icon: "✉",
+    label: "Email",
+    lines: [settings?.contactEmail].filter(Boolean),
+  },
+  {
+    icon: "☏",
+    label: "Call",
+    lines: [
+      settings?.primaryMobileNumber,
+      settings?.secondaryMobileNumber,
+    ].filter(Boolean),
+  },
+  {
+    icon: "◷",
+    label: "Open Hours",
+    lines: ["Available 24 / 7"],
+  },
+];
+
+export default function Contact() {
   const { settings } = useSettings();
+
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
+    name: "", email: "", subject: "", message: "",
   });
-  
-  const [status, setStatus] = useState({ type: "", message: "" });
-
-  useEffect(() => {
-    document.body.className = "contact-page";
-
-    return () => {
-      document.body.className = "";
-    };
-  }, []);
-
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
+  const [status, setStatus]       = useState({ type: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
+
+  const handleInputChange = (e) =>
+    setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (submitting) return;
-
     setSubmitting(true);
     setStatus({ type: "", message: "" });
 
@@ -48,26 +64,15 @@ const Contact = () => {
       if (res.ok) {
         setStatus({
           type: "success",
-          message: "✓ Thanks for reaching out! We've sent you a confirmation email and will respond shortly."
+          message: "✦ Thank you for reaching out — we'll respond shortly.",
         });
         setFormData({ name: "", email: "", subject: "", message: "" });
-        
-        // Auto-clear success message after 5 seconds
-        setTimeout(() => {
-          setStatus({ type: "", message: "" });
-        }, 5000);
+        setTimeout(() => setStatus({ type: "", message: "" }), 5000);
       } else {
-        setStatus({
-          type: "error",
-          message: "✗ Something went wrong. Please try again or contact us directly."
-        });
+        setStatus({ type: "error", message: "✗ Something went wrong. Please try again." });
       }
-    } catch (error) {
-      console.error("Contact Form Error:", error);
-      setStatus({
-        type: "error",
-        message: "✗ Error sending message. Please check your connection and try again."
-      });
+    } catch {
+      setStatus({ type: "error", message: "✗ Connection error. Please try again." });
     } finally {
       setSubmitting(false);
     }
@@ -77,220 +82,183 @@ const Contact = () => {
     <>
       <Header />
 
-      <main className="main">
-        {/* Page Title */}
-        <div
-          className="page-title dark-background"
-          style={{ backgroundImage: "url('/assets/img/HomePage/16.webp')" }}
-        >
-          <div className="container position-relative">
-            <h1>Contact</h1>
-            <nav className="breadcrumbs">
-              <ol>
-                <li>
-                  <a href="/">Home</a>
-                </li>
+      <div className="pp-main">
+
+        {/* ══ HERO ══════════════════════════════════════════════ */}
+        <section className="cnt-hero">
+          <div className="cnt-hero-bg">
+            <img src="/assets/img/HomePage/16.webp" alt="Contact hero" />
+          </div>
+          <div className="cnt-hero-veil" />
+          <div className="cnt-hero-body">
+            <span className="cnt-eyebrow">Let's Connect</span>
+            <h1 className="cnt-hero-title">Get in Touch</h1>
+            <p className="cnt-hero-sub">
+              We'd love to hear your story — reach out and let's create something beautiful together.
+            </p>
+            <nav aria-label="Breadcrumb">
+              <ol className="cnt-breadcrumb">
+                <li><Link to="/">Home</Link></li>
+                <li className="sep">›</li>
                 <li className="current">Contact</li>
               </ol>
             </nav>
           </div>
-        </div>
+        </section>
 
-        {/* Contact Section */}
-        <section id="contact" className="contact section">
-          <div className="container" data-aos="fade-up" data-aos-delay="100">
-            <div className="row gy-4">
-              <div className="col-lg-4">
-                <div className="contact-info-page">
-                  <div className="contact-card">
-                    <div className="icon-box">
-                      <i className="bi bi-geo-alt"></i>
-                    </div>
-                    <div className="contact-text">
-                      <h4>Location</h4>
-                      <p>{settings?.address || "Maharashtra, India"}</p>
+        {/* ══ CONTACT BODY ══════════════════════════════════════ */}
+        <section className="cnt-section">
+          <div className="cnt-inner">
+
+            {/* ── Info column ── */}
+            <aside className="cnt-info-col">
+              <span className="pp-tag">Reach Us</span>
+              <h2 className="cnt-info-title">
+                Always <em>Here</em> for You
+              </h2>
+              <p className="cnt-info-desc">
+                Whether you're planning a wedding, a portrait session, or simply want to say hello — we're just a message away.
+              </p>
+
+              <div className="cnt-cards">
+                {INFO_CARDS(settings).map((card, i) => (
+                  <div className="cnt-card" key={i}>
+                    <span className="cnt-card-icon">{card.icon}</span>
+                    <div className="cnt-card-body">
+                      <span className="cnt-card-label">{card.label}</span>
+                      {card.lines.map((line, j) => (
+                        <span className="cnt-card-val" key={j}>{line}</span>
+                      ))}
                     </div>
                   </div>
-
-                  <div className="contact-card">
-                    <div className="icon-box">
-                      <i className="bi bi-envelope"></i>
-                    </div>
-                    <div className="contact-text">
-                      <h4>Email</h4>
-                      <p>
-                        {settings?.contactEmail && (
-                          <p>{settings.contactEmail}</p>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="contact-card">
-                    <div className="icon-box">
-                      <i className="bi bi-telephone"></i>
-                    </div>
-                    <div className="contact-text">
-                      <h4>Call</h4>
-                      <p>{settings?.primaryMobileNumber}</p>
-                      {settings?.secondaryMobileNumber && (
-                        <p>{settings?.secondaryMobileNumber}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="contact-card">
-                    <div className="icon-box">
-                      <i className="bi bi-clock"></i>
-                    </div>
-                    <div className="contact-text">
-                      <h4>Open Hours</h4>
-                      <p>Open 24/7</p>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
 
-              <div className="col-lg-8">
-                <div
-                  className="contact-form-container"
-                  data-aos="fade-up"
-                  data-aos-delay="400"
+              {/* Social strip */}
+              <div className="cnt-social">
+                <span className="cnt-social-label">Follow Along</span>
+                <a
+                  href="https://www.instagram.com/thepatilphotography"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="cnt-social-link"
                 >
-                  <h3>Get in Touch</h3>
-                  <p>
-                    We'd love to hear from you. Send us a message and we'll
-                    respond as soon as possible.
-                  </p>
-
-                  {/* Status Message */}
-                  {status.message && (
-                    <div
-                      style={{
-                        padding: "12px 16px",
-                        borderRadius: "8px",
-                        marginBottom: "20px",
-                        fontSize: "0.95rem",
-                        backgroundColor: status.type === "success" ? "#d4edda" : "#f8d7da",
-                        color: status.type === "success" ? "#155724" : "#721c24",
-                        border: `1px solid ${status.type === "success" ? "#c3e6cb" : "#f5c6cb"}`,
-                        animation: "slideDown 0.3s ease"
-                      }}
-                    >
-                      {status.message}
-                    </div>
-                  )}
-
-                  <form onSubmit={handleSubmit} className="contact-form">
-                    <div className="row">
-                      <div className="col-md-6 form-group">
-                        <input
-                          type="text"
-                          name="name"
-                          className="form-control"
-                          placeholder="Your Name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                      <div className="col-md-6 form-group mt-3 mt-md-0">
-                        <input
-                          type="email"
-                          className="form-control"
-                          name="email"
-                          placeholder="Your Email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="form-group mt-3">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="subject"
-                        placeholder="Subject"
-                        value={formData.subject}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className="form-group mt-3">
-                      <textarea
-                        className="form-control"
-                        name="message"
-                        rows="5"
-                        placeholder="Message"
-                        value={formData.message}
-                        onChange={handleInputChange}
-                        required
-                      ></textarea>
-                    </div>
-
-                    <div className="form-submit">
-                      <button
-                        type="submit"
-                        className="submit-btn mt-3"
-                        disabled={submitting}
-                        style={{
-                          opacity: submitting ? 0.7 : 1,
-                          cursor: submitting ? "not-allowed" : "pointer",
-                          minWidth: "150px",
-                          transition: "all 0.3s ease"
-                        }}
-                      >
-                        {submitting ? (
-                          <>
-                            <span
-                              className="spinner-border spinner-border-sm me-2"
-                              role="status"
-                              aria-hidden="true"
-                            ></span>
-                            Sending...
-                          </>
-                        ) : (
-                          <>
-                            <i className="bi bi-send me-2"></i>
-                            Send Message
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </form>
-                </div>
+                  @thepatilphotography
+                </a>
               </div>
+            </aside>
+
+            {/* ── Form column ── */}
+            <div className="cnt-form-col">
+
+              {/* Status banner */}
+              {status.message && (
+                <div className={`cnt-status cnt-status--${status.type}`}>
+                  {status.message}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="cnt-form" noValidate>
+
+                <div className="cnt-form-row">
+                  <div className="cnt-field">
+                    <label className="cnt-label" htmlFor="cnt-name">Your Name</label>
+                    <input
+                      id="cnt-name"
+                      type="text"
+                      name="name"
+                      className="cnt-input"
+                      placeholder="Priya & Rahul"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="cnt-field">
+                    <label className="cnt-label" htmlFor="cnt-email">Email Address</label>
+                    <input
+                      id="cnt-email"
+                      type="email"
+                      name="email"
+                      className="cnt-input"
+                      placeholder="hello@example.com"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="cnt-field">
+                  <label className="cnt-label" htmlFor="cnt-subject">Subject</label>
+                  <input
+                    id="cnt-subject"
+                    type="text"
+                    name="subject"
+                    className="cnt-input"
+                    placeholder="Wedding Photography Inquiry"
+                    value={formData.subject}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+
+                <div className="cnt-field">
+                  <label className="cnt-label" htmlFor="cnt-message">Your Message</label>
+                  <textarea
+                    id="cnt-message"
+                    name="message"
+                    className="cnt-input cnt-textarea"
+                    placeholder="Tell us about your special day — venue, date, style, or anything on your mind…"
+                    rows="6"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+
+                <div className="cnt-form-footer">
+                  <button
+                    type="submit"
+                    className="pp-btn-primary cnt-submit"
+                    disabled={submitting}
+                  >
+                    {submitting ? (
+                      <span className="cnt-spinner-wrap">
+                        <span className="cnt-spinner" />
+                        Sending…
+                      </span>
+                    ) : (
+                      "Send Message ✦"
+                    )}
+                  </button>
+                  <p className="cnt-privacy">
+                    We respect your privacy and will never share your details.
+                  </p>
+                </div>
+
+              </form>
             </div>
+
           </div>
         </section>
-      </main>
+
+        {/* ══ QUOTE BAND ════════════════════════════════════════ */}
+        <section className="pp-quote-band">
+          <div className="pp-quote-orn">✦</div>
+          <blockquote className="pp-quote-text">
+            "Every love story is beautiful — let us tell yours."
+          </blockquote>
+          <div className="pp-quote-orn">✦</div>
+        </section>
+
+      </div>
 
       <Footer />
 
-      {/* Scroll Top Button */}
-      <a
-        href="#"
-        id="scroll-top"
-        className="scroll-top d-flex align-items-center justify-content-center"
-      >
-        <i className="bi bi-arrow-up-short"></i>
+      <a href="#" id="scroll-top" className="scroll-top d-flex align-items-center justify-content-center">
+        <i className="bi bi-arrow-up-short" />
       </a>
-
-      <style>{`
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </>
   );
-};
-
-export default Contact;
+}

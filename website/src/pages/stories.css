@@ -1,0 +1,372 @@
+/* ═══════════════════════════════════════════════════════════
+   THE PATIL PHOTOGRAPHY — STORIES PAGE STYLES
+   Inherits pp-* atoms from home.css
+   Scoped additions use ps-* prefix
+═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap');
+
+/* ── Variables ──────────────────────────────────────────── */
+:root {
+  --ink:        #0d0b09;
+  --ink-2:      #1a1410;
+  --ink-3:      #2a2018;
+  --cream:      #f5f0e8;
+  --cream-2:    #faf7f2;
+  --gold:       #c9974a;
+  --gold-2:     #e0b876;
+  --body:       #6b5a48;
+  --muted:      #9a8878;
+
+  --ff-display: 'DM Serif Display', Georgia, serif;
+  --ff-body:    'Outfit', system-ui, sans-serif;
+
+  --max-w:      1200px;
+  --px:         clamp(24px, 5vw, 72px);
+  --section-py: clamp(72px, 9vw, 120px);
+}
+
+/* ── Base ───────────────────────────────────────────────── */
+.ps-main *, .ps-main *::before, .ps-main *::after { box-sizing: border-box; }
+.ps-main { font-family: var(--ff-body); color: var(--body); background: var(--cream-2); overflow-x: hidden; }
+.ps-main img { display: block; max-width: 100%; }
+
+/* ── Keyframes ──────────────────────────────────────────── */
+@keyframes ps-kb      { from{transform:scale(1)} to{transform:scale(1.06)} }
+@keyframes ps-fade    { from{opacity:0;transform:translateY(26px)} to{opacity:1;transform:translateY(0)} }
+@keyframes ps-skel    { 0%,100%{opacity:.45} 50%{opacity:.9} }
+@keyframes ps-card-in { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+@keyframes ps-float   { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-10px) rotate(8deg)} }
+
+
+/* ══════════════════════════════════════════════════════════
+   HERO
+══════════════════════════════════════════════════════════ */
+.ps-hero {
+  position: relative;
+  height: 72vh;
+  min-height: 520px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.ps-hero-bg {
+  position: absolute; inset: 0;
+}
+.ps-hero-bg img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  animation: ps-kb 18s ease-in-out alternate infinite;
+}
+
+.ps-hero-veil {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(13,11,9,0.94) 0%,
+    rgba(13,11,9,0.48) 42%,
+    rgba(13,11,9,0.14) 100%
+  );
+  z-index: 1;
+}
+
+.ps-hero-body {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 var(--px) clamp(56px, 8vh, 90px);
+  animation: ps-fade 1s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.ps-eyebrow {
+  display: inline-block;
+  font-family: var(--ff-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+
+.ps-hero-title {
+  font-family: var(--ff-display);
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 400;
+  color: var(--cream);
+  line-height: 1;
+  margin: 0 0 18px;
+}
+
+.ps-hero-sub {
+  font-size: clamp(0.9rem, 1.3vw, 1.05rem);
+  color: rgba(245,240,232,0.6);
+  font-style: italic;
+  margin: 0 0 28px;
+  max-width: 420px;
+  line-height: 1.75;
+}
+
+/* breadcrumb */
+.ps-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+.ps-breadcrumb a {
+  color: rgba(245,240,232,0.5);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.ps-breadcrumb a:hover { color: var(--gold); }
+.ps-crumb-sep { color: var(--gold); font-size: 0.55rem; opacity: 0.7; }
+.ps-crumb-cur { color: var(--cream); }
+
+/* floating ornaments */
+.ps-hero-orns {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.ps-orn {
+  position: absolute;
+  color: var(--gold);
+  opacity: 0.12;
+  animation: ps-float 6s ease-in-out infinite;
+}
+.ps-orn-0 { top: 18%; right: 12%; font-size: 2.4rem; animation-delay: 0s; }
+.ps-orn-1 { top: 55%; right: 28%; font-size: 1rem;   animation-delay: 1.2s; }
+.ps-orn-2 { top: 28%; right: 38%; font-size: 1.6rem; animation-delay: 2.4s; }
+.ps-orn-3 { top: 70%; right: 8%;  font-size: 1.2rem; animation-delay: 0.8s; }
+.ps-orn-4 { top: 40%; right: 55%; font-size: 0.8rem; animation-delay: 3s; }
+
+
+/* ══════════════════════════════════════════════════════════
+   INTRO
+══════════════════════════════════════════════════════════ */
+.ps-intro {
+  background: var(--cream-2);
+  padding: clamp(64px, 8vw, 100px) var(--px);
+}
+.ps-intro-inner {
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
+}
+.ps-intro-body {
+  font-size: 1rem;
+  line-height: 1.9;
+  color: var(--body);
+  margin: 0;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   STORIES GRID SECTION
+══════════════════════════════════════════════════════════ */
+.ps-stories-section {
+  background: var(--ink-2);
+  padding: var(--section-py) var(--px);
+}
+.ps-container {
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+
+/* ── Grid ─────────────────────────────────────────────── */
+.ps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+
+/* ── Card ─────────────────────────────────────────────── */
+.ps-card {
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--ink);
+  border: 1px solid rgba(201,151,74,0.1);
+  transition: transform 0.42s ease, border-color 0.35s, box-shadow 0.4s;
+  animation: ps-card-in 0.55s ease both;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+}
+.ps-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(201,151,74,0.32);
+  box-shadow: 0 20px 52px rgba(0,0,0,0.45);
+}
+.ps-card:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* thumbnail */
+.ps-card-thumb {
+  position: relative;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.ps-card-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.65s ease;
+}
+.ps-card:hover .ps-card-thumb img { transform: scale(1.07); }
+
+.ps-card-veil {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(13,11,9,0.85) 0%,
+    rgba(13,11,9,0.2) 55%,
+    transparent 100%
+  );
+  transition: background 0.4s;
+}
+.ps-card:hover .ps-card-veil {
+  background: linear-gradient(
+    to top,
+    rgba(13,11,9,0.92) 0%,
+    rgba(13,11,9,0.45) 55%,
+    rgba(13,11,9,0.12) 100%
+  );
+}
+
+/* hover CTA overlay */
+.ps-card-hover-cta {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -44%) scale(0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.35s, transform 0.35s;
+  z-index: 2;
+  pointer-events: none;
+}
+.ps-card:hover .ps-card-hover-cta {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+.ps-play-ring {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold);
+  background: rgba(201,151,74,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--gold);
+  backdrop-filter: blur(4px);
+}
+.ps-open-label {
+  font-family: var(--ff-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cream);
+}
+
+/* location badge */
+.ps-loc-badge {
+  position: absolute;
+  top: 14px; left: 14px;
+  font-family: var(--ff-body);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--gold);
+  border-radius: 3px;
+  padding: 4px 10px;
+  z-index: 2;
+}
+
+/* info strip */
+.ps-card-info {
+  padding: 22px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+.ps-card-title {
+  font-family: var(--ff-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--cream);
+  margin: 0;
+  line-height: 1.25;
+}
+.ps-card-desc {
+  font-size: 0.84rem;
+  line-height: 1.75;
+  color: rgba(245,240,232,0.45);
+  margin: 0;
+  flex: 1;
+}
+.ps-card-cta {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(245,240,232,0.3);
+  margin-top: 6px;
+  transition: color 0.3s;
+  align-self: flex-start;
+}
+.ps-card:hover .ps-card-cta { color: var(--gold); }
+
+
+/* ── Skeleton ─────────────────────────────────────────── */
+.ps-card-skel {
+  border-radius: 16px;
+  aspect-ratio: 3/5;
+  background: linear-gradient(90deg, #1e1712 25%, #2a2018 50%, #1e1712 75%);
+  background-size: 200% 100%;
+  animation: ps-skel 1.5s ease-in-out infinite;
+}
+
+/* ── Empty ────────────────────────────────────────────── */
+.ps-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: rgba(245,240,232,0.3);
+  padding: 80px 0;
+  font-size: 0.95rem;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .ps-grid { grid-template-columns: repeat(2, 1fr); gap: 22px; }
+}
+
+@media (max-width: 768px) {
+  .ps-hero        { height: 60vh; }
+  .ps-grid        { grid-template-columns: 1fr; gap: 20px; }
+  .ps-card-thumb  { aspect-ratio: 4/3; }
+}
+
+@media (max-width: 480px) {
+  .ps-grid { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,137 @@
+/* ═══════════════════════════════════════════════════════════
+   THE PATIL PHOTOGRAPHY — LUX GALLERY COMPONENT
+   Design system: Dark Luxury Editorial
+═══════════════════════════════════════════════════════════ */
+
+:root {
+  --lux-gold:    #c9974a;
+  --lux-gold-2:  #e0b876;
+  --lux-ink:     #0d0b09;
+  --lux-radius:  10px;
+  --lux-gap:     10px;
+}
+
+/* ── Grid ─────────────────────────────────────────────────── */
+.lux-gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 220px;
+  gap: var(--lux-gap);
+  width: 100%;
+}
+
+/* tall cards span 2 rows */
+.lux-card--tall { grid-row: span 2; }
+
+/* ── Card ─────────────────────────────────────────────────── */
+.lux-card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--lux-radius);
+  background: var(--lux-ink);
+  cursor: pointer;
+  /* gold border reveal on hover */
+  outline: 2px solid transparent;
+  outline-offset: 0px;
+  transition: outline-color 0.35s ease, outline-offset 0.35s ease;
+}
+.lux-card:hover {
+  outline-color: var(--lux-gold);
+  outline-offset: -2px;
+}
+
+/* ── Image ────────────────────────────────────────────────── */
+.lux-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.65s cubic-bezier(.25,.46,.45,.94);
+}
+.lux-card:hover img { transform: scale(1.07); }
+
+/* ── Gold shine sweep ─────────────────────────────────────── */
+.lux-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    transparent 30%,
+    rgba(201,151,74,0.18) 50%,
+    transparent 70%,
+    transparent 100%
+  );
+  background-size: 250% 100%;
+  background-position: 200% center;
+  transition: background-position 0.75s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+.lux-card:hover .lux-shine {
+  background-position: -50% center;
+}
+
+/* ── Overlay ──────────────────────────────────────────────── */
+.lux-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(13,11,9,0.7) 0%,
+    rgba(13,11,9,0.1) 55%,
+    transparent 100%
+  );
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 14px 16px;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 2;
+}
+.lux-card:hover .lux-overlay { opacity: 1; }
+
+.lux-overlay-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--lux-gold);
+  color: var(--lux-ink);
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background 0.25s;
+}
+.lux-card:hover .lux-overlay-icon {
+  background: var(--lux-gold-2);
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .lux-gallery {
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .lux-gallery {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 180px;
+  }
+  /* disable tall on small screens for even rows */
+  .lux-card--tall { grid-row: span 1; }
+}
+
+@media (max-width: 480px) {
+  .lux-gallery {
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 150px;
+    gap: 6px;
+  }
+}

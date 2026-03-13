@@ -1,109 +1,110 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useSettings } from '../hooks/useSettings';
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useSettings } from "../hooks/useSettings";
+import "./header.css";
 
-const Header = () => {
-  const { settings } = useSettings();
-  const location = useLocation();
-  const isHomePage = location.pathname === '/';
-  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-  const [showTeamMenu, setShowTeamMenu] = useState(false);
+const NAV_LINKS = [
+  { to: "/",                label: "Home" },
+  { to: "/about",           label: "About Us" },
+  { to: "/portfolio",       label: "Portfolio" },
+  { to: "/stories",         label: "Stories" },
+  { to: "/films",           label: "Films" },
+  { to: "/reviews-feedback",label: "Reviews" },
+  { to: "/contact",         label: "Contact" },
+];
 
-  // ... (rest of logic)
+export default function Header() {
+  const { settings }    = useSettings();
+  const location        = useLocation();
+  const isHome          = location.pathname === "/";
 
-  const toggleMobileNav = () => {
-    setIsMobileNavOpen(!isMobileNavOpen);
-  };
+  const [scrolled,    setScrolled]    = useState(false);
+  const [mobileOpen,  setMobileOpen]  = useState(false);
 
+  /* scroll detection */
   useEffect(() => {
-    try {
-      if (isMobileNavOpen) {
-        document.body.classList.add('mobile-nav-active');
-      } else {
-        document.body.classList.remove('mobile-nav-active');
-      }
-    } catch (error) {
-      console.error('Error in Header useEffect:', error);
-    }
-  }, [isMobileNavOpen]);
-
-  // Check if any public team members exist; if not, hide Team menu
-  useEffect(() => {
-    let mounted = true;
-    fetch('/api/team?publicOnly=true')
-      .then((res) => res.json())
-      .then((data) => {
-        if (!mounted) return;
-        setShowTeamMenu(Array.isArray(data) && data.length > 0);
-      })
-      .catch((err) => {
-        console.error('Error fetching team for header:', err);
-        if (mounted) setShowTeamMenu(false);
-      });
-
-    return () => {
-      mounted = false;
-    };
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close mobile nav on route change
+  /* close mobile nav on route change */
+  useEffect(() => { setMobileOpen(false); }, [location]);
+
+  /* body lock when mobile open */
   useEffect(() => {
-    try {
-      setIsMobileNavOpen(false);
-    } catch (error) {
-      console.error('Error closing mobile nav:', error);
-    }
-  }, [location]);
+    document.body.classList.toggle("mobile-nav-active", mobileOpen);
+  }, [mobileOpen]);
+
+  const solid = !isHome || scrolled;
 
   return (
-    <header id="header" className={`header d-flex align-items-center fixed-top ${!isHomePage ? 'not-home' : ''}`}>
-      <div className="container-fluid container-xl position-relative d-flex align-items-center">
+    <header className={`hd-root ${solid ? "hd-solid" : ""} ${mobileOpen ? "hd-mobile-open" : ""}`}>
+      <div className="hd-inner">
 
-        <Link to="/" className="logo d-flex align-items-center me-auto">
+        {/* ── LOGO ── */}
+        <Link to="/" className="hd-logo" onClick={() => setMobileOpen(false)}>
           {settings?.primaryLogo ? (
-            <img src={settings.primaryLogo} alt="Logo" style={{ maxHeight: '60px', width: 'auto', objectFit: 'contain' }} />
+            <img src={settings.primaryLogo} alt={settings?.businessName || "Logo"} />
           ) : (
             <img src="/assets/img/logo.PNG" alt="Logo" />
           )}
-          {(!settings?.primaryLogo && !settings) && (
-            // Fallback or if desired to show name alongside logo
-            null
-          )}
-          {/* Optional: Show business name if no logo, or responsive logic */}
-          {/* <h1 className="sitename d-none d-sm-block">{settings?.businessName || "The Patil Photography"}</h1> */}
         </Link>
 
-        <nav id="navmenu" className="navmenu">
-          <ul>
-            <li><Link to="/" className={location.pathname === '/' ? 'active' : ''}>Home</Link></li>
-            {/*><Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>About Us</Link></li>
-            <li className={`dropdown ${location.pathname.startsWith('/services') || location.pathname === '/service-details' ? 'active' : ''}`}>
-              <Link to="/services">Services</Link>
-              <ul>
-                <li><Link to="/services" className={location.pathname === '/services' ? 'active' : ''}>All Services</Link></li>
-                <li><Link to="/service-details" className={location.pathname === '/service-details' ? 'active' : ''}>Service Details</Link></li>
-              </ul>
-            </li> */}
-            {/* {showTeamMenu && (
-              <li><Link to="/team" className={location.pathname === '/team' ? 'active' : ''}>Team</Link></li>
-            )} */}
-            <li><Link to="/portfolio" className={location.pathname === '/portfolio' ? 'active' : ''}>Portfolio</Link></li>
-            <li><Link to="/stories" className={location.pathname === '/stories' ? 'active' : ''}>Stories</Link></li>
-            <li><Link to="/films" className={location.pathname === '/films' ? 'active' : ''}>Films</Link></li>
-            <li><Link to="/reviews-feedback" className={location.pathname === '/reviews-feedback' ? 'active' : ''}>Reviews & Feedback</Link></li>
-            <li><Link to="/contact" className={location.pathname === '/contact' ? 'active' : ''}>Contact Us</Link></li>
-            <li><Link to="/quote" className={location.pathname === '/quote' ? 'active' : ''}>Book Us</Link></li>
-            
-          </ul>
-          <i
-            className={`mobile-nav-toggle d-xl-none bi ${isMobileNavOpen ? 'bi-x' : 'bi-list'}`}
-            onClick={toggleMobileNav}
-          ></i>
+        {/* ── DESKTOP NAV ── */}
+        <nav className="hd-nav">
+          {NAV_LINKS.map(({ to, label }) => (
+            <Link
+              key={to}
+              to={to}
+              className={`hd-link ${location.pathname === to ? "hd-link--active" : ""}`}
+            >
+              {label}
+            </Link>
+          ))}
+          <Link to="/quote" className="hd-book-btn">Book Us</Link>
         </nav>
 
+        {/* ── MOBILE TOGGLE ── */}
+        <button
+          className="hd-toggle"
+          onClick={() => setMobileOpen(p => !p)}
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+        >
+          <span className={`hd-burger ${mobileOpen ? "hd-burger--open" : ""}`}>
+            <span /><span /><span />
+          </span>
+        </button>
       </div>
+
+      {/* ── MOBILE DRAWER ── */}
+      <div className={`hd-drawer ${mobileOpen ? "hd-drawer--open" : ""}`}>
+        <nav className="hd-drawer-nav">
+          {NAV_LINKS.map(({ to, label }) => (
+            <Link
+              key={to}
+              to={to}
+              className={`hd-drawer-link ${location.pathname === to ? "hd-drawer-link--active" : ""}`}
+              onClick={() => setMobileOpen(false)}
+            >
+              {label}
+            </Link>
+          ))}
+          <Link
+            to="/quote"
+            className="hd-book-btn hd-book-btn--drawer"
+            onClick={() => setMobileOpen(false)}
+          >
+            Book Us
+          </Link>
+        </nav>
+      </div>
+
+      {/* backdrop */}
+      {mobileOpen && (
+        <div className="hd-backdrop" onClick={() => setMobileOpen(false)} />
+      )}
     </header>
   );
-};
-
-export default Header;
+}
