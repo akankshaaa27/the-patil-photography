@@ -1,4 +1,4 @@
-import React, { useEffect, lazy, Suspense } from 'react'
+import React, { useState, useEffect, lazy, Suspense } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import './App.css'
 import ErrorBoundary from './components/ErrorBoundary'
@@ -51,48 +51,37 @@ function App() {
       }
     }
   }, [settings]);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
   useEffect(() => {
-    console.log('App useEffect running');
     // Initialize AOS globally
     if (typeof window !== 'undefined' && window.AOS) {
       window.AOS.init({
         duration: 600,
         easing: 'ease-in-out',
         once: true,
-        mirror: false
+        mirror: false,
       });
     }
-    // Initialize scroll top button
-    const toggleScrolled = () => {
-      const selectBody = document.querySelector('body');
-      const selectHeader = document.querySelector('#header');
-      if (!selectHeader && !selectBody) return; // Guard clause
-      if (selectHeader && !selectHeader.classList.contains('scroll-up-sticky') && !selectHeader.classList.contains('sticky-top') && !selectHeader.classList.contains('fixed-top')) return;
-      if (selectBody) {
-        window.scrollY > 100 ? selectBody.classList.add('scrolled') : selectBody.classList.remove('scrolled');
-      }
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        const y = window.scrollY;
+        setShowScrollTop(y > 120);
+        ticking = false;
+      });
     };
 
-    document.addEventListener('scroll', toggleScrolled);
-    window.addEventListener('load', toggleScrolled);
-
-    // Scroll top functionality
-    const scrollTop = document.querySelector('.scroll-top');
-    if (scrollTop) {
-      const toggleScrollTop = () => {
-        if (scrollTop) {
-          window.scrollY > 100 ? scrollTop.classList.add('active') : scrollTop.classList.remove('active');
-        }
-      };
-      window.addEventListener('load', toggleScrollTop);
-      document.addEventListener('scroll', toggleScrollTop);
-    }
+    window.addEventListener('scroll', onScroll, { passive: true });
 
     return () => {
-      document.removeEventListener('scroll', toggleScrolled);
-      window.removeEventListener('load', toggleScrolled);
+      window.removeEventListener('scroll', onScroll);
     };
   }, []);
+
 
   return (
     <div className="App">

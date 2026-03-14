@@ -110,7 +110,7 @@ export default function Home() {
       .then(r => r.json())
       .then(d => {
         const active = Array.isArray(d) ? d.filter(i => i.status === "Active") : [];
-        setGallery(active.slice(0, 12));
+        setGallery(active.slice(0, 16));
       })
       .catch(() => {})
       .finally(() => setLdGallery(false));
@@ -138,6 +138,9 @@ export default function Home() {
 
   /* ── helpers ── */
   const openStory = (story) => { setSelectedStory(story); setShowModal(true); };
+
+  const storiesToShow = stories.slice(0, 3);
+  const testimonialsToShow = testimonials.slice(0, 3);
 
   /* Extract image URLs for LuxGallery */
   const galleryImageUrls = gallery.map(item => item.image);
@@ -345,7 +348,7 @@ export default function Home() {
           ) : stories.length > 0 ? (
             <>
               <div className="pp-stories-grid">
-                {stories.slice(0, 6).map((story) => (
+                {storiesToShow.map((story) => (
                   <div
                     key={story._id}
                     className="pp-story-card"
@@ -364,6 +367,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>
+
               <div className="pp-center-cta">
                 <Link to="/stories" className="pp-btn-primary">View All Stories</Link>
               </div>
@@ -389,7 +393,7 @@ export default function Home() {
           ) : testimonials.length > 0 ? (
             <>
               <div className="pp-testi-grid">
-                {testimonials.slice(0, 6).map((t, i) => (
+                {testimonialsToShow.map((t, i) => (
                   <div key={t._id || i} className="pp-testi-card">
                     <div className="pp-testi-quote">"</div>
                     <p className="pp-testi-text">"{t.fullDescription}"</p>
@@ -488,9 +492,7 @@ export default function Home() {
       />
 
       {/* Scroll-top */}
-      <a href="#" id="scroll-top" className="scroll-top d-flex align-items-center justify-content-center">
-        <i className="bi bi-arrow-up-short" />
-      </a>
+   
     </>
   );
 }

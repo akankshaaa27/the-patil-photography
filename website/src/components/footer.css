@@ -45,12 +45,13 @@
   text-decoration: none;
 }
 .ft-logo img {
-  height: 52px;
-  width: auto;
-  object-fit: contain;
-  display: block;
-  opacity: 0.92;
-  transition: opacity 0.3s;
+    height: 77px;
+    width: auto;
+    -o-object-fit: contain;
+    object-fit: contain;
+    display: block;
+    opacity: 0.92;
+    transition: opacity 0.3s;
 }
 .ft-logo:hover img { opacity: 1; }
 

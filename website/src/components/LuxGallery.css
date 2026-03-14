@@ -57,6 +57,10 @@
   background-position: -200%;
 }
 
+.glightbox-clean .gclose path, .glightbox-clean .gnext path, .glightbox-clean .gprev path {
+     fill: transparent !important; 
+}
+
 /* OVERLAY */
 
 .pp-gal-overlay {
@@ -64,8 +68,8 @@
   inset: 0;
   display: flex;
   align-items: flex-end;
-  justify-content: flex-end;
-  padding: 14px;
+  justify-content: space-between;
+  padding: 12px;
   background: linear-gradient(to top, rgba(0, 0, 0, .7), transparent);
   opacity: 0;
   transition: 0.3s;
@@ -73,6 +77,37 @@
 
 .pp-gal-item:hover .pp-gal-overlay {
   opacity: 1;
+}
+
+.pp-gal-overlay-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pp-gal-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 151, 74, .5);
+  background: rgba(0, 0, 0, .5);
+  color: var(--pp-gold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.25s;
+  padding: 0;
+}
+
+.pp-gal-action-btn:hover {
+  background: rgba(201, 151, 74, .3);
+  transform: scale(1.06);
+}
+
+.pp-gal-action-btn svg {
+  width: 14px;
+  height: 14px;
 }
 
 .pp-gal-overlay-icon {
@@ -130,6 +165,28 @@
   transition: .3s;
 
   font-size: 0 !important;
+}
+
+.glightbox-container .gnext::after,
+.glightbox-container .gprev::after,
+.glightbox-container .gclose::after {
+  content: none;
+}
+
+.glightbox-container .gnext svg,
+.glightbox-container .gprev svg,
+.glightbox-container .gclose svg {
+  width: 18px;
+  height: 18px;
+  color: var(--pp-gold);
+}
+
+.glightbox-container .gnext:hover,
+.glightbox-container .gprev:hover,
+.glightbox-container .gclose:hover {
+  background: rgba(201, 151, 74, .3) !important;
+  transform: scale(1.1);
+  color: #fff;
 }
 
 .glightbox-container .gnext:hover,

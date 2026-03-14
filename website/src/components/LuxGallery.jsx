@@ -62,9 +62,22 @@ const LuxGallery = ({ images = [], galleryId = "gallery" }) => {
       closeOnOutsideClick: true,
       autoplayVideos: false,
       svg: {
-        close: " ",
-        next: " ",
-        prev: " ",
+        close: `
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <line x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <line x1="20" y1="4" x2="4" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        `,
+        next: `
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        `,
+        prev: `
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 4l-8 8 8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        `,
       },
     });
   }, [images]);
@@ -115,7 +128,7 @@ const LuxGallery = ({ images = [], galleryId = "gallery" }) => {
             <span className="pp-gal-shine" />
 
             <div className="pp-gal-overlay">
-              <span className="pp-gal-overlay-icon">
+              <span className="pp-gal-overlay-icon" title="Open Lightbox">
                 <svg viewBox="0 0 18 18">
                   <path
                     d="M10.5 3H15V7.5"

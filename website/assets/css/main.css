@@ -29,7 +29,11 @@
   --px: clamp(24px, 5vw, 72px);
   --section-py: clamp(72px, 9vw, 120px);
 }
-
+html,
+*,
+body{
+  scroll-behavior: smooth;
+}
 /* ── Reset & base ───────────────────────────────────────── */
 .pp-main *, .pp-main *::before, .pp-main *::after { box-sizing: border-box; }
 .pp-main { font-family: var(--ff-body); color: var(--body); background: var(--cream-2); overflow-x: hidden; }
@@ -770,4 +774,10 @@
 @media (max-width: 480px) {
   .pp-insta-grid       { grid-template-columns: repeat(2, 1fr); }
   .pp-gallery-grid     { grid-template-columns: repeat(2, 1fr); }
+}
+
+.glightbox-clean .gclose path, 
+.glightbox-clean .gnext path, 
+.glightbox-clean .gprev path {
+     fill: transparent !important; 
 }
