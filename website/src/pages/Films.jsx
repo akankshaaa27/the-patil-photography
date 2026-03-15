@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import PageHero from "../components/PageHero";
 import "./films.css";
 
 /* ─── helpers ──────────────────────────────────────────── */
@@ -78,31 +79,17 @@ export default function Films() {
       <main className="pf-main">
 
         {/* ══ HERO ═══════════════════════════════════════════ */}
-        <section className="pf-hero">
-          <div className="pf-hero-bg">
-            <img src="/assets/img/HomePage/84.webp" alt="Films hero" />
-          </div>
-          <div className="pf-hero-veil" />
-          <div className="pf-hero-body">
-            <span className="pf-eyebrow">Cinematic Storytelling</span>
-            <h1 className="pf-hero-title">Our Films</h1>
-            <p className="pf-hero-sub">
-              Every love story deserves to be felt, not just remembered.
-            </p>
-            <nav className="pf-breadcrumb">
-              <Link to="/">Home</Link>
-              <span className="pf-crumb-sep">✦</span>
-              <span className="pf-crumb-cur">Films</span>
-            </nav>
-          </div>
-
-          {/* decorative film-strip lines */}
-          <div className="pf-filmstrip" aria-hidden="true">
-            {Array.from({ length: 18 }).map((_, i) => (
-              <div key={i} className="pf-fs-hole" />
-            ))}
-          </div>
-        </section>
+        <PageHero
+          eyebrow="Cinematic Storytelling"
+          title="Our Films"
+          subtitle="Every love story deserves to be felt, not just remembered."
+          backgroundImage="/assets/img/HomePage/84.webp"
+          breadcrumbs={[
+            { label: 'Home', to: '/' },
+            { label: 'Films' }
+          ]}
+          showOrnaments={false}
+        />
 
         {/* ══ INTRO ══════════════════════════════════════════ */}
         <section className="pf-intro">

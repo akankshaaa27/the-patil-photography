@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useSettings } from '../hooks/useSettings';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import PageHero from '../components/PageHero';
 
 const servicesList = [
   {
@@ -57,18 +58,15 @@ const Services = () => {
     <>
       <Header />
 
-      <div className="page-title dark-background" style={{ backgroundImage: "url('/assets/img/HomePage/7.webp')" }}>
-        <div className="container position-relative">
-          <h1>Services</h1>
-          <p>Explore the range of photography & filmmaking services we offer.</p>
-          <nav className="breadcrumbs">
-            <ol>
-              <li><a href="/">Home</a></li>
-              <li className="current">Services</li>
-            </ol>
-          </nav>
-        </div>
-      </div>
+      <PageHero
+        title="Services"
+        subtitle="Explore the range of photography & filmmaking services we offer."
+        backgroundImage="/assets/img/HomePage/7.webp"
+        breadcrumbs={[
+          { label: 'Home', to: '/' },
+          { label: 'Services' }
+        ]}
+      />
 
       <main className="main">
         <section id="services" className="services section light-background">

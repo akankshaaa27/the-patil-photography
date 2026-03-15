@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import PageHero from '../components/PageHero';
 
 const Terms = () => {
   useEffect(() => {
@@ -15,19 +16,15 @@ const Terms = () => {
     <>
       <Header />
       
-      {/* Page Title */}
-      <div className="page-title dark-background" style={{backgroundImage: "url('/assets/img/slider/4.jpg')"}}>
-        <div className="container position-relative">
-          <h1>Terms of Service</h1>
-          <p>Terms and conditions for using our services</p>
-          <nav className="breadcrumbs">
-            <ol>
-              <li><a href="/">Home</a></li>
-              <li className="current">Terms of Service</li>
-            </ol>
-          </nav>
-        </div>
-      </div>
+      <PageHero
+        title="Terms of Service"
+        subtitle="Terms and conditions for using our services"
+        backgroundImage="/assets/img/slider/4.jpg"
+        breadcrumbs={[
+          { label: 'Home', to: '/' },
+          { label: 'Terms of Service' }
+        ]}
+      />
 
       <main className="main">
         <section className="section mt-5 pt-5">

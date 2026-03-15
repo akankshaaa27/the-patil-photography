@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import PageHero from '../components/PageHero';
 
 const ServiceDetails = () => {
   useEffect(() => {
@@ -15,20 +16,16 @@ const ServiceDetails = () => {
     <>
       <Header />
       
-      {/* Page Title */}
-      <div className="page-title dark-background" style={{backgroundImage: "url('/assets/img/HomePage/7.webp')"}}>
-        <div className="container position-relative">
-          <h1>Service Details</h1>
-          <p>Detailed information about our photography services</p>
-          <nav className="breadcrumbs">
-            <ol>
-              <li><a href="/">Home</a></li>
-              <li><a href="/services">Services</a></li>
-              <li className="current">Service Details</li>
-            </ol>
-          </nav>
-        </div>
-      </div>
+      <PageHero
+        title="Service Details"
+        subtitle="Detailed information about our photography services"
+        backgroundImage="/assets/img/HomePage/7.webp"
+        breadcrumbs={[
+          { label: 'Home', to: '/' },
+          { label: 'Services', to: '/services' },
+          { label: 'Service Details' }
+        ]}
+      />
 
       <main className="main">
         <section className="section mt-5 pt-5">

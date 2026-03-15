@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import PageHero from "../components/PageHero";
 import { useSettings } from "../hooks/useSettings";
 import "./contact.css";
 
@@ -84,27 +85,16 @@ export default function Contact() {
 
       <div className="pp-main">
 
-        {/* ══ HERO ══════════════════════════════════════════════ */}
-        <section className="cnt-hero">
-          <div className="cnt-hero-bg">
-            <img src="/assets/img/HomePage/16.webp" alt="Contact hero" />
-          </div>
-          <div className="cnt-hero-veil" />
-          <div className="cnt-hero-body">
-            <span className="cnt-eyebrow">Let's Connect</span>
-            <h1 className="cnt-hero-title">Get in Touch</h1>
-            <p className="cnt-hero-sub">
-              We'd love to hear your story — reach out and let's create something beautiful together.
-            </p>
-            <nav aria-label="Breadcrumb">
-              <ol className="cnt-breadcrumb">
-                <li><Link to="/">Home</Link></li>
-                <li className="sep">›</li>
-                <li className="current">Contact</li>
-              </ol>
-            </nav>
-          </div>
-        </section>
+        <PageHero
+          eyebrow="Let's Connect"
+          title="Get in Touch"
+          subtitle="We'd love to hear your story — reach out and let's create something beautiful together."
+          backgroundImage="/assets/img/HomePage/16.webp"
+          breadcrumbs={[
+            { label: 'Home', to: '/' },
+            { label: 'Contact' }
+          ]}
+        />
 
         {/* ══ CONTACT BODY ══════════════════════════════════════ */}
         <section className="cnt-section">

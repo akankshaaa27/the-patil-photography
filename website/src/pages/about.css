@@ -108,49 +108,6 @@
   box-shadow: 0 10px 28px rgba(201,151,74,0.35);
 }
 
-/* ══════════════════════════════════════════════════════════
-   PAGE TITLE
-══════════════════════════════════════════════════════════ */
-.ab-page-title {
-  position: relative;
-  min-height: 480px;
-  display: flex;
-  align-items: flex-end;
-  background-size: cover;
-  background-position: center;
-  overflow: hidden;
-  padding: 0 var(--px) clamp(48px, 7vh, 80px);
-}
-.ab-page-title::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(13,11,9,0.88) 0%,
-    rgba(13,11,9,0.42) 50%,
-    rgba(13,11,9,0.18) 100%
-  );
-}
-.ab-page-title > * { position: relative; z-index: 1; }
-
-/* Ken-Burns on bg image */
-.ab-page-title::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: inherit;
-  background-size: cover;
-  background-position: center;
-  animation: ab-kb 14s ease-in-out alternate infinite;
-  z-index: 0;
-}
-
-.ab-page-title-inner {
-  position: relative;
-  z-index: 2;
-  max-width: var(--max-w);
-  width: 100%;
-  animation: ab-fade 1s ease both;
-}
 
 .ab-page-eyebrow {
   font-family: var(--ff-body);
@@ -430,14 +387,6 @@
   line-height: 1.7;
 }
 
-/* ══════════════════════════════════════════════════════════
-   PAGE TITLE — fix layering (bg image on element, not pseudo)
-══════════════════════════════════════════════════════════ */
-.ab-page-title {
-  background-attachment: scroll;
-}
-/* override the ::after trick — simpler approach */
-.ab-page-title::after { display: none; }
 
 /* ══════════════════════════════════════════════════════════
    RESPONSIVE

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import PageHero from "../components/PageHero";
 import { useSettings } from "../hooks/useSettings";
 import "./Quote.css";
 
@@ -89,21 +90,18 @@ export default function Quote() {
     <>
       <Header />
 
-      <main className="qt-main">
+      <main className="pp-main">
 
-        {/* ── PAGE TITLE ── */}
-        <div className="qt-page-title" style={{ backgroundImage: "url('/assets/img/HomePage/3.webp')" }}>
-          <div className="qt-page-title-inner">
-            <p className="qt-eyebrow">Reserve Your Date</p>
-            <h1 className="qt-page-heading">Book Us</h1>
-            <p className="qt-page-sub">Let's create unforgettable memories together</p>
-            <nav className="qt-breadcrumb">
-              <Link to="/">Home</Link>
-              <span>/</span>
-              <span>Book Us</span>
-            </nav>
-          </div>
-        </div>
+        <PageHero
+          eyebrow="Reserve Your Date"
+          title="Book Us"
+          subtitle="Let's create unforgettable memories together"
+          backgroundImage="/assets/img/HomePage/3.webp"
+          breadcrumbs={[
+            { label: 'Home', to: '/' },
+            { label: 'Book Us' }
+          ]}
+        />
 
         {/* ── INTRO ── */}
         <section className="qt-intro">

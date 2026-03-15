@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import PageHero from "../components/PageHero";
 import { useSettings } from "../hooks/useSettings";
 import "./about.css";
 
@@ -38,22 +39,16 @@ export default function About() {
     <>
       <Header />
 
-      {/* ── PAGE TITLE ─────────────────────────────────────── */}
-      <div
-        className="ab-page-title"
-        style={{ backgroundImage: "url('/assets/img/HomePage/16.webp')" }}
-      >
-        <div className="ab-page-title-inner">
-          <p className="ab-page-eyebrow">Our Story</p>
-          <h1 className="ab-page-heading">About Us</h1>
-          <p className="ab-page-sub">Discover our story and passion for capturing life's beautiful moments</p>
-          <nav className="ab-breadcrumb">
-            <a href="/">Home</a>
-            <span>/</span>
-            <span>About Us</span>
-          </nav>
-        </div>
-      </div>
+      <PageHero
+        eyebrow="Our Story"
+        title="About Us"
+        subtitle="Discover our story and passion for capturing life's beautiful moments"
+        backgroundImage="/assets/img/HomePage/16.webp"
+        breadcrumbs={[
+          { label: 'Home', to: '/' },
+          { label: 'About Us' }
+        ]}
+      />
 
       <main className="ab-main">
 

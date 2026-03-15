@@ -31,55 +31,6 @@
 
 @keyframes qt-fade { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
 
-/* ══════════════════════════════════════════════════════════
-   PAGE TITLE
-══════════════════════════════════════════════════════════ */
-.qt-page-title {
-  position: relative;
-  min-height: 480px;
-  display: flex;
-  align-items: flex-end;
-  background-size: cover;
-  background-position: center;
-  padding: 0 var(--qt-px) clamp(48px, 7vh, 80px);
-}
-.qt-page-title::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(to top,
-    rgba(13,11,9,0.90) 0%,
-    rgba(13,11,9,0.44) 50%,
-    rgba(13,11,9,0.18) 100%);
-  z-index: 1;
-}
-.qt-page-title-inner {
-  position: relative; z-index: 2;
-  max-width: var(--qt-max); width: 100%;
-  animation: qt-fade 1s ease both;
-}
-.qt-eyebrow {
-  font-size: 0.68rem; font-weight: 600;
-  letter-spacing: 0.26em; text-transform: uppercase;
-  color: var(--qt-gold); margin-bottom: 14px;
-}
-.qt-page-heading {
-  font-family: var(--qt-display);
-  font-size: clamp(3rem, 7vw, 5.5rem);
-  font-weight: 400; color: var(--qt-cream);
-  line-height: 1.05; margin: 0 0 16px;
-}
-.qt-page-sub {
-  font-size: 1rem; color: rgba(245,240,232,0.62);
-  font-style: italic; margin: 0 0 20px;
-  max-width: 420px; line-height: 1.7;
-}
-.qt-breadcrumb {
-  display: flex; gap: 10px; align-items: center;
-  font-size: 0.78rem; color: rgba(245,240,232,0.5);
-}
-.qt-breadcrumb a { color: var(--qt-gold); text-decoration: none; transition: opacity 0.2s; }
-.qt-breadcrumb a:hover { opacity: 0.75; }
-.qt-breadcrumb span:last-child { color: rgba(245,240,232,0.7); }
 
 /* ══════════════════════════════════════════════════════════
    INTRO

@@ -49,90 +49,7 @@
 /* ══════════════════════════════════════════════════════════
    HERO
 ══════════════════════════════════════════════════════════ */
-.pf-hero {
-  position: relative;
-  height: 72vh;
-  min-height: 520px;
-  display: flex;
-  align-items: flex-end;
-  overflow: hidden;
-}
 
-.pf-hero-bg {
-  position: absolute;
-  inset: 0;
-}
-.pf-hero-bg img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  animation: pf-kb 18s ease-in-out alternate infinite;
-}
-
-.pf-hero-veil {
-  position: absolute; inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(13,11,9,0.95) 0%,
-    rgba(13,11,9,0.5)  40%,
-    rgba(13,11,9,0.15) 100%
-  );
-  z-index: 1;
-}
-
-.pf-hero-body {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  max-width: var(--max-w);
-  margin: 0 auto;
-  padding: 0 var(--px) clamp(56px, 8vh, 90px);
-  animation: pf-fade 1s cubic-bezier(.2,.8,.2,1) both;
-}
-
-.pf-eyebrow {
-  display: inline-block;
-  font-family: var(--ff-body);
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 14px;
-}
-
-.pf-hero-title {
-  font-family: var(--ff-display);
-  font-size: clamp(3rem, 8vw, 6.5rem);
-  font-weight: 400;
-  color: var(--cream);
-  line-height: 1;
-  margin: 0 0 18px;
-}
-
-.pf-hero-sub {
-  font-size: clamp(0.9rem, 1.3vw, 1.05rem);
-  color: rgba(245,240,232,0.6);
-  font-style: italic;
-  margin: 0 0 28px;
-  max-width: 420px;
-  line-height: 1.75;
-}
-
-/* breadcrumb */
-.pf-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-}
-.pf-breadcrumb a {
-  color: rgba(245,240,232,0.5);
-  text-decoration: none;
-  transition: color 0.3s;
-}
-.pf-breadcrumb a:hover { color: var(--gold); }
 .pf-crumb-sep { color: var(--gold); font-size: 0.55rem; opacity: 0.7; }
 .pf-crumb-cur { color: var(--cream); }
 
@@ -426,7 +343,6 @@
 }
 
 @media (max-width: 768px) {
-  .pf-hero { height: 60vh; }
   .pf-grid { grid-template-columns: 1fr; gap: 20px; }
   .pf-tabs { gap: 8px; }
   .pf-tab  { padding: 8px 18px; }

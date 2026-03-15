@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import LuxGallery from "../components/LuxGallery";
+import PageHero from "../components/PageHero";
 import "./portfolio.css";
 
 /* ═══════════════════════════════════════════════════════════
@@ -313,40 +314,16 @@ const Portfolio = () => {
 
       <div className="pp-main" style={S.page}>
 
-        {/* ══ HERO ══════════════════════════════════════════════ */}
-        <section style={S.hero}>
-          <div style={S.heroBg}>
-            <img
-              src="/assets/img/HomePage/11.webp"
-              alt="Portfolio hero"
-              style={S.heroBgImg}
-            />
-          </div>
-          <div style={S.heroVeil} />
-          <div style={S.heroBody}>
-            <span style={S.eyebrow}>Wedding · Portrait · Cinema</span>
-            <h1 style={S.heroTitle}>Our Portfolio</h1>
-            <p style={S.heroSub}>
-              Timeless frames and cinematic stories, crafted with intention.
-            </p>
-            <nav style={S.breadcrumb}>
-              <Link
-                to="/"
-                style={S.breadcrumbLink}
-                onMouseEnter={(e) =>
-                  (e.target.style.color = "var(--gold, #c9974a)")
-                }
-                onMouseLeave={(e) =>
-                  (e.target.style.color = "rgba(245,240,232,0.5)")
-                }
-              >
-                Home
-              </Link>
-              <span style={S.breadcrumbSep}>›</span>
-              <span style={S.breadcrumbCurrent}>Portfolio</span>
-            </nav>
-          </div>
-        </section>
+        <PageHero
+          eyebrow="Wedding · Portrait · Cinema"
+          title="Our Portfolio"
+          subtitle="Timeless frames and cinematic stories, crafted with intention."
+          backgroundImage="/assets/img/HomePage/11.webp"
+          breadcrumbs={[
+            { label: 'Home', to: '/' },
+            { label: 'Portfolio' }
+          ]}
+        />
 
         {/* ══ INTRO BAND ════════════════════════════════════════ */}
         <section style={S.intro}>

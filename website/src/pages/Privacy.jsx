@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import PageHero from '../components/PageHero';
 
 const Privacy = () => {
   useEffect(() => {
@@ -15,19 +16,15 @@ const Privacy = () => {
     <>
       <Header />
       
-      {/* Page Title */}
-      <div className="page-title dark-background" style={{backgroundImage: "url('/assets/img/slider/webbg.webp')"}}>
-        <div className="container position-relative">
-          <h1>Privacy Policy</h1>
-          <p>How we protect and handle your personal information</p>
-          <nav className="breadcrumbs">
-            <ol>
-              <li><a href="/">Home</a></li>
-              <li className="current">Privacy Policy</li>
-            </ol>
-          </nav>
-        </div>
-      </div>
+      <PageHero
+        title="Privacy Policy"
+        subtitle="Learn how we collect, protect, and use your information"
+        backgroundImage="/assets/img/slider/webbg.webp"
+        breadcrumbs={[
+          { label: 'Home', to: '/' },
+          { label: 'Privacy Policy' }
+        ]}
+      />
 
       <main className="main">
         <section className="section mt-5 pt-5">

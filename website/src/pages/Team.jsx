@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import PageHero from "../components/PageHero";
 import "../App.css";
 
 const Team = () => {
@@ -28,19 +29,15 @@ const Team = () => {
         <>
             <Header />
 
-            {/* Page Title */}
-            <div className="page-title dark-background" style={{ backgroundImage: "url('/assets/img/HomePage/16.webp')" }}>
-                <div className="container position-relative">
-                    <h1>Our Team</h1>
-                    <p>The Creative Souls Capturing Your Story</p>
-                    <nav className="breadcrumbs">
-                        <ol>
-                            <li><a href="/">Home</a></li>
-                            <li className="current">Team</li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
+            <PageHero
+                title="Our Team"
+                subtitle="The Creative Souls Capturing Your Story"
+                backgroundImage="/assets/img/HomePage/16.webp"
+                breadcrumbs={[
+                    { label: 'Home', to: '/' },
+                    { label: 'Team' }
+                ]}
+            />
 
             <main className="main">
                 {/* Meet Our Team Section */}

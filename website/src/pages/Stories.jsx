@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import StoryModal from "../components/StoryModal";
+import PageHero from "../components/PageHero";
 import "./stories.css";
 
 export default function Stories() {
@@ -34,31 +35,16 @@ export default function Stories() {
       <main className="ps-main">
 
         {/* ══ HERO ═══════════════════════════════════════════ */}
-        <section className="ps-hero">
-          <div className="ps-hero-bg">
-            <img src="/assets/img/HomePage/128.webp" alt="Love Stories" />
-          </div>
-          <div className="ps-hero-veil" />
-          <div className="ps-hero-body">
-            <span className="ps-eyebrow">Captured Forever</span>
-            <h1 className="ps-hero-title">Love Stories</h1>
-            <p className="ps-hero-sub">
-              Real moments, genuine emotions — each one a world of its own.
-            </p>
-            <nav className="ps-breadcrumb">
-              <Link to="/">Home</Link>
-              <span className="ps-crumb-sep">✦</span>
-              <span className="ps-crumb-cur">Stories</span>
-            </nav>
-          </div>
-
-          {/* scattered ornamental petals */}
-          <div className="ps-hero-orns" aria-hidden="true">
-            {["✦","◎","✦","◈","✦"].map((o, i) => (
-              <span key={i} className={`ps-orn ps-orn-${i}`}>{o}</span>
-            ))}
-          </div>
-        </section>
+        <PageHero
+          eyebrow="Captured Forever"
+          title="Love Stories"
+          subtitle="Real moments, genuine emotions — each one a world of its own."
+          backgroundImage="/assets/img/HomePage/128.webp"
+          breadcrumbs={[
+            { label: "Home", to: "/" },
+            { label: "Stories" }
+          ]}
+        />
 
         {/* ══ INTRO ══════════════════════════════════════════ */}
         <section className="ps-intro">

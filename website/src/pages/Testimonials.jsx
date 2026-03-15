@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import PageHero from "../components/PageHero";
 import "./Testimonials.css";
 
 export default function Testimonials() {
@@ -100,21 +101,19 @@ export default function Testimonials() {
     <>
       <Header />
 
-      <main className="tm-main">
+       <main className="ps-main">
 
-        {/* ── PAGE TITLE ── */}
-        <div className="tm-page-title" style={{ backgroundImage: "url('/assets/img/HomePage/16.webp')" }}>
-          <div className="tm-page-title-inner">
-            <p className="tm-eyebrow">Kind Words</p>
-            <h1 className="tm-page-heading">Reviews &amp; Feedback</h1>
-            <p className="tm-page-sub">Words from the heart of our beloved couples</p>
-            <nav className="tm-breadcrumb">
-              <a href="/">Home</a>
-              <span>/</span>
-              <span>Reviews &amp; Feedback</span>
-            </nav>
-          </div>
-        </div>
+
+          <PageHero
+          eyebrow="Kind Words"
+          title="Reviews & Feedback"
+          subtitle="Words from the heart of our beloved couples"
+          backgroundImage="/assets/img/HomePage/16.webp"
+          breadcrumbs={[
+            { label: 'Home', to: '/' },
+            { label: 'Reviews & Feedback' }
+          ]}
+        />
 
         {/* ── REVIEWS SECTION ── */}
         <section className="tm-section">

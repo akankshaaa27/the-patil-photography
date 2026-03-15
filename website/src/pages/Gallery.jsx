@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import PageHero from "../components/PageHero";
 
 const Gallery = () => {
     const [galleryItems, setGalleryItems] = useState([]);
@@ -46,25 +47,15 @@ const Gallery = () => {
             <Header />
 
             <main className="main">
-                {/* Page Title */}
-                <div
-                    className="page-title dark-background"
-                    style={{ backgroundImage: "url('/assets/img/HomePage/84.webp')" }}
-                >
-                    <div className="container position-relative text-center">
-                        <h1>Our Gallery</h1>
-                        <p>
-                            Capturing life’s most precious moments through cinematic
-                            storytelling
-                        </p>
-                        <nav className="breadcrumbs">
-                            <ol>
-                                <li><a href="/">Home</a></li>
-                                <li className="current">Gallery</li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
+                <PageHero
+                title="Our Gallery"
+                subtitle="Capturing life’s most precious moments through cinematic storytelling"
+                backgroundImage="/assets/img/HomePage/84.webp"
+                breadcrumbs={[
+                    { label: 'Home', to: '/' },
+                    { label: 'Gallery' }
+                ]}
+            />
 
                 {/* Gallery Section */}
                 <section className="section py-5">
