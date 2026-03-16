@@ -25,8 +25,34 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // CORS configuration
+const defaultAllowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:8080',
+  'https://thepatilphotography.com',
+  'https://www.thepatilphotography.com'
+];
+
+const buildAllowedOrigins = () => {
+  const envOrigins = process.env.CORS_ORIGIN || '';
+  const parsed = envOrigins
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  return Array.from(new Set([...defaultAllowedOrigins, ...parsed]));
+};
+
+const allowedOrigins = buildAllowedOrigins();
+
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin(origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+      return callback(null, true);
+    }
+    console.warn(`⚠️  Blocked CORS origin: ${origin}`);
+    return callback(null, false);
+  },
   credentials: true,
   optionsSuccessStatus: 200,
 };

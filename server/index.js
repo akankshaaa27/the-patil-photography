@@ -36,6 +36,8 @@ const defaultAllowedOrigins = [
   "http://localhost:8080",
   "https://potography-webapp.vercel.app",
   "https://potography-webapp-website.vercel.app",
+  "https://thepatilphotography.com",
+  "https://www.thepatilphotography.com",
 ];
 
 const buildAllowedOrigins = () => {
