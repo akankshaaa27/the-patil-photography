@@ -81,6 +81,7 @@ const LuxGallery = ({ images = [], galleryId = "gallery" }) => {
       },
     });
   }, [images]);
+  
 
   const handleClick = useCallback((e, index) => {
     e.preventDefault();
