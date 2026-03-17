@@ -85,6 +85,19 @@ export default function Home() {
 
   /* overall page loading */
   const [pageLoading, setPageLoading] = useState(true);
+  const pageLoadingTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    pageLoadingTimeoutRef.current = setTimeout(() => {
+      setPageLoading(false);
+    }, 12000);
+
+    return () => {
+      if (pageLoadingTimeoutRef.current) {
+        clearTimeout(pageLoadingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   /* ── fetch ── */
   useEffect(() => {

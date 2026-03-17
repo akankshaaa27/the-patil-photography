@@ -11,11 +11,13 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(null);
+    setIsLoading(true);
 
     // Auto-handle "admin" shorthand
     const emailToSend =
@@ -45,6 +47,8 @@ const Login = () => {
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -144,9 +148,10 @@ const Login = () => {
               {/* Login Button */}
               <button
                 type="submit"
-                className="w-full bg-gold-500 hover:bg-gold-600 text-white font-semibold py-3 rounded-lg transition duration-200"
+                className="w-full bg-gold-500 hover:bg-gold-600 text-white font-semibold py-3 rounded-lg transition duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
+                disabled={isLoading}
               >
-                Login
+                {isLoading ? "Logging in..." : "Login"}
               </button>
             </form>
 

@@ -22,20 +22,27 @@
 .pp-gal-item {
   position: relative;
   overflow: hidden;
-  border-radius: 10px;
-  cursor: pointer;
+  border-radius: 16px;
+  cursor: zoom-in;
   background: #000;
+  box-shadow: 0 8px 26px rgba(13, 11, 9, 0.2);
+  transition: transform 0.4s, box-shadow 0.4s;
+}
+
+.pp-gal-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px rgba(13, 11, 9, 0.32);
 }
 
 .pp-gal-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s;
+  transition: transform 0.6s ease;
 }
 
 .pp-gal-item:hover img {
-  transform: scale(1.08);
+  transform: scale(1.05);
 }
 
 /* SHINE */
@@ -43,18 +50,19 @@
 .pp-gal-shine {
   position: absolute;
   inset: 0;
+  pointer-events: none;
   background: linear-gradient(120deg,
-      transparent 20%,
-      rgba(201, 151, 74, 0.2) 50%,
-      transparent 80%);
-  background-size: 200%;
+    rgba(255, 255, 255, 0.02) 0%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0.02) 100%);
+  background-size: 200% 100%;
   opacity: 0;
-  transition: 0.6s;
+  transition: opacity 0.5s ease, background-position 0.8s ease;
 }
 
 .pp-gal-item:hover .pp-gal-shine {
   opacity: 1;
-  background-position: -200%;
+  background-position: -200% 0;
 }
 
 .glightbox-clean .gclose path, .glightbox-clean .gnext path, .glightbox-clean .gprev path {
@@ -69,14 +77,16 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  padding: 12px;
-  background: linear-gradient(to top, rgba(0, 0, 0, .7), transparent);
+  padding: 14px;
+  background: linear-gradient(to top, rgba(0, 0, 0, .72), rgba(0, 0, 0, .15) 30%, transparent 75%);
   opacity: 0;
-  transition: 0.3s;
+  transform: translateY(10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .pp-gal-item:hover .pp-gal-overlay {
   opacity: 1;
+  transform: translateY(0);
 }
 
 .pp-gal-overlay-actions {
@@ -111,25 +121,41 @@
 }
 
 .pp-gal-overlay-icon {
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, .6);
-  border: 1px solid var(--pp-gold);
+  background: rgba(0, 0, 0, .55);
+  border: 1px solid rgba(201, 151, 74, .6);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--pp-gold);
-  transition: 0.3s;
+  transition: all 0.3s ease;
+  margin-right: 8px;
 }
 
 .pp-gal-overlay-icon svg {
-  width: 16px;
+  width: 18px;
+  height: 18px;
 }
 
 .pp-gal-overlay-icon:hover {
-  background: var(--pp-gold);
-  color: black;
+  background: rgba(201, 151, 74, .95);
+  color: #111;
+  transform: scale(1.08);
+}
+
+.pp-gal-open-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .45);
+  backdrop-filter: blur(4px);
 }
 
 /* LIGHTBOX BACKDROP */
